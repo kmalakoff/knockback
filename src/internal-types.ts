@@ -1,6 +1,6 @@
 import type * as Backbone from 'backbone';
 
-export type Creator<T = unknown> = { create?: (obj: unknown, options: CreateOptions) => T; models_only?: boolean } | (new (obj: unknown, options: CreateOptions) => T);
+export type Creator<T = unknown> = { create?: (obj: unknown, options: CreateOptions) => T; models_only?: boolean } | (new (obj: unknown, options: CreateOptions) => T) | ((obj: unknown, options: CreateOptions) => T);
 
 export type FactoriesOption<T = unknown> = Record<string, Creator<T>> | Creator<T>;
 

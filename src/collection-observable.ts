@@ -66,6 +66,7 @@ export function compare(valueA: unknown, valueB: unknown): number {
  * @param options - Additional options
  * @returns A Knockout observable array with Knockback extensions
  */
+export function collectionObservable<T = unknown>(inputCollection: Backbone.Collection | Backbone.Model[] | Record<string, unknown>[], viewModelOrOptions?: CollectionObservableOptions<T> | CollectionObservableOptions<T>['view_model'], options?: CollectionObservableOptions<T>): CollectionObservable<T>;
 export function collectionObservable<T = unknown>(inputCollection?: Backbone.Collection | unknown[], viewModelOrOptions?: unknown, options?: CollectionObservableOptions<T>): CollectionObservable<T> {
   return kb.ignore(() => {
     // Normalize arguments
@@ -150,7 +151,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
 
     // Factory
     state.path = mergedOptions.path;
-    createOptions.factory = utils.wrappedFactory(observable, shareOrCreateFactory(mergedOptions));
+    createOptions.factory = utils.wrappedFactory(observable, shareOrCreateFactory(mergedOptions as InternalCollectionObservableOptions));
     createOptions.path = utils.pathJoin(mergedOptions.path, 'models');
 
     // Check for models_only
@@ -257,6 +258,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
     // =============================================================================
 
     function dispose(): void {
+      if (state.__kb_released) return;
       state.__kb_released = true;
       const obs = utils.getObservable(state) as Observable & ko.ObservableArray;
       const coll = kb.peek(_collection);
@@ -274,12 +276,13 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
 
       _mapper.dispose();
 
-      kb.release(_filters);
+      _filters([]);
+      _filters = null as unknown as ko.ObservableArray<unknown>;
 
       _comparator(null);
 
       state.create_options = undefined as unknown as InternalCreateOptions;
-      utils.wrappedDestroy(state);
+      utils.disposeMetadata(state);
 
       const stats = (kb as { statistics?: { unregister: (name: string, obj: unknown) => void } }).statistics;
       if (stats) {

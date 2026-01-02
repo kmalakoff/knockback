@@ -33,7 +33,8 @@ export class Store {
   }
 
   // Clean up the store
-  destroy(): void {
+  dispose(): void {
+    if (this.__kb_released) return;
     this.__kb_released = true;
     this.clear();
 
@@ -158,7 +159,7 @@ export class Store {
   // Release an observable
   release(observable: unknown, force?: boolean): void {
     if (!this._canRegister(observable)) {
-      kb.release(observable);
+      (observable as { dispose?: () => void }).dispose?.();
       return;
     }
 
@@ -175,7 +176,12 @@ export class Store {
     if ((observable as { __kb_released?: boolean }).__kb_released) return;
 
     if (force || this._refCount(observable) <= 1) {
-      kb.release(observable);
+      const disposable = observable as { dispose?: () => void };
+      if (typeof disposable.dispose === 'function') {
+        disposable.dispose();
+      } else if (observable && typeof observable === 'object') {
+        utils.disposeDisposableKeys(observable as Record<string, unknown>);
+      }
     }
   }
 

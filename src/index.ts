@@ -28,22 +28,21 @@ export const VERSION = kbCore.VERSION;
 // Memory Management
 // =============================================================================
 
-export const release = kbCore.release.bind(kbCore);
 export const releaseOnNodeRemove = kbCore.releaseOnNodeRemove.bind(kbCore);
 export const applyBindings = kbCore.applyBindings.bind(kbCore);
 export const renderTemplate = kbCore.renderTemplate.bind(kbCore);
-export const wasReleased = kbCore.wasReleased.bind(kbCore);
 export const isReleaseable = kbCore.isReleaseable.bind(kbCore);
 export const isModel = kbCore.isModel.bind(kbCore);
 export const isCollection = kbCore.isCollection.bind(kbCore);
 export const isViewModel = kbCore.isViewModel.bind(kbCore);
+export const dispose = kbCore.dispose.bind(kbCore);
 
 // =============================================================================
 // Localization
 // =============================================================================
 
-export const getLocaleManager = (): LocaleManager | null => kbCore.locale_manager;
-export const setLocaleManager = (manager: LocaleManager | null): void => {
+export const getLocaleManager = <T extends LocaleManager = LocaleManager>(): T | null => kbCore.locale_manager as T | null;
+export const setLocaleManager = <T extends LocaleManager>(manager: T | null): void => {
   kbCore.locale_manager = manager;
 };
 export { localizedObservable };
@@ -83,11 +82,11 @@ export type { CollectionObservable, CollectionObservableOptions, LocaleManager, 
 // =============================================================================
 
 export namespace kb {
-  export type Observable<T = unknown> = ko.Observable<T>;
+  export type Observable<T = unknown> = import('./types.ts').Observable<T>;
   export type Computed<T = unknown> = ko.Computed<T>;
   export type ObservableArray<T = unknown> = ko.ObservableArray<T>;
   export type CollectionObservable<T = unknown> = import('./types.ts').CollectionObservable<T>;
-  export type ViewModel<T extends Record<string, unknown> = Record<string, unknown>> = import('./types.ts').ViewModel<T>;
+  export type ViewModel<T extends object = Record<string, unknown>> = import('./types.ts').ViewModel<T>;
 }
 
 // =============================================================================
@@ -99,7 +98,7 @@ export const kb: {
     ...args: unknown[]
   ) => {
     dispose(): void;
-    model: ko.Computed<Backbone.Model | null>;
+    model: ko.Computed<Backbone.Model | null> & ((value: Backbone.Model | null) => void);
     [key: string]: unknown;
   };
   observable: typeof observable;
@@ -111,15 +110,14 @@ export const kb: {
   TYPE_MODEL: typeof TYPE_MODEL;
   TYPE_SIMPLE: typeof TYPE_SIMPLE;
   TYPE_UNKNOWN: typeof TYPE_UNKNOWN;
-  release: typeof release;
   releaseOnNodeRemove: typeof releaseOnNodeRemove;
   applyBindings: typeof applyBindings;
   renderTemplate: typeof renderTemplate;
-  wasReleased: typeof wasReleased;
   isReleaseable: typeof isReleaseable;
   isModel: typeof isModel;
   isCollection: typeof isCollection;
   isViewModel: typeof isViewModel;
+  dispose: typeof dispose;
   getLocaleManager: typeof getLocaleManager;
   setLocaleManager: typeof setLocaleManager;
   localizedObservable: typeof localizedObservable;
@@ -146,15 +144,14 @@ export const kb: {
   TYPE_MODEL,
   TYPE_SIMPLE,
   TYPE_UNKNOWN,
-  release,
   releaseOnNodeRemove,
   applyBindings,
   renderTemplate,
-  wasReleased,
   isReleaseable,
   isModel,
   isCollection,
   isViewModel,
+  dispose,
   getLocaleManager,
   setLocaleManager,
   localizedObservable,

@@ -134,7 +134,7 @@ export function localizedObservable(value: unknown, options: LocalizedObservable
   // biome-ignore lint/suspicious/noExplicitAny: Wrapping observable with default value changes type
   let result: any = observable;
   if (options.default !== undefined) {
-    result = defaultObservable(observable, options.default);
+    result = defaultObservable<unknown>(observable, options.default);
   }
 
   return result;
@@ -144,12 +144,14 @@ export function localizedObservable(value: unknown, options: LocalizedObservable
   // =============================================================================
 
   function dispose(): void {
+    if (state.__kb_released) return;
+    state.__kb_released = true;
     const localeManager = kb.locale_manager as LocaleManager;
     if (localeManager?.off && state.__kb._onLocaleChange) {
       localeManager.off('change', state.__kb._onLocaleChange);
     }
     state.vm = {};
-    utils.wrappedDestroy(state);
+    utils.disposeMetadata(state);
   }
 
   function resetToCurrent(): void {

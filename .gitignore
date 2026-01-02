@@ -7,7 +7,6 @@ npm-debug.log*
 .cache/
 
 # agents
-.agents/
 AGENTS.md
 .claude/
 CLAUDE.md

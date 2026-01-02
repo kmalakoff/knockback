@@ -21,7 +21,7 @@ describe('observable advanced', () => {
       model.set('name', 'Starr');
       assert.strictEqual(nameObs(), 'First: Starr', 'Custom read updates with model');
 
-      kb.release(nameObs);
+      nameObs.dispose();
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
     });
@@ -44,7 +44,7 @@ describe('observable advanced', () => {
       assert.strictEqual(model.get('number'), '9222-222-222', 'Custom write applied');
       assert.strictEqual(numberObs(), '#: 9222-222-222', 'Read reflects write');
 
-      kb.release(numberObs);
+      numberObs.dispose();
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
     });
@@ -70,7 +70,7 @@ describe('observable advanced', () => {
       assert.strictEqual(nameObs(), 'John', 'Write trimmed value');
       assert.strictEqual(formattedName(), 'John');
 
-      kb.release(nameObs);
+      nameObs.dispose();
       formattedName.dispose();
 
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
@@ -84,7 +84,7 @@ describe('observable advanced', () => {
       kb.setStatistics(stats);
 
       const model = new Backbone.Model({ id: 1, name: 'Bob' });
-      const obs = kb.observable(model, 'name') as unknown as ko.Observable & { model: ko.Observable<Backbone.Model | null> };
+      const obs = kb.observable<string>(model, 'name');
 
       let count = 0;
       ko.computed(() => {
@@ -100,7 +100,7 @@ describe('observable advanced', () => {
       obs.model(model);
       assert.strictEqual(count, 3, 'Model restored');
 
-      kb.release(obs);
+      obs.dispose();
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
     });
@@ -133,7 +133,7 @@ describe('observable advanced', () => {
       assert.strictEqual(countManual, 1, 'Manual write computed did not re-run');
       assert.strictEqual(observableCount, 2, 'Observable read computed re-ran');
 
-      kb.release(obs);
+      obs.dispose();
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
     });
@@ -149,12 +149,12 @@ describe('observable advanced', () => {
       class TestViewModel {
         // biome-ignore lint/suspicious/noExplicitAny: Test class with dynamic properties
         [key: string]: any;
-        number: ko.Observable<number>;
-        formatted_number: ko.Observable<string>;
+        number: kb.Observable<number>;
+        formatted_number: kb.Observable<string>;
 
         constructor(m: Backbone.Model) {
-          this.number = kb.observable(m, 'number') as unknown as ko.Observable<number>;
-          this.formatted_number = kb.observable(
+          this.number = kb.observable<number>(m, 'number');
+          this.formatted_number = kb.observable<string>(
             m,
             {
               key: 'number',
@@ -162,8 +162,8 @@ describe('observable advanced', () => {
               write: (value: string) => this.number(parseInt(value.substring(3), 10)),
             },
             {},
-            this as unknown as Record<string, unknown>
-          ) as unknown as ko.Observable<string>;
+            this
+          );
         }
       }
 
@@ -173,7 +173,7 @@ describe('observable advanced', () => {
       vm.formatted_number('#: 42');
       assert.strictEqual(vm.number(), 42);
 
-      kb.release(vm);
+      kb.dispose(vm);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
     });
@@ -188,7 +188,7 @@ describe('observable advanced', () => {
       const m1 = new Backbone.Model({ n: 'm1' });
       const m2 = new Backbone.Model({ n: 'm2' });
 
-      const obs = kb.observable(m1, 'n') as unknown as ko.Observable<string> & { model: (m?: Backbone.Model | null) => Backbone.Model | null };
+      const obs = kb.observable<string>(m1, 'n');
 
       obs.subscribe((nv: string) => values.push(nv));
 
@@ -207,7 +207,7 @@ describe('observable advanced', () => {
       m1.set({ n: 'm1_4' });
       assert.deepStrictEqual(values, ['m1_2', 'm2', 'm2_2'], 'Still no update from old model');
 
-      kb.release(obs);
+      obs.dispose();
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
     });
@@ -236,7 +236,7 @@ describe('observable advanced', () => {
       assert.ok(receivedArgs.includes('name'), 'Received string arg');
       assert.ok(receivedArgs.includes(1), 'Received number arg');
 
-      kb.release(obs);
+      obs.dispose();
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
     });

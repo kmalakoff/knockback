@@ -5,7 +5,7 @@ interface KBObject {
 }
 
 // Clean up all kb metadata on an object
-export default function wrappedDestroy(obj: KBObject): void {
+export default function disposeMetadata(obj: KBObject): void {
   if (!obj.__kb) return;
 
   // Release event watcher callbacks
@@ -22,12 +22,8 @@ export default function wrappedDestroy(obj: KBObject): void {
     // biome-ignore lint/suspicious/noExplicitAny: Clearing dynamic properties
     const obs = __kb.observable as any;
     obs.dispose = undefined;
-    const disposeSymbol = (Symbol as unknown as { dispose?: symbol }).dispose;
-    if (disposeSymbol) {
-      obs[disposeSymbol] = undefined;
-    }
     obs.release = undefined;
-    wrappedDestroy(__kb.observable as unknown as KBObject);
+    disposeMetadata(__kb.observable as unknown as KBObject);
     __kb.observable = undefined;
   }
 
@@ -36,13 +32,13 @@ export default function wrappedDestroy(obj: KBObject): void {
 
   // Release owned event watcher
   if (__kb.event_watcher_is_owned && __kb.event_watcher) {
-    __kb.event_watcher.destroy();
+    __kb.event_watcher.dispose();
   }
   __kb.event_watcher = undefined;
 
   // Release owned store
   if (__kb.store_is_owned && __kb.store) {
-    __kb.store.destroy();
+    __kb.store.dispose();
   }
   __kb.store = undefined;
 

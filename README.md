@@ -76,18 +76,18 @@ const vm = kb.viewModel<PersonViewModel>(model, {
 ko.applyBindings(vm);
 
 // ... do stuff then clean up
-kb.release(vm);
+vm.dispose();
 
 Named imports are also supported if you prefer them:
 
 ```typescript
-import { viewModel, release } from '@mcpeasy/knockback';
+import { viewModel } from '@mcpeasy/knockback';
 
 const vm = viewModel<PersonViewModel>(model);
-release(vm);
+vm.dispose();
 ```
 
-// dispose() is attached automatically and is called by release/releaseOnNodeRemove.
+// dispose() is attached automatically and is called by releaseOnNodeRemove / KO component disposal.
 // You no longer call destroy() manually.
 ```
 
@@ -119,14 +119,34 @@ Now, the greeting updates as you type!
 - `observable(model, key, options?)` - Create an observable bound to a model attribute
 - `viewModel(model, options?)` - Create observables for all model attributes
 - `collectionObservable(collection, options?)` - Create an observable array bound to a collection
-- `release(obj)` - Release a view model or observable and all its resources
-- `dispose()` - Attached to view models/observables; called by `release` and `releaseOnNodeRemove`
+- `dispose()` - Attached to view models/observables; called by `releaseOnNodeRemove` and KO component disposal
+- `dispose(obj)` - Helper to dispose plain objects that contain Knockback observables
 
 ### Plugins
 
-- `defaultObservable(observable, defaultValue)` - Provide default values
+- `defaultObservable<T>(observable, defaultValue)` - Provide default values
 - `formattedObservable(format, ...args)` - Two-way string formatting
 - `localizedObservable(value, options)` - Locale-aware observables
+
+### Localization (typed)
+
+```ts
+import kb from '@mcpeasy/knockback';
+import type { LocaleManager } from '@mcpeasy/knockback';
+
+class MyLocaleManager implements LocaleManager {
+  get(id: string): string {
+    return id;
+  }
+  getLocale(): string {
+    return 'en';
+  }
+  setLocale(_locale: string): void {}
+}
+
+kb.setLocaleManager(new MyLocaleManager());
+const localeManager = kb.getLocaleManager<MyLocaleManager>();
+```
 - `triggeredObservable(emitter, event)` - Event-based observable updates
 - `valueValidator(observable, validators)` - Value validation
 

@@ -161,7 +161,9 @@ export function formattedObservable(format: string | ko.Observable<string>, ...a
   // =============================================================================
 
   function dispose(): void {
-    utils.wrappedDestroy(state);
+    if (state.__kb_released) return;
+    state.__kb_released = true;
+    utils.disposeMetadata(state);
   }
 }
 

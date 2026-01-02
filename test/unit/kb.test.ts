@@ -22,14 +22,14 @@ describe('@mcpeasy/knockback', () => {
   describe('kb.observable', () => {
     it('should create an observable from a model attribute', () => {
       const model = new Backbone.Model({ name: 'Bob' });
-      const nameObs = kb.observable(model, 'name');
+      const nameObs = kb.observable<string>(model, 'name');
 
       assert.strictEqual(nameObs(), 'Bob');
     });
 
     it('should update when model changes', () => {
       const model = new Backbone.Model({ name: 'Bob' });
-      const nameObs = kb.observable(model, 'name');
+      const nameObs = kb.observable<string>(model, 'name');
 
       assert.strictEqual(nameObs(), 'Bob');
       model.set('name', 'Fred');
@@ -38,7 +38,7 @@ describe('@mcpeasy/knockback', () => {
 
     it('should update model when observable changes', () => {
       const model = new Backbone.Model({ name: 'Bob' });
-      const nameObs = kb.observable(model, 'name');
+      const nameObs = kb.observable<string>(model, 'name');
 
       nameObs('Alice');
       assert.strictEqual(model.get('name'), 'Alice');
@@ -47,33 +47,48 @@ describe('@mcpeasy/knockback', () => {
 
   describe('kb.viewModel', () => {
     it('should create observables for all model attributes', () => {
-      const model = new Backbone.Model({ first_name: 'Bob', last_name: 'Smith' });
-      const vm = viewModel(model);
+      interface PersonViewModel {
+        first_name: ko.Observable<string>;
+        last_name: ko.Observable<string>;
+      }
 
-      assert.ok(ko.isObservable((vm as Record<string, unknown>).first_name));
-      assert.ok(ko.isObservable((vm as Record<string, unknown>).last_name));
-      assert.strictEqual(((vm as Record<string, unknown>).first_name as ko.Observable)(), 'Bob');
-      assert.strictEqual(((vm as Record<string, unknown>).last_name as ko.Observable)(), 'Smith');
+      const model = new Backbone.Model({ first_name: 'Bob', last_name: 'Smith' });
+      const vm = viewModel<PersonViewModel>(model);
+
+      assert.ok(ko.isObservable(vm.first_name));
+      assert.ok(ko.isObservable(vm.last_name));
+      assert.strictEqual(vm.first_name(), 'Bob');
+      assert.strictEqual(vm.last_name(), 'Smith');
     });
 
     it('should sync changes with model', () => {
-      const model = new Backbone.Model({ name: 'Bob' });
-      const vm = kb.viewModel(model);
+      interface NameViewModel {
+        name: ko.Observable<string>;
+      }
 
-      ((vm as Record<string, unknown>).name as ko.Observable)('Fred');
+      const model = new Backbone.Model({ name: 'Bob' });
+      const vm = kb.viewModel<NameViewModel>(model);
+
+      vm.name('Fred');
       assert.strictEqual(model.get('name'), 'Fred');
 
       model.set('name', 'Alice');
-      assert.strictEqual(((vm as Record<string, unknown>).name as ko.Observable)(), 'Alice');
+      assert.strictEqual(vm.name(), 'Alice');
     });
 
     it('should support keys option', () => {
-      const model = new Backbone.Model({ name: 'Bob', age: 30, email: 'bob@example.com' });
-      const vm = kb.viewModel(model, { keys: ['name', 'age'] });
+      interface KeysViewModel {
+        name: ko.Observable<string>;
+        age: ko.Observable<number>;
+        email?: ko.Observable<string>;
+      }
 
-      assert.ok(ko.isObservable((vm as Record<string, unknown>).name));
-      assert.ok(ko.isObservable((vm as Record<string, unknown>).age));
-      assert.strictEqual((vm as Record<string, unknown>).email, undefined);
+      const model = new Backbone.Model({ name: 'Bob', age: 30, email: 'bob@example.com' });
+      const vm = kb.viewModel<KeysViewModel>(model, { keys: ['name', 'age'] });
+
+      assert.ok(ko.isObservable(vm.name));
+      assert.ok(ko.isObservable(vm.age));
+      assert.strictEqual(vm.email, undefined);
     });
   });
 
@@ -108,23 +123,27 @@ describe('@mcpeasy/knockback', () => {
     });
   });
 
-  describe('kb.release', () => {
-    it('should release view models', () => {
+  describe('dispose()', () => {
+    it('should dispose view models', () => {
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
       const model = new Backbone.Model({ name: 'Bob' });
       const vm = kb.viewModel(model);
 
-      assert.ok(!kb.wasReleased(vm));
-      kb.release(vm);
-      assert.ok(kb.wasReleased(vm));
+      vm.dispose();
+      assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
+      kb.setStatistics(null);
     });
 
-    it('should release observables', () => {
+    it('should dispose observables', () => {
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
       const model = new Backbone.Model({ name: 'Bob' });
-      const obs = kb.observable(model, 'name');
+      const obs = kb.observable<string>(model, 'name');
 
-      assert.ok(!kb.wasReleased(obs));
-      kb.release(obs);
-      assert.ok(kb.wasReleased(obs));
+      obs.dispose();
+      assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
+      kb.setStatistics(null);
     });
   });
 });

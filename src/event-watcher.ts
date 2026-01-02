@@ -22,6 +22,7 @@ interface EventWatcherMetadata extends KBMetadata {
 // Aggregates model events for efficient event handling
 export class EventWatcher {
   __kb: EventWatcherMetadata;
+  __kb_released = false;
   ee: Backbone.Model | null = null;
 
   // Use existing event watcher from options or create a new one
@@ -54,10 +55,12 @@ export class EventWatcher {
   }
 
   // Clean up
-  destroy(): void {
+  dispose(): void {
+    if (this.__kb_released) return;
+    this.__kb_released = true;
     this.emitter(null);
     this.__kb.callbacks = null;
-    utils.wrappedDestroy(this);
+    utils.disposeMetadata(this);
   }
 
   // Get or set the emitter (model)

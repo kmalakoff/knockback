@@ -235,6 +235,7 @@ export class ViewModelClass {
 
   // Clean up
   dispose(): void {
+    if (this.__kb_released) return;
     this.__kb_released = true;
     const __kb = this.__kb as ViewModelMetadata;
 
@@ -249,8 +250,8 @@ export class ViewModelClass {
     __kb.view_model = undefined;
     __kb.create_options = undefined;
 
-    kb.releaseKeys(this as unknown as Record<string, unknown>);
-    utils.wrappedDestroy(this);
+    utils.disposeDisposableKeys(this as unknown as Record<string, unknown>);
+    utils.disposeMetadata(this);
 
     const statistics = (kb as { statistics?: { unregister: (name: string, obj: unknown) => void } }).statistics;
     if (statistics) {
@@ -320,6 +321,10 @@ export class ViewModelClass {
 
 /**
  * Creates a ViewModel for a Backbone model.
+ *
+ * @example
+ * import { viewModel } from '@mcpeasy/knockback';
+ * const vm = viewModel<PersonViewModel>(model);
  *
  * @param model - The Backbone model
  * @param options - View model options or array of attribute keys

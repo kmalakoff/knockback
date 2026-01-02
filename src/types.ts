@@ -36,7 +36,7 @@ export interface ObservableOptions {
     ...args: unknown[]
   ) => unknown;
   /** Factory mappings for nested view models */
-  factories?: Record<string, unknown> | { create?: (obj: unknown, options: { path?: string; creator?: unknown }) => unknown; models_only?: boolean } | (new (obj: unknown, options: { path?: string; creator?: unknown }) => unknown);
+  factories?: Record<string, unknown> | { create?: (obj: unknown, options: { path?: string; creator?: unknown }) => unknown; models_only?: boolean } | (new (obj: unknown, options: { path?: string; creator?: unknown }) => unknown) | ((obj: unknown, options: { path?: string; creator?: unknown }) => unknown);
   /** Path for nested view model creation */
   path?: string;
 }
@@ -58,11 +58,11 @@ export interface ViewModelOptions {
   /** Per-key observable options */
   mappings?: Record<string, ObservableOptions>;
   /** Factory mappings for nested view models */
-  factories?: Record<string, unknown> | { create?: (obj: unknown, options: { path?: string; creator?: unknown }) => unknown; models_only?: boolean } | (new (obj: unknown, options: { path?: string; creator?: unknown }) => unknown);
+  factories?: Record<string, unknown> | { create?: (obj: unknown, options: { path?: string; creator?: unknown }) => unknown; models_only?: boolean } | (new (obj: unknown, options: { path?: string; creator?: unknown }) => unknown) | ((obj: unknown, options: { path?: string; creator?: unknown }) => unknown);
   /** Path for nested view model creation */
   path?: string;
   /** Custom creator for this view model */
-  creator?: { create?: (obj: unknown, options: { path?: string; creator?: unknown }) => unknown; models_only?: boolean } | (new (obj: unknown, options: { path?: string; creator?: unknown }) => unknown);
+  creator?: { create?: (obj: unknown, options: { path?: string; creator?: unknown }) => unknown; models_only?: boolean } | (new (obj: unknown, options: { path?: string; creator?: unknown }) => unknown) | ((obj: unknown, options: { path?: string; creator?: unknown }) => unknown);
   /** Nested options (for inheritance) */
   options?: ViewModelOptions;
   /**
@@ -93,8 +93,12 @@ export interface ViewModelOptions {
 
 /** Options for kb.collectionObservable() */
 export interface CollectionObservableOptions<T = unknown> {
+  /** Shared store for view model reuse */
+  store?: unknown;
+  /** Shared factory for nested mappings */
+  factory?: unknown;
   /** View model constructor or creator for collection items */
-  view_model?: { create?: (obj: unknown, options: { path?: string; creator?: unknown }) => T; models_only?: boolean } | (new (obj: unknown, options: { path?: string; creator?: unknown }) => T);
+  view_model?: { create?: (obj: unknown, options: { path?: string; creator?: unknown }) => T; models_only?: boolean } | (new (obj: unknown, options: { path?: string; creator?: unknown }) => T) | ((obj: unknown, options: { path?: string; creator?: unknown }) => T);
   /** Custom create function for collection items */
   create?: (model: Backbone.Model, options: { path?: string; creator?: unknown }) => T;
   /** If true, array contains models instead of view models */
@@ -108,7 +112,7 @@ export interface CollectionObservableOptions<T = unknown> {
   /** Filter(s) for which models to include */
   filters?: string | ((model: Backbone.Model) => boolean) | Array<string | ((model: Backbone.Model) => boolean)>;
   /** Factory mappings for nested view models */
-  factories?: Record<string, unknown> | { create?: (obj: unknown, options: { path?: string; creator?: unknown }) => T; models_only?: boolean } | (new (obj: unknown, options: { path?: string; creator?: unknown }) => T);
+  factories?: Record<string, unknown> | { create?: (obj: unknown, options: { path?: string; creator?: unknown }) => T; models_only?: boolean } | (new (obj: unknown, options: { path?: string; creator?: unknown }) => T) | ((obj: unknown, options: { path?: string; creator?: unknown }) => T);
   /** Path for nested view model creation */
   path?: string;
 }
@@ -121,13 +125,13 @@ export interface CollectionObservableOptions<T = unknown> {
  * Knockback observable - a ko.Computed bound to a model attribute.
  * Created via `observable(model, key)` or `observable(model, options)`.
  */
-export interface Observable<T = unknown> extends ko.Computed<T> {
-  /** Dispose and release all resources (called by kb.release/releaseOnNodeRemove) */
+export interface Observable<T = unknown> extends ko.Observable<T> {
+  /** Dispose and release all resources (called by releaseOnNodeRemove / KO component disposal) */
   dispose(): void;
   /** Get the current value type (TYPE_SIMPLE, TYPE_MODEL, etc.) */
   valueType(): typeof TYPE_UNKNOWN | typeof TYPE_SIMPLE | typeof TYPE_ARRAY | typeof TYPE_MODEL | typeof TYPE_COLLECTION;
   /** Observable for the underlying model */
-  readonly model: ko.Computed<Backbone.Model | null>;
+  readonly model: ko.Computed<Backbone.Model | null> & ((value: Backbone.Model | null) => void);
 }
 
 /** Public observable type alias */
@@ -136,10 +140,10 @@ export interface Observable<T = unknown> extends ko.Computed<T> {
  * Created via `collectionObservable(collection, options)`.
  */
 export interface CollectionObservable<T = unknown> extends ko.ObservableArray<T> {
-  /** Dispose and release all resources (called by kb.release/releaseOnNodeRemove) */
+  /** Dispose and release all resources (called by releaseOnNodeRemove / KO component disposal) */
   dispose(): void;
   /** Observable for the underlying collection */
-  readonly collection: ko.Computed<Backbone.Collection | null>;
+  readonly collection: ko.Computed<Backbone.Collection | null> & ((value: Backbone.Collection | null) => void);
   /** Set or get filters for which models to include */
   filters(filters?: string | ((model: Backbone.Model) => boolean) | Array<string | ((model: Backbone.Model) => boolean)>): Array<string | ((model: Backbone.Model) => boolean)>;
   /** Set comparator function for sorting */
@@ -175,10 +179,10 @@ export interface CollectionObservable<T = unknown> extends ko.ObservableArray<T>
  * vm.name(); // returns string
  */
 export type ViewModel<T extends object = Record<string, unknown>> = {
-  /** Dispose and release all resources (called by kb.release/releaseOnNodeRemove) */
+  /** Dispose and release all resources (called by releaseOnNodeRemove / KO component disposal) */
   dispose(): void;
   /** Observable for the underlying model */
-  readonly model: ko.Computed<Backbone.Model | null>;
+  readonly model: ko.Computed<Backbone.Model | null> & ((value: Backbone.Model | null) => void);
 } & T;
 
 // =============================================================================
@@ -214,7 +218,7 @@ export interface LocaleManager {
  */
 export interface Store {
   __kb_released?: boolean;
-  destroy(): void;
+  dispose(): void;
   clear(): void;
   compact(): void;
   release(observable: unknown, force?: boolean): void;
@@ -244,8 +248,9 @@ export interface Factory {
  */
 export interface EventWatcher {
   __kb: { callbacks?: Record<string, unknown> | null };
+  __kb_released?: boolean;
   ee: Backbone.Model | null;
-  destroy(): void;
+  dispose(): void;
   emitter(): Backbone.Model | null;
   emitter(newEmitter: Backbone.Model | null): Backbone.Model | null;
   registerCallbacks(obj: unknown, callbackInfo: EventCallbackInfo): this;
@@ -302,7 +307,7 @@ export interface ObservableInternal<T = unknown> extends Omit<Observable<T>, 'mo
   __kb_is_o?: boolean;
   __kb_released?: boolean;
   /** Writable during construction, readonly after */
-  model: ko.Computed<Backbone.Model | null>;
+  model: ko.Computed<Backbone.Model | null> & ((value: Backbone.Model | null) => void);
 }
 
 /**
@@ -315,7 +320,7 @@ export interface CollectionObservableInternal<T = unknown> extends Omit<Collecti
   __kb_is_co?: boolean;
   __kb_released?: boolean;
   /** Writable during construction, readonly after */
-  collection: ko.Computed<Backbone.Collection | null>;
+  collection: ko.Computed<Backbone.Collection | null> & ((value: Backbone.Collection | null) => void);
 }
 
 /**
@@ -335,12 +340,12 @@ export interface ViewModelInternal
   __kb_is_vm?: boolean;
   __kb_released?: boolean;
   /** Writable during construction, readonly after */
-  model: ko.Computed<Backbone.Model | null>;
+  model: ko.Computed<Backbone.Model | null> & ((value: Backbone.Model | null) => void);
 }
 
 /**
  * Base type for checking any Knockback object (internal)
- * Used for type guards and release logic.
+ * Used for type guards and disposal logic.
  * @internal
  */
 export interface ObservableBase {

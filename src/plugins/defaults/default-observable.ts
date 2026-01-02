@@ -32,7 +32,7 @@ export interface DefaultObservableInstance {
  * @example
  *   const wrapped_name = kb.defaultObservable(kb.observable(model, 'name'), '(no name)');
  */
-export function defaultObservable(targetObservable: ko.Observable, defaultValue: unknown): ko.Observable & { dispose: () => void; setToDefault: () => void } {
+export function defaultObservable<T>(targetObservable: ko.Observable<T>, defaultValue: T): ko.Observable<T> & { dispose: () => void; setToDefault: () => void } {
   // Instance state (closure-based)
   const state: DefaultObservableInstance = {
     __kb: {},
@@ -52,11 +52,11 @@ export function defaultObservable(targetObservable: ko.Observable, defaultValue:
         }
         return currentTarget;
       },
-      write: (value: unknown) => {
+      write: (value: T) => {
         targetObservable(value);
       },
     })
-  ) as ko.Observable & { dispose: () => void; setToDefault: () => void };
+  ) as ko.Observable<T> & { dispose: () => void; setToDefault: () => void };
 
   // Publish public interface on the observable
   kb.publishMethods(observable as unknown as Record<string, unknown>, state, KEYS_PUBLISH as unknown as string[]);
@@ -69,7 +69,9 @@ export function defaultObservable(targetObservable: ko.Observable, defaultValue:
   // =============================================================================
 
   function dispose(): void {
-    utils.wrappedDestroy(state);
+    if (state.__kb_released) return;
+    state.__kb_released = true;
+    utils.disposeMetadata(state);
   }
 
   function setToDefault(): void {

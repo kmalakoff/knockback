@@ -1,9 +1,6 @@
 import Backbone from 'backbone';
 import ko from 'knockout';
-import type { KBSettings, LocaleManager, ObservableBase } from './types.ts';
-import { TYPE_COLLECTION } from './types.ts';
-
-const LIFECYCLE_METHODS = ['release', 'dispose'] as const;
+import type { KBSettings, LocaleManager } from './types.ts';
 
 // Get global window object (works in browser and Node)
 const globalWindow: (Window & typeof globalThis) | undefined = typeof window !== 'undefined' ? window : undefined;
@@ -37,142 +34,70 @@ const kb = {
   // Statistics (for debugging/testing)
   statistics: null as StatisticsLike | null,
 
-  // Checks if an object has been released
+  // Checks if an object has been released (internal)
   wasReleased(obj: unknown): boolean {
     return !obj || (obj as { __kb_released?: boolean }).__kb_released === true;
   },
 
-  // Checks if an object can be released
-  isReleaseable(obj: unknown, depth = 0): boolean {
-    // Must be an object and not already released
-    if (!obj || obj !== Object(obj) || (obj as { __kb_released?: boolean }).__kb_released) {
-      return false;
-    }
-
-    // Known releaseable types
-    if (ko.isObservable(obj)) return true;
-    if (kb.isViewModel(obj)) return true;
-
-    // Known non-releaseable types
-    if (typeof obj === 'function' || kb.isModel(obj) || kb.isCollection(obj)) {
-      return false;
-    }
-
-    // Check for releaseable signature (has release/dispose method)
-    for (const method of LIFECYCLE_METHODS) {
-      if (typeof (obj as Record<string, unknown>)[method] === 'function') {
-        return true;
-      }
-    }
-    const disposeSymbol = (Symbol as unknown as { dispose?: symbol }).dispose;
-    if (disposeSymbol && typeof (obj as unknown as Record<symbol, unknown>)[disposeSymbol] === 'function') {
-      return true;
-    }
-
-    // Max depth check for ViewModel inside of ViewModel
-    if (depth > 0) return false;
-
-    // Check nested properties
-    for (const key in obj as Record<string, unknown>) {
-      if (key !== '__kb' && kb.isReleaseable((obj as Record<string, unknown>)[key], depth + 1)) {
-        return true;
-      }
-    }
-
-    return false;
+  // Checks if an object can be disposed
+  isReleaseable(obj: unknown): boolean {
+    return !!obj && (ko.isSubscribable(obj) || typeof (obj as { dispose?: () => void }).dispose === 'function');
   },
 
-  // Releases any type of view model or observable
-  release(obj: unknown): void {
-    if (!kb.isReleaseable(obj)) return;
+  // Disposes an object or collection (public helper for plain objects)
+  // Use when you created a plain object that contains Knockback observables.
+  dispose(obj: unknown): void {
+    if (!obj) return;
 
-    (obj as { __kb_released: boolean }).__kb_released = true;
+    const disposable = obj as { dispose?: () => void };
+    if (typeof disposable.dispose === 'function') {
+      disposable.dispose();
+      return;
+    }
 
-    // Release array items
     if (Array.isArray(obj)) {
       for (let i = 0; i < obj.length; i++) {
         const value = obj[i];
         if (kb.isReleaseable(value)) {
           obj[i] = null;
-          kb.release(value);
+          (value as { dispose?: () => void }).dispose?.();
         }
       }
       return;
     }
 
-    // Observable or lifecycle managed
-    if (ko.isObservable(obj)) {
-      const kbObs = obj as ObservableBase;
-      const array = kb.peek(obj);
-
-      if (Array.isArray(array)) {
-        if (kbObs.__kb_is_co || (kbObs.__kb_is_o && kbObs.valueType?.() === TYPE_COLLECTION)) {
-          kbObs.dispose?.();
-          return;
-        }
-
-        for (let i = 0; i < array.length; i++) {
-          const value = array[i];
-          if (kb.isReleaseable(value)) {
-            array[i] = null;
-            kb.release(value);
+    if (obj === Object(obj)) {
+      for (const key in obj as Record<string, unknown>) {
+        if (key === '__kb') continue;
+        const value = (obj as Record<string, unknown>)[key];
+        if (Array.isArray(value)) {
+          for (let i = 0; i < value.length; i++) {
+            const item = value[i];
+            if (kb.isReleaseable(item)) {
+              value[i] = null;
+              (item as { dispose?: () => void }).dispose?.();
+            }
           }
+          continue;
         }
-      }
-
-      // Dispose computed/observable
-      const disposable = obj as { dispose?: () => void };
-      if (typeof disposable.dispose === 'function') {
-        disposable.dispose();
-      } else {
-        const disposeSymbol = (Symbol as unknown as { dispose?: symbol }).dispose;
-        const symbolDispose = disposeSymbol ? (obj as unknown as Record<symbol, unknown>)[disposeSymbol] : undefined;
-        if (typeof symbolDispose === 'function') {
-          (symbolDispose as () => void).call(obj);
+        if (kb.isReleaseable(value)) {
+          (obj as Record<string, unknown>)[key] = null;
+          (value as { dispose?: () => void }).dispose?.();
         }
-      }
-      return;
-    }
-
-    // Check for lifecycle methods
-    for (const method of LIFECYCLE_METHODS) {
-      if (typeof (obj as Record<string, unknown>)[method] === 'function') {
-        (obj as Record<string, () => void>)[method].call(obj);
-        return;
-      }
-    }
-    const disposeSymbol = (Symbol as unknown as { dispose?: symbol }).dispose;
-    const symbolDispose = disposeSymbol ? (obj as unknown as Record<symbol, unknown>)[disposeSymbol] : undefined;
-    if (typeof symbolDispose === 'function') {
-      (symbolDispose as () => void).call(obj);
-      return;
-    }
-
-    // View model - release keys
-    if (!ko.isObservable(obj)) {
-      kb.releaseKeys(obj as Record<string, unknown>);
-    }
-  },
-
-  // Releases and clears all keys on an object
-  releaseKeys(obj: Record<string, unknown>): void {
-    for (const key in obj) {
-      if (key !== '__kb' && kb.isReleaseable(obj[key])) {
-        const value = obj[key];
-        obj[key] = null;
-        kb.release(value);
       }
     }
   },
 
-  // Binds a callback to the node that releases the view model when the node is removed
+  // Binds a callback to the node that disposes the view model when the node is removed
   releaseOnNodeRemove(view_model: unknown, node: Node): void {
     if (!view_model) kb._throwUnexpected('kb', 'missing view model');
     if (!node) kb._throwUnexpected('kb', 'missing node');
-    ko.utils.domNodeDisposal.addDisposeCallback(node, () => kb.release(view_model));
+    ko.utils.domNodeDisposal.addDisposeCallback(node, () => {
+      (view_model as { dispose?: () => void }).dispose?.();
+    });
   },
 
-  // Renders a template and binds automatic release
+  // Renders a template and binds automatic disposal
   renderTemplate(template: string, view_model: { afterRender?: (el: Element) => void }, options: { afterRender?: () => void } = {}): Element | null {
     if (!globalWindow?.document) {
       console?.log?.('renderTemplate: document is undefined');
@@ -207,7 +132,7 @@ const kb = {
     return el;
   },
 
-  // Applies bindings and binds automatic release
+  // Applies bindings and binds automatic disposal
   applyBindings(view_model: unknown, node: Element | NodeList | HTMLCollection): Element {
     // Convert NodeList/HTMLCollection to root element
     if ('length' in node) {

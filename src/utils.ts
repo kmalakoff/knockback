@@ -2,8 +2,8 @@ import Backbone from 'backbone';
 import ko from 'knockout';
 import _ from 'underscore';
 import collapseOptions from './functions/collapse-options.ts';
+import disposeMetadata from './functions/dispose-metadata.ts';
 import unwrapModels from './functions/unwrap-models.ts';
-import wrappedDestroy from './functions/wrapped-destroy.ts';
 import type { Creator } from './internal-types.ts';
 import kb from './kb.ts';
 import type { EventWatcher, Factory, KBMetadata, ObservableBase, Store, ValueType, ViewModelOptions } from './types.ts';
@@ -209,12 +209,60 @@ export function wrappedEventWatcherIsOwned(obj: KBObject, value?: boolean): bool
 // Utility functions
 // =============================================================================
 
-const disposeSymbol = (Symbol as unknown as { dispose?: symbol }).dispose;
-
 export function attachDispose(obj: Record<string, unknown>, dispose: () => void): void {
   obj.dispose = dispose;
-  if (disposeSymbol) {
-    (obj as Record<symbol, unknown>)[disposeSymbol] = dispose;
+}
+
+export function isDisposable(obj: unknown): boolean {
+  if (!obj || obj !== Object(obj) || (obj as { __kb_released?: boolean }).__kb_released) {
+    return false;
+  }
+  return ko.isSubscribable(obj) || typeof (obj as { dispose?: () => void }).dispose === 'function';
+}
+
+function disposeValue(value: unknown): void {
+  if (!value) return;
+
+  if (Array.isArray(value)) {
+    disposeArray(value);
+    return;
+  }
+
+  if (ko.isObservable(value)) {
+    const peekValue = kb.peek(value as ko.Observable);
+    if (Array.isArray(peekValue)) {
+      disposeArray(peekValue);
+    }
+  }
+
+  if (kb.isViewModel(value) || isDisposable(value)) {
+    (value as { dispose?: () => void }).dispose?.();
+    return;
+  }
+
+  if (value === Object(value)) {
+    disposeDisposableKeys(value as Record<string, unknown>);
+  }
+}
+
+export function disposeArray(arr: unknown[]): void {
+  for (let i = 0; i < arr.length; i++) {
+    const item = arr[i];
+    disposeValue(item);
+    if (kb.isViewModel(item) || isDisposable(item)) {
+      arr[i] = null;
+    }
+  }
+}
+
+export function disposeDisposableKeys(vm: Record<string, unknown>): void {
+  for (const key in vm) {
+    if (key === '__kb') continue;
+    const value = vm[key];
+    disposeValue(value);
+    if (kb.isViewModel(value) || isDisposable(value)) {
+      vm[key] = null;
+    }
   }
 }
 
@@ -334,10 +382,13 @@ const utils = {
   wrappedEventWatcherIsOwned,
 
   // Cleanup
-  wrappedDestroy,
+  disposeMetadata,
 
   // Utilities
   attachDispose,
+  disposeArray,
+  disposeDisposableKeys,
+  isDisposable,
   valueType,
   pathJoin,
   optionsPathJoin,

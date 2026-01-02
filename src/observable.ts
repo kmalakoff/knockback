@@ -202,16 +202,17 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
     // =============================================================================
 
     function dispose(): void {
+      if (state.__kb_released) return;
       const obs = utils.getObservable(state);
       state.__kb_released = true;
-      state._value.destroy();
+      state._value.dispose();
       state._value = undefined as unknown as TypedValue;
       state.model.dispose();
       state.model = undefined as unknown as ko.Computed<Backbone.Model | null>;
       if (obs) {
         (obs as unknown as ObservableInternal).model = undefined as unknown as ko.Computed<Backbone.Model | null>;
       }
-      utils.wrappedDestroy(state);
+      utils.disposeMetadata(state);
     }
 
     function value(): unknown {

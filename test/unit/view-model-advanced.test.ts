@@ -3,23 +3,28 @@ import assert from 'assert';
 import Backbone from 'backbone';
 import ko from 'knockout';
 
-type ViewModel = kb.ViewModel;
-
 describe('ViewModel advanced', () => {
   describe('options', () => {
     it('should support keys option to limit observables', () => {
       const stats = new kb.Statistics();
       kb.setStatistics(stats);
 
+      interface KeysViewModel {
+        name: ko.Observable<string>;
+        age: ko.Observable<number>;
+        email?: ko.Observable<string>;
+        phone?: ko.Observable<string>;
+      }
+
       const model = new Backbone.Model({ name: 'Bob', age: 30, email: 'bob@test.com', phone: '555-1234' });
-      const vm = kb.viewModel(model, { keys: ['name', 'age'] }) as Record<string, unknown>;
+      const vm = kb.viewModel<KeysViewModel>(model, { keys: ['name', 'age'] });
 
       assert.ok(ko.isObservable(vm.name), 'name is observable');
       assert.ok(ko.isObservable(vm.age), 'age is observable');
       assert.strictEqual(vm.email, undefined, 'email not created');
       assert.strictEqual(vm.phone, undefined, 'phone not created');
 
-      kb.release(vm);
+      vm.dispose();
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
     });
@@ -28,14 +33,20 @@ describe('ViewModel advanced', () => {
       const stats = new kb.Statistics();
       kb.setStatistics(stats);
 
+      interface ExcludesViewModel {
+        name: ko.Observable<string>;
+        email: ko.Observable<string>;
+        password?: ko.Observable<string>;
+      }
+
       const model = new Backbone.Model({ name: 'Bob', password: 'secret', email: 'bob@test.com' });
-      const vm = kb.viewModel(model, { excludes: ['password'] }) as Record<string, unknown>;
+      const vm = kb.viewModel<ExcludesViewModel>(model, { excludes: ['password'] });
 
       assert.ok(ko.isObservable(vm.name), 'name is observable');
       assert.ok(ko.isObservable(vm.email), 'email is observable');
       assert.strictEqual(vm.password, undefined, 'password excluded');
 
-      kb.release(vm);
+      vm.dispose();
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
     });
@@ -44,14 +55,20 @@ describe('ViewModel advanced', () => {
       const stats = new kb.Statistics();
       kb.setStatistics(stats);
 
+      interface InternalsViewModel {
+        name: ko.Observable<string>;
+        _id: ko.Observable<number>;
+        id?: ko.Observable<number>;
+      }
+
       const model = new Backbone.Model({ name: 'Bob', id: 123 });
-      const vm = kb.viewModel(model, { internals: ['id'] }) as Record<string, unknown>;
+      const vm = kb.viewModel<InternalsViewModel>(model, { internals: ['id'] });
 
       assert.ok(ko.isObservable(vm.name), 'name is observable');
       assert.ok(ko.isObservable(vm._id), 'id renamed to _id');
       assert.strictEqual(vm.id, undefined, 'original id not present');
 
-      kb.release(vm);
+      vm.dispose();
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
     });
@@ -60,20 +77,27 @@ describe('ViewModel advanced', () => {
       const stats = new kb.Statistics();
       kb.setStatistics(stats);
 
-      const model = new Backbone.Model({ name: 'Bob' });
-      const vm = kb.viewModel(model, { requires: ['name', 'age', 'email'] }) as Record<string, unknown>;
+      interface RequiresViewModel {
+        name: ko.Observable<string>;
+        age: ko.Observable<number | null>;
+        email: ko.Observable<string | null>;
+      }
+
+      const model: Backbone.Model<Record<string, unknown>> = new Backbone.Model();
+      model.set('name', 'Bob');
+      const vm = kb.viewModel<RequiresViewModel>(model, { requires: ['name', 'age', 'email'] });
 
       // All required keys should be observables even if not in model
       assert.ok(ko.isObservable(vm.name), 'name is observable');
       assert.ok(ko.isObservable(vm.age), 'age is observable (required)');
       assert.ok(ko.isObservable(vm.email), 'email is observable (required)');
 
-      assert.strictEqual((vm.name as ko.Observable)(), 'Bob');
+      assert.strictEqual(vm.name(), 'Bob');
       // Observables for non-existent model attributes return null
-      assert.strictEqual((vm.age as ko.Observable)(), null);
-      assert.strictEqual((vm.email as ko.Observable)(), null);
+      assert.strictEqual(vm.age(), null);
+      assert.strictEqual(vm.email(), null);
 
-      kb.release(vm);
+      vm.dispose();
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
     });
@@ -84,8 +108,13 @@ describe('ViewModel advanced', () => {
       const stats = new kb.Statistics();
       kb.setStatistics(stats);
 
+      interface StaticsViewModel {
+        name: ko.Observable<string>;
+        type: string;
+      }
+
       const model = new Backbone.Model({ name: 'Bob', type: 'admin' });
-      const vm = kb.viewModel(model, { statics: ['type'] }) as Record<string, unknown>;
+      const vm = kb.viewModel<StaticsViewModel>(model, { statics: ['type'] });
 
       assert.ok(ko.isObservable(vm.name), 'name is observable');
       assert.ok(!ko.isObservable(vm.type), 'type is NOT observable');
@@ -95,7 +124,7 @@ describe('ViewModel advanced', () => {
       model.set('type', 'user');
       assert.strictEqual(vm.type, 'admin', 'static type unchanged');
 
-      kb.release(vm);
+      vm.dispose();
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
     });
@@ -104,16 +133,22 @@ describe('ViewModel advanced', () => {
       const stats = new kb.Statistics();
       kb.setStatistics(stats);
 
-      const model = new Backbone.Model({ name: 'Bob' });
-      const vm = kb.viewModel(model, {
+      interface StaticDefaultsViewModel {
+        name?: ko.Observable<string>;
+        type: string;
+        role: string;
+      }
+
+      const model = new Backbone.Model<{ name: string; age?: number }>({ name: 'Bob' });
+      const vm = kb.viewModel<StaticDefaultsViewModel>(model, {
         statics: ['type', 'role'],
         static_defaults: { type: 'guest', role: 'viewer' },
-      }) as Record<string, unknown>;
+      });
 
       assert.strictEqual(vm.type, 'guest', 'type has default value');
       assert.strictEqual(vm.role, 'viewer', 'role has default value');
 
-      kb.release(vm);
+      vm.dispose();
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
     });
@@ -124,13 +159,18 @@ describe('ViewModel advanced', () => {
       const stats = new kb.Statistics();
       kb.setStatistics(stats);
 
-      const model = new Backbone.Model({ name: 'Bob' });
-      const vm = kb.viewModel(model) as ViewModel & { shareOptions: () => { store: unknown; factory: unknown } };
+      interface ShareOptionsViewModel {
+        shareOptions: () => { store: unknown; factory: unknown };
+      }
+
+      const model: Backbone.Model<Record<string, unknown>> = new Backbone.Model();
+      model.set('name', 'Bob');
+      const vm = kb.viewModel<ShareOptionsViewModel>(model);
 
       assert.ok(ko.isObservable(vm.model), 'model is observable');
       assert.strictEqual(vm.model(), model, 'model() returns the model');
 
-      kb.release(vm);
+      vm.dispose();
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
     });
@@ -139,9 +179,13 @@ describe('ViewModel advanced', () => {
       const stats = new kb.Statistics();
       kb.setStatistics(stats);
 
+      interface NameViewModel {
+        name: ko.Observable<string>;
+      }
+
       const model1 = new Backbone.Model({ name: 'Bob' });
       const model2 = new Backbone.Model({ name: 'Alice' });
-      const vm = kb.viewModel(model1) as ViewModel & { name: ko.Observable<string> };
+      const vm = kb.viewModel<NameViewModel>(model1);
 
       let modelChangeCount = 0;
       ko.computed(() => {
@@ -157,7 +201,7 @@ describe('ViewModel advanced', () => {
       assert.ok(modelChangeCount > initialCount, 'Model changed triggered update');
       assert.strictEqual(vm.name(), 'Alice');
 
-      kb.release(vm);
+      vm.dispose();
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
     });
@@ -168,9 +212,14 @@ describe('ViewModel advanced', () => {
       const stats = new kb.Statistics();
       kb.setStatistics(stats);
 
+      interface NameAgeViewModel {
+        name: ko.Observable<string>;
+        age: ko.Observable<number>;
+      }
+
       const model1 = new Backbone.Model({ name: 'Bob', age: 30 });
       const model2 = new Backbone.Model({ name: 'Alice', age: 25 });
-      const vm = kb.viewModel(model1) as ViewModel & { name: ko.Observable<string>; age: ko.Observable<number> };
+      const vm = kb.viewModel<NameAgeViewModel>(model1);
 
       assert.strictEqual(vm.name(), 'Bob');
       assert.strictEqual(vm.age(), 30);
@@ -188,7 +237,7 @@ describe('ViewModel advanced', () => {
       model2.set('name', 'Alicia');
       assert.strictEqual(vm.name(), 'Alicia');
 
-      kb.release(vm);
+      vm.dispose();
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
     });
@@ -196,7 +245,8 @@ describe('ViewModel advanced', () => {
 
   describe('extend', () => {
     it('should support extend as an object literal', () => {
-      const model = new Backbone.Model({ name: 'Bob' });
+      const model: Backbone.Model<Record<string, unknown>> = new Backbone.Model();
+      model.set('name', 'Bob');
       const vm = kb.viewModel<{ name: ko.Observable<string>; onEdit: () => void; isAdmin: ko.Observable<boolean> }>(model, {
         extend: {
           onEdit: () => model.set('name', 'Alice'),
@@ -211,7 +261,7 @@ describe('ViewModel advanced', () => {
       vm.isAdmin(true);
       assert.strictEqual(vm.isAdmin(), true);
 
-      kb.release(vm);
+      vm.dispose();
     });
 
     it('should support extend as a mutating function', () => {
@@ -228,7 +278,7 @@ describe('ViewModel advanced', () => {
       assert.strictEqual(vm.name(), 'Alice');
       assert.strictEqual(vm.isAdmin(), true);
 
-      kb.release(vm);
+      vm.dispose();
     });
 
     it('should support extend as a function returning an object', () => {
@@ -244,7 +294,7 @@ describe('ViewModel advanced', () => {
       vm.onEdit();
       assert.strictEqual(vm.displayName(), 'User: Alice');
 
-      kb.release(vm);
+      vm.dispose();
     });
   });
 
@@ -254,13 +304,17 @@ describe('ViewModel advanced', () => {
       kb.setStatistics(stats);
 
       const model = new Backbone.Model({ name: 'Bob' });
-      const vm = kb.viewModel(model) as ViewModel & { shareOptions: () => { store: unknown; factory: unknown } };
+      interface ShareOptionsViewModel {
+        shareOptions: () => { store: unknown; factory: unknown };
+      }
+
+      const vm = kb.viewModel<ShareOptionsViewModel>(model);
 
       const options = vm.shareOptions();
       assert.ok(options.store, 'has store');
       assert.ok(options.factory, 'has factory');
 
-      kb.release(vm);
+      vm.dispose();
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
     });
@@ -271,9 +325,15 @@ describe('ViewModel advanced', () => {
       const stats = new kb.Statistics();
       kb.setStatistics(stats);
 
-      // biome-ignore lint/suspicious/noExplicitAny: Creating untyped model for dynamic attributes
-      const model: any = new Backbone.Model({ name: 'Bob' });
-      const vm = kb.viewModel(model, { keys: ['name'] }) as ViewModel & Record<string, unknown> & { createObservables: (model: Backbone.Model, keys: string[]) => void };
+      interface DynamicViewModel {
+        name: ko.Observable<string>;
+        age?: ko.Observable<number>;
+        createObservables: (model: Backbone.Model, keys: string[]) => void;
+      }
+
+      const model: Backbone.Model<Record<string, unknown>> = new Backbone.Model();
+      model.set('name', 'Bob');
+      const vm = kb.viewModel<DynamicViewModel>(model, { keys: ['name'] });
 
       assert.ok(ko.isObservable(vm.name), 'name exists');
       assert.strictEqual(vm.age, undefined, 'age does not exist');
@@ -283,9 +343,9 @@ describe('ViewModel advanced', () => {
       vm.createObservables(model, ['age']);
 
       assert.ok(ko.isObservable(vm.age), 'age now exists');
-      assert.strictEqual((vm.age as ko.Observable)(), 30);
+      assert.strictEqual(vm.age?.(), 30);
 
-      kb.release(vm);
+      vm.dispose();
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
     });
@@ -296,8 +356,12 @@ describe('ViewModel advanced', () => {
       const stats = new kb.Statistics();
       kb.setStatistics(stats);
 
+      interface NameViewModel {
+        name: ko.Observable<string>;
+      }
+
       const model = new Backbone.Model({ name: 'Initial' });
-      const vm = kb.viewModel(model) as ViewModel & { name: ko.Observable<string> };
+      const vm = kb.viewModel<NameViewModel>(model);
 
       let writeCount = 0;
       ko.computed(() => {
@@ -318,7 +382,7 @@ describe('ViewModel advanced', () => {
       assert.strictEqual(writeCount, 1, 'Write computed did not re-run');
       assert.strictEqual(readCount, 2, 'Read computed re-ran');
 
-      kb.release(vm);
+      vm.dispose();
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
     });
@@ -329,25 +393,32 @@ describe('ViewModel advanced', () => {
       const stats = new kb.Statistics();
       kb.setStatistics(stats);
 
+      interface MappingViewModel {
+        firstName: ko.Observable<string>;
+        lastName: ko.Observable<string>;
+        first_name?: ko.Observable<string>;
+        last_name?: ko.Observable<string>;
+      }
+
       const model = new Backbone.Model({ first_name: 'Bob', last_name: 'Smith' });
-      const vm = kb.viewModel(model, {
+      const vm = kb.viewModel<MappingViewModel>(model, {
         keys: [], // Use empty keys to prevent auto-creation of model attributes
         mappings: {
           firstName: { key: 'first_name' },
           lastName: { key: 'last_name' },
         },
-      }) as Record<string, unknown>;
+      });
 
       assert.ok(ko.isObservable(vm.firstName), 'firstName is observable');
       assert.ok(ko.isObservable(vm.lastName), 'lastName is observable');
-      assert.strictEqual((vm.firstName as ko.Observable)(), 'Bob');
-      assert.strictEqual((vm.lastName as ko.Observable)(), 'Smith');
+      assert.strictEqual(vm.firstName(), 'Bob');
+      assert.strictEqual(vm.lastName(), 'Smith');
 
       // With keys: [], original attributes should not be auto-created
       assert.strictEqual(vm.first_name, undefined, 'first_name not auto-created');
       assert.strictEqual(vm.last_name, undefined, 'last_name not auto-created');
 
-      kb.release(vm);
+      vm.dispose();
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
     });

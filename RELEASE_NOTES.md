@@ -2,7 +2,10 @@ Please refer to the following release notes when upgrading your version of Knock
 
 ## 2.0.0
 
-- BREAKING API CHANGE: `destroy()` has been replaced by `dispose()` across view models and observables. Use `kb.release` / `kb.releaseOnNodeRemove` to dispose automatically (and `Symbol.dispose` is supported when available).
+- BREAKING API CHANGE: `destroy()` has been replaced by `dispose()` across view models and observables.
+- BREAKING API CHANGE: `kb.release` has been removed. Call `dispose()` directly or rely on `releaseOnNodeRemove` / KO component disposal. Use `kb.dispose(obj)` for plain objects that contain Knockback observables.
+- BREAKING API CHANGE: `kb.wasReleased` is no longer part of the public API.
+- BREAKING API CHANGE: `Symbol.dispose` support removed. Use `dispose()` explicitly.
 
 ## 1.2.3
 

@@ -70,7 +70,11 @@ export function triggeredObservable(emitter: Backbone.Events, eventSelector: str
   ) as ko.Observable & { dispose: () => void };
 
   // Add dispose method to state for publishMethods
-  (state as unknown as Record<string, unknown>).dispose = () => utils.wrappedDestroy(state);
+  (state as unknown as Record<string, unknown>).dispose = () => {
+    if (state.__kb_released) return;
+    state.__kb_released = true;
+    utils.disposeMetadata(state);
+  };
 
   // Publish public interface on the observable
   kb.publishMethods(observable as unknown as Record<string, unknown>, state, KEYS_PUBLISH as unknown as string[]);

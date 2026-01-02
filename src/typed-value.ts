@@ -20,7 +20,8 @@ export class TypedValue {
     this._vo = ko.observable(null);
   }
 
-  destroy(): void {
+  dispose(): void {
+    if (this.__kb_released) return;
     this.__kb_released = true;
     const previousValue = this.__kb_value;
 
@@ -30,7 +31,7 @@ export class TypedValue {
       if (store && utils.wrappedCreator(previousValue)) {
         store.release(previousValue);
       } else {
-        kb.release(previousValue);
+        (previousValue as { dispose?: () => void }).dispose?.();
       }
     }
 
@@ -203,7 +204,7 @@ export class TypedValue {
       if (store) {
         store.release(previousValue);
       } else {
-        kb.release(previousValue);
+        (previousValue as { dispose?: () => void }).dispose?.();
       }
     }
 

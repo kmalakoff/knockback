@@ -7,24 +7,24 @@ describe('knockback plugins', () => {
   describe('defaults plugin', () => {
     it('should provide default value when observable is null', () => {
       const model = new Backbone.Model({ name: null });
-      const nameObs = kb.observable(model, 'name') as unknown as ko.Observable;
-      const wrapped = kb.defaultObservable(nameObs, '(no name)');
+      const nameObs = kb.observable<string | null>(model, 'name');
+      const wrapped = kb.defaultObservable<string | null>(nameObs, '(no name)');
 
       assert.strictEqual(wrapped(), '(no name)');
     });
 
     it('should return actual value when not null', () => {
       const model = new Backbone.Model({ name: 'Bob' });
-      const nameObs = kb.observable(model, 'name') as unknown as ko.Observable;
-      const wrapped = kb.defaultObservable(nameObs, '(no name)');
+      const nameObs = kb.observable<string>(model, 'name');
+      const wrapped = kb.defaultObservable<string>(nameObs, '(no name)');
 
       assert.strictEqual(wrapped(), 'Bob');
     });
 
     it('should update when underlying observable changes', () => {
       const model = new Backbone.Model({ name: null });
-      const nameObs = kb.observable(model, 'name') as unknown as ko.Observable;
-      const wrapped = kb.defaultObservable(nameObs, '(no name)');
+      const nameObs = kb.observable<string | null>(model, 'name');
+      const wrapped = kb.defaultObservable<string | null>(nameObs, '(no name)');
 
       assert.strictEqual(wrapped(), '(no name)');
       model.set('name', 'Alice');
