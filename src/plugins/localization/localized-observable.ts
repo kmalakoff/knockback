@@ -116,13 +116,14 @@ export function localizedObservable(value: unknown, options: LocalizedObservable
   ) as ko.Observable & { dispose: () => void; observedValue: (value?: unknown) => unknown; resetToCurrent: () => void };
 
   // Add methods to state for publishMethods to find
-  (state as unknown as Record<string, unknown>).dispose = dispose;
-  (state as unknown as Record<string, unknown>).observedValue = observedValue;
-  (state as unknown as Record<string, unknown>).resetToCurrent = resetToCurrent;
+  const stateWithMethods = state as unknown as Record<string, unknown>;
+  stateWithMethods.dispose = dispose;
+  stateWithMethods.observedValue = observedValue;
+  stateWithMethods.resetToCurrent = resetToCurrent;
 
   // Publish public interface on the observable
-  kb.publishMethods(observable as unknown as Record<string, unknown>, state as unknown as Record<string, unknown>, KEYS_PUBLISH as unknown as string[]);
-  utils.attachDispose(observable as unknown as Record<string, unknown>, dispose);
+  kb.publishMethods(observable, stateWithMethods, KEYS_PUBLISH);
+  utils.attachDispose(observable, dispose);
 
   // Start listening to locale changes
   const localeManager = kb.locale_manager as LocaleManager;

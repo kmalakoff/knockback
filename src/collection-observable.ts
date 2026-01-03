@@ -29,8 +29,8 @@ export interface CollectionObservableInstance {
   models_only?: boolean;
   auto_compact?: boolean;
   path?: string;
-  create_options: InternalCreateOptions;
-  collection: ko.Computed<Backbone.Collection | null>;
+  create_options?: InternalCreateOptions;
+  collection?: ko.Computed<Backbone.Collection | null>;
 
   // Methods
   dispose(): void;
@@ -98,8 +98,6 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
       models_only: undefined,
       auto_compact: undefined,
       path: undefined,
-      create_options: {} as InternalCreateOptions,
-      collection: undefined as unknown as ko.Computed<Backbone.Collection | null>,
 
       dispose,
       shareOptions,
@@ -161,8 +159,8 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
     }
 
     // Publish methods
-    kb.publishMethods(observable as unknown as Record<string, unknown>, state as unknown as Record<string, unknown>, KEYS_PUBLISH as unknown as string[]);
-    utils.attachDispose(observable as unknown as Record<string, unknown>, dispose);
+    kb.publishMethods(observable, state, KEYS_PUBLISH);
+    utils.attachDispose(observable, dispose);
 
     // Collection observable
     _collection = ko.observable(collection);
@@ -271,8 +269,8 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
         array.splice(0, array.length);
       }
 
-      state.collection.dispose();
-      (obs as unknown as Record<string, unknown>).collection = state.collection = undefined as unknown as ko.Computed<Backbone.Collection | null>;
+      state.collection?.dispose();
+      (obs as unknown as Record<string, unknown>).collection = state.collection = undefined;
 
       _mapper.dispose();
 
@@ -281,7 +279,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
 
       _comparator(null);
 
-      state.create_options = undefined as unknown as InternalCreateOptions;
+      state.create_options = undefined;
       utils.disposeMetadata(state);
 
       const stats = (kb as { statistics?: { unregister: (name: string, obj: unknown) => void } }).statistics;
@@ -499,14 +497,14 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
             }
 
             // Retain in store
-            const store = state.create_options.store as Store;
-            const currentViewModel = state.create_options.creator ? store.find(model, state.create_options.creator) : null;
+            const store = state.create_options?.store as Store;
+            const currentViewModel = state.create_options?.creator ? store.find(model, state.create_options?.creator) : null;
             if (currentViewModel) {
               if (currentViewModel.constructor !== (vm as object).constructor) {
                 kb._throwUnexpected({ constructor: { name: 'CollectionObservable' } }, 'replacing different type of view model');
               }
             }
-            store.retain(vm, model, state.create_options.creator);
+            store.retain(vm, model, state.create_options?.creator);
             models.push(model);
           }
         }
@@ -539,6 +537,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
 
     function createViewModel(model: Backbone.Model): unknown {
       if (state.models_only) return model;
+      if (!state.create_options) throw new Error('create_options not initialized');
       const store = state.create_options.store as Store;
       return store.retainOrCreate(model, state.create_options);
     }

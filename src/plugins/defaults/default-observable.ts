@@ -59,8 +59,8 @@ export function defaultObservable<T>(targetObservable: ko.Observable<T>, default
   ) as ko.Observable<T> & { dispose: () => void; setToDefault: () => void };
 
   // Publish public interface on the observable
-  kb.publishMethods(observable as unknown as Record<string, unknown>, state, KEYS_PUBLISH as unknown as string[]);
-  utils.attachDispose(observable as unknown as Record<string, unknown>, dispose);
+  kb.publishMethods(observable, state, KEYS_PUBLISH);
+  utils.attachDispose(observable, dispose);
 
   return observable;
 

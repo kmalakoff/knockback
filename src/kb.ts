@@ -234,9 +234,10 @@ const kb = {
   },
 
   // Publish methods from instance to observable
-  publishMethods(observable: Record<string, unknown>, instance: Record<string, unknown>, methods: string[]): void {
+  publishMethods<T extends object, S extends object, K extends readonly (keyof S)[]>(observable: T, instance: S, methods: K): void {
     for (const fn of methods) {
-      observable[fn] = (instance[fn] as (...args: unknown[]) => unknown).bind(instance);
+      const key = fn as keyof S;
+      (observable as Record<string, unknown>)[fn as string] = (instance[key] as (...args: unknown[]) => unknown).bind(instance);
     }
   },
 };

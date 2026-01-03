@@ -209,8 +209,8 @@ export function wrappedEventWatcherIsOwned(obj: KBObject, value?: boolean): bool
 // Utility functions
 // =============================================================================
 
-export function attachDispose(obj: Record<string, unknown>, dispose: () => void): void {
-  obj.dispose = dispose;
+export function attachDispose<T extends object>(obj: T, dispose: () => void): void {
+  (obj as Record<string, unknown>).dispose = dispose;
 }
 
 export function isDisposable(obj: unknown): boolean {

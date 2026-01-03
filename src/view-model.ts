@@ -224,7 +224,7 @@ export class ViewModelClass {
       }
     }
 
-    utils.attachDispose(this as unknown as Record<string, unknown>, this.dispose.bind(this));
+    utils.attachDispose(this, this.dispose.bind(this));
 
     // Statistics tracking
     const statistics = (kb as { statistics?: { register: (name: string, obj: unknown) => void } }).statistics;

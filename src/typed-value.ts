@@ -12,7 +12,7 @@ export class TypedValue {
   __kb_released = false;
   __kb_value: unknown;
   value_type?: ValueType;
-  create_options: InternalCreateOptions;
+  create_options?: InternalCreateOptions;
   private _vo: ko.Observable<unknown>;
 
   constructor(createOptions: InternalCreateOptions) {
@@ -27,7 +27,7 @@ export class TypedValue {
 
     if (previousValue) {
       this.__kb_value = undefined;
-      const store = this.create_options.store as Store;
+      const store = this.create_options?.store as Store;
       if (store && utils.wrappedCreator(previousValue)) {
         store.release(previousValue);
       } else {
@@ -35,7 +35,7 @@ export class TypedValue {
       }
     }
 
-    this.create_options = undefined as unknown as InternalCreateOptions;
+    this.create_options = undefined;
   }
 
   // Get the unwrapped value
@@ -129,6 +129,7 @@ export class TypedValue {
   }
 
   private _updateValueObservable(newValue: unknown, newObservable?: unknown): void {
+    if (!this.create_options) throw new Error('create_options not initialized');
     const createOptions = this.create_options;
     let creator = utils.inferCreator(newValue, createOptions.factory, createOptions.path || '');
 

@@ -152,7 +152,7 @@ export function formattedObservable(format: string | ko.Observable<string>, ...a
     })
   ) as ko.Observable<string> & { dispose: () => void };
 
-  utils.attachDispose(observable as unknown as Record<string, unknown>, dispose);
+  utils.attachDispose(observable, dispose);
 
   return observable;
 
