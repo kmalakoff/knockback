@@ -1,5 +1,6 @@
 import Backbone from 'backbone';
 import ko from 'knockout';
+import { MissingPropertyError, UnexpectedValueError } from './errors/index.ts';
 import type { KBSettings, LocaleManager } from './types.ts';
 
 // Get global window object (works in browser and Node)
@@ -211,7 +212,7 @@ export function applyBindings(view_model: unknown, node: Element | NodeList | HT
   // Convert NodeList/HTMLCollection to root element
   if ('length' in node) {
     if (!globalWindow?.document) {
-      throw new Error('applyBindings: document is undefined');
+      throw new UnexpectedValueError('applyBindings', 'document is undefined');
     }
     const doc = globalWindow.document;
     const children = Array.from(node as NodeList);
@@ -271,13 +272,13 @@ export function setValue(model: Backbone.Model | null, key: string, value: unkno
 /** @internal Throw error for missing parameter */
 export function _throwMissing(instance: string | { constructor: { name: string } }, message: string): never {
   const name = typeof instance === 'string' ? instance : instance.constructor.name;
-  throw new Error(`${name}: ${message} is missing`);
+  throw new MissingPropertyError(name, message);
 }
 
 /** @internal Throw error for unexpected value */
 export function _throwUnexpected(instance: string | { constructor: { name: string } }, message: string): never {
   const name = typeof instance === 'string' ? instance : instance.constructor.name;
-  throw new Error(`${name}: ${message} is unexpected`);
+  throw new UnexpectedValueError(name, message);
 }
 
 // =============================================================================

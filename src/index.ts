@@ -54,6 +54,12 @@ export { getStatistics, setStatistics } from './kb.ts';
 export { Statistics };
 
 // =============================================================================
+// Errors
+// =============================================================================
+
+export { KnockbackError, MissingPropertyError, NotInitializedError, ReleasedObjectError, UnexpectedValueError } from './errors/index.ts';
+
+// =============================================================================
 // Types
 // =============================================================================
 
@@ -80,6 +86,7 @@ export namespace kb {
 
 import type * as Backbone from 'backbone';
 import type * as ko from 'knockout';
+import { KnockbackError, MissingPropertyError, NotInitializedError, ReleasedObjectError, UnexpectedValueError } from './errors/index.ts';
 import { ViewModelClass } from './view-model.ts';
 
 export const kb: {
@@ -122,6 +129,11 @@ export const kb: {
   getStatistics: typeof getStatistics;
   setStatistics: typeof setStatistics;
   Statistics: typeof Statistics;
+  KnockbackError: typeof KnockbackError;
+  MissingPropertyError: typeof MissingPropertyError;
+  UnexpectedValueError: typeof UnexpectedValueError;
+  NotInitializedError: typeof NotInitializedError;
+  ReleasedObjectError: typeof ReleasedObjectError;
 } = {
   // Core
   observable,
@@ -169,6 +181,13 @@ export const kb: {
   TYPE_MODEL,
   TYPE_SIMPLE,
   TYPE_UNKNOWN,
+
+  // Errors
+  KnockbackError,
+  MissingPropertyError,
+  UnexpectedValueError,
+  NotInitializedError,
+  ReleasedObjectError,
 };
 
 Object.defineProperties(kb, {

@@ -1,5 +1,6 @@
 import ko from 'knockout';
 import _ from 'underscore';
+import { UnexpectedValueError } from './errors/index.ts';
 import type { CreateOptions, Creator } from './internal-types.ts';
 import { isCreatorConstructor, isCreatorObject } from './internal-types.ts';
 import { ignore, isModel, settings } from './kb.ts';
@@ -128,7 +129,7 @@ export class Store {
     }
 
     if (!createFn) {
-      throw new Error(`Invalid factory for "${options.path}"`);
+      throw new UnexpectedValueError('Store', `Invalid factory for "${options.path}"`);
     }
 
     const newObservable = ignore(() => {
@@ -156,11 +157,11 @@ export class Store {
     if (currentObj === obj) return;
 
     if (!this._canRegister(observable)) {
-      throw new Error('Cannot reuse a simple observable');
+      throw new UnexpectedValueError('Store', 'Cannot reuse a simple observable');
     }
 
     if (this._refCount(observable) !== 1) {
-      throw new Error(`Trying to change a shared view model. Ref count: ${this._refCount(observable)}`);
+      throw new UnexpectedValueError('Store', `Trying to change a shared view model. Ref count: ${this._refCount(observable)}`);
     }
 
     const creator = wrappedCreator(observable) || (observable as { constructor: Creator }).constructor;

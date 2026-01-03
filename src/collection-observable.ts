@@ -1,6 +1,7 @@
 import Backbone from 'backbone';
 import ko from 'knockout';
 import _ from 'underscore';
+import { NotInitializedError } from './errors/index.ts';
 import { Factory } from './factory.ts';
 import type { Creator } from './internal-types.ts';
 import { _throwUnexpected, ignore, peek, publishMethods, wasReleased } from './kb.ts';
@@ -535,7 +536,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
 
     function createViewModel(model: Backbone.Model): unknown {
       if (state.models_only) return model;
-      if (!state.create_options) throw new Error('create_options not initialized');
+      if (!state.create_options) throw new NotInitializedError('CollectionObservable', 'create_options');
       const store = state.create_options.store as Store;
       return store.retainOrCreate(model, state.create_options);
     }

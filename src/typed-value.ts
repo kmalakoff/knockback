@@ -1,6 +1,7 @@
 import type * as Backbone from 'backbone';
 import ko from 'knockout';
 import _ from 'underscore';
+import { NotInitializedError } from './errors/index.ts';
 import { isCreatorConstructor, isCreatorObject } from './internal-types.ts';
 import { getValue, isModel, peek } from './kb.ts';
 import type { InternalCreateOptions, Observable, ObservableBase, Store, ValueType } from './types.ts';
@@ -128,7 +129,7 @@ export class TypedValue {
   }
 
   private _updateValueObservable(newValue: unknown, newObservable?: unknown): void {
-    if (!this.create_options) throw new Error('create_options not initialized');
+    if (!this.create_options) throw new NotInitializedError('TypedValue', 'create_options');
     const createOptions = this.create_options;
     let creator = inferCreator(newValue, createOptions.factory, createOptions.path || '');
 
