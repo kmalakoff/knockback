@@ -227,9 +227,8 @@ export class ViewModelClass {
     attachDispose(this, this.dispose.bind(this));
 
     // Statistics tracking
-    const statistics = (globalThis as { statistics?: { register: (name: string, obj: unknown) => void } }).statistics;
-    if (statistics) {
-      statistics.register('ViewModel', this);
+    if (globalThis.statistics) {
+      globalThis.statistics.register('ViewModel', this);
     }
   }
 
@@ -253,9 +252,8 @@ export class ViewModelClass {
     disposeDisposableKeys(this as unknown as Record<string, unknown>);
     disposeMetadata(this);
 
-    const statistics = (globalThis as { statistics?: { unregister: (name: string, obj: unknown) => void } }).statistics;
-    if (statistics) {
-      statistics.unregister('ViewModel', this);
+    if (globalThis.statistics) {
+      globalThis.statistics.unregister('ViewModel', this);
     }
   }
 

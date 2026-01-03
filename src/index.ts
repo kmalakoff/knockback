@@ -188,9 +188,27 @@ Object.defineProperties(kb, {
   },
 });
 
+// Augment globalThis interface for type safety
+declare global {
+  interface GlobalThis {
+    kb: typeof kb;
+    statistics: Statistics | null;
+    ViewModel: typeof ViewModelClass;
+    CollectionObservable: typeof collectionObservable;
+    viewModel: typeof viewModel;
+    collectionObservable: typeof collectionObservable;
+    defaultObservable: typeof defaultObservable;
+  }
+}
+
 // Set globalThis.kb for plugin compatibility
 if (typeof globalThis !== 'undefined') {
-  (globalThis as { kb?: typeof kb }).kb = kb;
+  globalThis.kb = kb;
+  globalThis.ViewModel = ViewModelClass;
+  globalThis.CollectionObservable = collectionObservable;
+  globalThis.viewModel = viewModel;
+  globalThis.collectionObservable = collectionObservable;
+  globalThis.defaultObservable = defaultObservable;
 
   // Set up property forwarding for statistics
   Object.defineProperty(globalThis, 'statistics', {

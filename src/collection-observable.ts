@@ -243,9 +243,8 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
     observable.subscribe(onObservableArrayChange);
 
     // Statistics
-    const statistics = (globalThis as { statistics?: { register: (name: string, obj: unknown) => void } }).statistics;
-    if (statistics) {
-      statistics.register('CollectionObservable', state);
+    if (globalThis.statistics) {
+      globalThis.statistics.register('CollectionObservable', state);
     }
 
     return observable as CollectionObservable<T>;
@@ -281,9 +280,8 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
       state.create_options = undefined;
       disposeMetadata(state);
 
-      const stats = (globalThis as { statistics?: { unregister: (name: string, obj: unknown) => void } }).statistics;
-      if (stats) {
-        stats.unregister('CollectionObservable', state);
+      if (globalThis.statistics) {
+        globalThis.statistics.unregister('CollectionObservable', state);
       }
     }
 

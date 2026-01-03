@@ -189,9 +189,8 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
     }
 
     // Wrap with default observable if specified (plugin support)
-    const defaultObservableFn = (globalThis as { defaultObservable?: unknown }).defaultObservable;
-    if (typeof defaultObservableFn === 'function' && Object.hasOwn(info, 'default')) {
-      result = (defaultObservableFn as (obs: unknown, defaultVal: unknown) => unknown)(result, info.default);
+    if (typeof globalThis.defaultObservable === 'function' && Object.hasOwn(info, 'default')) {
+      result = globalThis.defaultObservable(result, info.default);
     }
 
     return result as Observable;

@@ -1,7 +1,6 @@
 import type * as Backbone from 'backbone';
 import ko from 'knockout';
 import _ from 'underscore';
-import type { Creator } from './internal-types.ts';
 import { isCreatorConstructor, isCreatorObject } from './internal-types.ts';
 import { getValue, isModel, peek } from './kb.ts';
 import type { InternalCreateOptions, Observable, ObservableBase, Store, ValueType } from './types.ts';
@@ -88,8 +87,7 @@ export class TypedValue {
 
         if (newType === TYPE_COLLECTION || _.isNull(newValue)) {
           // Use provided CollectionObservable
-          const CollectionObservable = (globalThis as { CollectionObservable?: { new (...args: unknown[]): unknown } }).CollectionObservable;
-          if (newValue && CollectionObservable && newValue instanceof CollectionObservable) {
+          if (newValue && globalThis.CollectionObservable && newValue instanceof globalThis.CollectionObservable) {
             this._updateValueObservable(wrappedObject(newValue as Observable), newValue);
           } else {
             const collectionFn = value as Observable & { collection?: ko.Computed<Backbone.Collection | null> };
@@ -137,9 +135,9 @@ export class TypedValue {
     // Retain previous type
     if (newValue === null && !creator) {
       if (this.value_type === TYPE_MODEL) {
-        creator = (globalThis as { ViewModel?: Creator }).ViewModel;
+        creator = globalThis.ViewModel;
       } else if (this.value_type === TYPE_COLLECTION) {
-        creator = (globalThis as { CollectionObservable?: Creator }).CollectionObservable;
+        creator = globalThis.CollectionObservable;
       }
     }
 

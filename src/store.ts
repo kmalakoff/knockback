@@ -343,7 +343,7 @@ export class Store {
     if (creator) return creator;
 
     if (isModel(obj)) {
-      return (globalThis as { ViewModel?: Creator }).ViewModel;
+      return globalThis.ViewModel;
     }
 
     return undefined;

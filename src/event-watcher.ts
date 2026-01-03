@@ -117,9 +117,8 @@ export class EventWatcher {
               }
 
               // Track statistics if available
-              const statistics = (globalThis as { statistics?: { addModelEvent: (e: unknown) => void } }).statistics;
-              if (statistics) {
-                statistics.addModelEvent({
+              if (globalThis.statistics) {
+                globalThis.statistics.addModelEvent({
                   name: eventName,
                   model: eventModel,
                   key: info.key,

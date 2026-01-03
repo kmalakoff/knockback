@@ -309,10 +309,10 @@ export function inferCreator(value: unknown, factory: Factory | undefined, path:
 
   // These will be set later when ViewModel and CollectionObservable are defined
   if (value instanceof Backbone.Model) {
-    return (globalThis as { ViewModel?: Creator }).ViewModel || null;
+    return globalThis.ViewModel || null;
   }
   if (value instanceof Backbone.Collection) {
-    return (globalThis as { CollectionObservable?: Creator }).CollectionObservable || null;
+    return globalThis.CollectionObservable || null;
   }
 
   return null;
@@ -321,12 +321,10 @@ export function inferCreator(value: unknown, factory: Factory | undefined, path:
 /** Create observable based on value type */
 export function createFromDefaultCreator(obj: unknown, options: ViewModelOptions): unknown {
   if (isModel(obj)) {
-    const viewModel = (globalThis as { viewModel?: (m: unknown, o: unknown) => unknown }).viewModel;
-    return viewModel ? viewModel(obj, options) : ko.observable(obj);
+    return globalThis.viewModel ? globalThis.viewModel(obj, options) : ko.observable(obj);
   }
   if (isCollection(obj)) {
-    const collectionObservable = (globalThis as { collectionObservable?: (c: unknown, o: unknown) => unknown }).collectionObservable;
-    return collectionObservable ? collectionObservable(obj, options) : ko.observableArray([]);
+    return globalThis.collectionObservable ? globalThis.collectionObservable(obj, options) : ko.observableArray([]);
   }
   if (Array.isArray(obj)) {
     return ko.observableArray(obj);
