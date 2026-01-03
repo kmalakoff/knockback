@@ -1,5 +1,6 @@
 import Backbone from 'backbone';
 import ko from 'knockout';
+import { KB_DISPOSE_STATE } from './constants.ts';
 import { MissingPropertyError, UnexpectedValueError } from './errors/index.ts';
 import type { Statistics } from './statistics.ts';
 import type { KBSettings, LocaleManager } from './types.ts';
@@ -114,13 +115,6 @@ export function wasReleased(obj: unknown): boolean {
   // Check if disposing or disposed (state >= 1)
   return disposable.__kb_dispose !== undefined && disposable.__kb_dispose >= 1;
 }
-
-// Dispose state constants
-const KB_DISPOSE_STATE = {
-  ACTIVE: 0, // Not disposed, ready to use
-  DISPOSING: 1, // Currently disposing (prevents re-entry)
-  DISPOSED: 2, // Disposal complete (prevents double-disposal)
-} as const;
 
 /** Checks if an object can be disposed */
 export function isReleaseable(obj: unknown): boolean {

@@ -1,16 +1,10 @@
 import ko from 'knockout';
 import _ from 'underscore';
+import { KB_DISPOSE_STATE } from '../../constants.ts';
 import { publishMethods } from '../../kb.ts';
 import { attachDispose, disposeMetadata, getObservable, setObservable } from '../../utils.ts';
 
 const KEYS_PUBLISH = ['dispose', 'setToDefault'] as const;
-
-// Dispose state constants (matches kb.ts)
-const KB_DISPOSE_STATE = {
-  ACTIVE: 0, // Not disposed, ready to use
-  DISPOSING: 1, // Currently disposing (prevents re-entry)
-  DISPOSED: 2, // Disposal complete (prevents double-disposal)
-} as const;
 
 // =============================================================================
 // Interface

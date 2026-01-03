@@ -1,5 +1,6 @@
 import type * as Backbone from 'backbone';
 import ko from 'knockout';
+import { KB_DISPOSE_STATE } from './constants.ts';
 import { EventWatcher } from './event-watcher.ts';
 import { Factory } from './factory.ts';
 import { _throwMissing, getValue, ignore, peek, publishMethods, setValue } from './kb.ts';
@@ -14,13 +15,6 @@ const KEYS_INFO = ['args', 'read', 'write'] as const;
 // =============================================================================
 // Observable Interface
 // =============================================================================
-
-// Dispose state constants (matches kb.ts)
-const KB_DISPOSE_STATE = {
-  ACTIVE: 0, // Not disposed, ready to use
-  DISPOSING: 1, // Currently disposing (prevents re-entry)
-  DISPOSED: 2, // Disposal complete (prevents double-disposal)
-} as const;
 
 export interface ObservableInstance {
   // Index signature for dynamic property access

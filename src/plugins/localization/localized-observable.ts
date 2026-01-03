@@ -1,20 +1,11 @@
 import ko from 'knockout';
+import { KB_DISPOSE_STATE } from '../../constants.ts';
 import { _throwMissing, _throwUnexpected, publishMethods } from '../../kb.ts';
 import type { LocaleManager } from '../../types.ts';
 import { attachDispose, disposeMetadata, getObservable, setObservable } from '../../utils.ts';
 import { defaultObservable } from '../defaults/default-observable.ts';
 
 const KEYS_PUBLISH = ['dispose', 'observedValue', 'resetToCurrent'] as const;
-
-// Dispose state constants (matches kb.ts)
-const KB_DISPOSE_STATE = {
-  ACTIVE: 0, // Not disposed, ready to use
-  DISPOSING: 1, // Currently disposing (prevents re-entry)
-  DISPOSED: 2, // Disposal complete (prevents double-disposal),
-} as const;
-
-// Re-export LocaleManager type for backwards compatibility
-export type { LocaleManager };
 
 export interface LocalizedObservableOptions {
   /** Required: function to read/format the localized value */

@@ -1,5 +1,6 @@
 import type * as Backbone from 'backbone';
 import ko from 'knockout';
+import { KB_DISPOSE_STATE } from './constants.ts';
 import { _throwMissing, _throwUnexpected, settings, wasReleased } from './kb.ts';
 import type { EventCallbackInfo, EventWatcher as EventWatcherInterface, KBMetadata } from './types.ts';
 import { disposeMetadata, wrappedEventWatcher, wrappedEventWatcherIsOwned } from './utils.ts';
@@ -18,13 +19,6 @@ interface CallbackRecord {
 interface EventWatcherMetadata extends KBMetadata {
   callbacks?: Record<string, CallbackRecord> | null;
 }
-
-// Dispose state constants (matches kb.ts)
-const KB_DISPOSE_STATE = {
-  ACTIVE: 0, // Not disposed, ready to use
-  DISPOSING: 1, // Currently disposing (prevents re-entry)
-  DISPOSED: 2, // Disposal complete (prevents double-disposal)
-} as const;
 
 // Aggregates model events for efficient event handling
 export class EventWatcher {

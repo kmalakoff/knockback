@@ -1,19 +1,13 @@
 import type * as Backbone from 'backbone';
 import ko from 'knockout';
 import _ from 'underscore';
+import { KB_DISPOSE_STATE } from './constants.ts';
 import { NotInitializedError } from './errors/index.ts';
 import { isCreatorConstructor, isCreatorObject } from './internal-types.ts';
 import { getValue, isModel, peek } from './kb.ts';
 import type { InternalCreateOptions, Observable, ObservableBase, Store, ValueType } from './types.ts';
 import { TYPE_ARRAY, TYPE_COLLECTION, TYPE_MODEL, TYPE_SIMPLE, TYPE_UNKNOWN } from './types.ts';
 import { inferCreator, resolveModel, valueType, wrappedCreator, wrappedObject } from './utils.ts';
-
-// Dispose state constants (matches kb.ts)
-const KB_DISPOSE_STATE = {
-  ACTIVE: 0, // Not disposed, ready to use
-  DISPOSING: 1, // Currently disposing (prevents re-entry)
-  DISPOSED: 2, // Disposal complete (prevents double-disposal)
-} as const;
 
 // Internal class for managing typed observable values
 export class TypedValue {

@@ -1,6 +1,7 @@
 import Backbone from 'backbone';
 import ko from 'knockout';
 import _ from 'underscore';
+import { KB_DISPOSE_STATE } from './constants.ts';
 import { NotInitializedError } from './errors/index.ts';
 import { Factory } from './factory.ts';
 import type { Creator } from './internal-types.ts';
@@ -15,13 +16,6 @@ const COMPARE_ASCENDING = -1;
 const COMPARE_DESCENDING = 1;
 
 const KEYS_PUBLISH = ['dispose', 'shareOptions', 'filters', 'comparator', 'sortAttribute', 'viewModelByModel', 'hasViewModels'] as const;
-
-// Dispose state constants (matches kb.ts)
-const KB_DISPOSE_STATE = {
-  ACTIVE: 0, // Not disposed, ready to use
-  DISPOSING: 1, // Currently disposing (prevents re-entry)
-  DISPOSED: 2, // Disposal complete (prevents double-disposal)
-} as const;
 
 type ComparatorFn = (a: unknown, b: unknown) => number;
 type FilterFn = (model: Backbone.Model) => boolean;

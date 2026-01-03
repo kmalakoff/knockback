@@ -1,5 +1,6 @@
 import type * as Backbone from 'backbone';
 import ko from 'knockout';
+import { KB_DISPOSE_STATE } from './constants.ts';
 import { EventWatcher } from './event-watcher.ts';
 import { Factory } from './factory.ts';
 import { _throwUnexpected, ignore, isModel, settings, wasReleased } from './kb.ts';
@@ -9,13 +10,6 @@ import type { InternalCreateOptions, InternalViewModelOptions, KBMetadata, Obser
 import { attachDispose, collapseOptions, disposeDisposableKeys, disposeMetadata, resolveModel, wrappedEventWatcher, wrappedFactory, wrappedObject, wrappedStore } from './utils.ts';
 
 const KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'staticDefaults'] as const;
-
-// Dispose state constants (matches kb.ts)
-const KB_DISPOSE_STATE = {
-  ACTIVE: 0, // Not disposed, ready to use
-  DISPOSING: 1, // Currently disposing (prevents re-entry)
-  DISPOSED: 2, // Disposal complete (prevents double-disposal)
-} as const;
 
 /**
  * Extended metadata for ViewModels

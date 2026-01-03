@@ -1,5 +1,6 @@
 import ko from 'knockout';
 import _ from 'underscore';
+import { KB_DISPOSE_STATE } from './constants.ts';
 import { UnexpectedValueError } from './errors/index.ts';
 import type { CreateOptions, Creator } from './internal-types.ts';
 import { isCreatorConstructor, isCreatorObject } from './internal-types.ts';
@@ -10,13 +11,6 @@ import { createFromDefaultCreator, disposeDisposableKeys, get, inferCreator, orS
 interface ObservableRecord {
   [cid: string]: unknown;
 }
-
-// Dispose state constants (matches kb.ts)
-const KB_DISPOSE_STATE = {
-  ACTIVE: 0, // Not disposed, ready to use
-  DISPOSING: 1, // Currently disposing (prevents re-entry)
-  DISPOSED: 2, // Disposal complete (prevents double-disposal)
-} as const;
 
 // Store for caching and sharing view models
 export class Store {
