@@ -10,12 +10,12 @@ type AnyPropsViewModel = {
 describe('memory management', () => {
   // Helper: Ref-countable view model for testing
   class RefCountableViewModel {
-    static view_models: RefCountableViewModel[] = [];
+    static viewModels: RefCountableViewModel[] = [];
     ref_count = 1;
     is_destroyed = false;
 
     constructor() {
-      RefCountableViewModel.view_models.push(this);
+      RefCountableViewModel.viewModels.push(this);
     }
 
     refCount(): number {
@@ -42,44 +42,44 @@ describe('memory management', () => {
     }
 
     __destroy(): void {
-      const index = RefCountableViewModel.view_models.indexOf(this);
+      const index = RefCountableViewModel.viewModels.indexOf(this);
       if (index >= 0) {
-        RefCountableViewModel.view_models.splice(index, 1);
+        RefCountableViewModel.viewModels.splice(index, 1);
       }
     }
   }
 
   // Helper: Disposable view model
   class DisposableViewModel {
-    static view_models: DisposableViewModel[] = [];
+    static viewModels: DisposableViewModel[] = [];
 
     constructor() {
-      DisposableViewModel.view_models.push(this);
+      DisposableViewModel.viewModels.push(this);
     }
 
     dispose(): void {
-      const index = DisposableViewModel.view_models.indexOf(this);
+      const index = DisposableViewModel.viewModels.indexOf(this);
       if (index >= 0) {
-        DisposableViewModel.view_models.splice(index, 1);
+        DisposableViewModel.viewModels.splice(index, 1);
       }
     }
   }
 
   // Helper: Simple view model
   class SimpleViewModel {
-    static view_models: SimpleViewModel[] = [];
+    static viewModels: SimpleViewModel[] = [];
     prop: ko.Observable<unknown>;
 
     constructor() {
       this.prop = ko.observable();
-      SimpleViewModel.view_models.push(this);
+      SimpleViewModel.viewModels.push(this);
     }
   }
 
   beforeEach(() => {
-    RefCountableViewModel.view_models = [];
-    DisposableViewModel.view_models = [];
-    SimpleViewModel.view_models = [];
+    RefCountableViewModel.viewModels = [];
+    DisposableViewModel.viewModels = [];
+    SimpleViewModel.viewModels = [];
   });
 
   describe('basic view model properties', () => {
@@ -96,7 +96,7 @@ describe('memory management', () => {
       vm.prop4 = ko.computed(() => true);
       vm.prop5 = kb.observable<string>(new Backbone.Model({ name: 'name1' }), 'name');
       vm.prop6 = nestedViewModel;
-      vm.prop7 = kb.collectionObservable(new Backbone.Collection(), { models_only: true });
+      vm.prop7 = kb.collectionObservable(new Backbone.Collection(), { modelsOnly: true });
       vm.prop8 = kb.viewModel(new Backbone.Model({ name: 'name1' }));
       vm.prop9 = kb.collectionObservable(new Backbone.Collection());
 
@@ -179,16 +179,16 @@ describe('memory management', () => {
       kb.setStatistics(stats);
 
       // Test with destroyable view model
-      DisposableViewModel.view_models = [];
+      DisposableViewModel.viewModels = [];
       const co = kb.collectionObservable(new Backbone.Collection([{ name: 'name1' }, { name: 'name2' }]), {
-        view_model: {
+        viewModel: {
           create: () => new DisposableViewModel(),
         },
       });
-      assert.strictEqual(DisposableViewModel.view_models.length, 2, 'Created: 2');
+      assert.strictEqual(DisposableViewModel.viewModels.length, 2, 'Created: 2');
 
       co.dispose();
-      assert.strictEqual(DisposableViewModel.view_models.length, 0, 'All disposed');
+      assert.strictEqual(DisposableViewModel.viewModels.length, 0, 'All disposed');
 
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
@@ -198,18 +198,18 @@ describe('memory management', () => {
       const stats = new kb.Statistics();
       kb.setStatistics(stats);
 
-      SimpleViewModel.view_models = [];
+      SimpleViewModel.viewModels = [];
       const co = kb.collectionObservable(new Backbone.Collection([{ name: 'name1' }, { name: 'name2' }]), {
-        view_model: {
+        viewModel: {
           create: () => new SimpleViewModel(),
         },
       });
-      assert.strictEqual(SimpleViewModel.view_models.length, 2, 'Created: 2');
+      assert.strictEqual(SimpleViewModel.viewModels.length, 2, 'Created: 2');
 
       co.dispose();
       // Simple view models stay in array but props are released
-      assert.strictEqual(SimpleViewModel.view_models.length, 2, 'Still in array: 2');
-      for (const vm of SimpleViewModel.view_models) {
+      assert.strictEqual(SimpleViewModel.viewModels.length, 2, 'Still in array: 2');
+      for (const vm of SimpleViewModel.viewModels) {
         assert.ok(!vm.prop, 'Prop destroyed');
       }
 

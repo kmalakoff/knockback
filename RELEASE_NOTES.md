@@ -79,7 +79,7 @@ Please refer to the following release notes when upgrading your version of Knock
 
 ## 0.19.1
 
-- BREAKING API CHANGE: kb.observable now splits share options out to the second parameter to give a new signature: kb.observable(model, key, share_options, view_model)
+- BREAKING API CHANGE: kb.observable now splits share options out to the second parameter to give a new signature: kb.observable(model, key, share_options, viewModel)
 - BREAKING API CHANGE: kb.ViewModel::mapObservables is now aliased to kb.ViewModel::createObservables. Also, kb.ViewModel::createObservables now respected the excludes option. Use kb.observable(model, key_or_options, share_options, vm) to manually add observables to a view model.
 - Removed support for Knockout version < 2.1.0.
 - Patched Knockout extend to release observables: https://github.com/kmalakoff/knockback/issues/124
@@ -115,7 +115,7 @@ Please refer to the following release notes when upgrading your version of Knock
 
 ## 0.18.2
 
-- added auto_compact option for collection paging to regenerate observables on collection reset
+- added autoCompact option for collection paging to regenerate observables on collection reset
 - exposed kb.ViewModel's createObservables and mapObservables functions for manual use
 
 ## 0.18.1
@@ -135,7 +135,7 @@ Please refer to the following release notes when upgrading your version of Knock
 - updated tests for latest libraries (Knockout 3.0.0, Backbone 1.2.0, Underscore 1.5.2, LoDash 2.3, and BackboneRelational 0.8.6)
 - added 'sort' collection message in addition to 'resort'
 - bug fix for removed model: https://github.com/kmalakoff/knockback/issues/87
-- added statics and static_defaults: kb.viewModel(model, {statics: ['name'], staticDefaults: {name: '(no name)'}})
+- added statics and staticDefaults: kb.viewModel(model, {statics: ['name'], staticDefaults: {name: '(no name)'}})
 
 ## 0.17.2
 
@@ -155,7 +155,7 @@ Please refer to the following release notes when upgrading your version of Knock
 - added support for Parse framework (no-AMD support): https://github.com/kmalakoff/knockback/issues/51
 - bug fix for nested filter dependencies: https://github.com/addyosmani/todomvc/issues/381
 - bug fix for filtering notifications: https://github.com/kmalakoff/knockback/issues/53
-- bug fix for models_only on change event: https://github.com/kmalakoff/knockback/issues/59
+- bug fix for modelsOnly on change event: https://github.com/kmalakoff/knockback/issues/59
 - added support for Backbone 1.2.0. Note: needed to patch Backbone-relational to 0.8.0plus and to add \_.findWhere to lodash.
 - added automatic call of afterRender on a view model in kb.renderTemplate unless afterRender is also provided in the options (to avoid multiple calls).
 
@@ -187,8 +187,8 @@ Please refer to the following release notes when upgrading your version of Knock
 
 ## 0.16.5
 
-- renamed kb-app to kb-inject and kb.injectApps to kb.injectViewModels to better reflect the general nature of the injection mechanism: expanded the flexibilty and use cases for data-bind 'inject' amd kb-inject: use 'new' on the for functions to permit class hierachies to be used and recursively resolving view_model or create within the binding cycle.
-- **afterBinding and beforeBinding**: put into a special options property to simplify the kb-inject attribute syntax (eg. no need to specify view_model: for the properties to seed your view model with) and allow to be included on the view_model
+- renamed kb-app to kb-inject and kb.injectApps to kb.injectViewModels to better reflect the general nature of the injection mechanism: expanded the flexibilty and use cases for data-bind 'inject' amd kb-inject: use 'new' on the for functions to permit class hierachies to be used and recursively resolving viewModel or create within the binding cycle.
+- **afterBinding and beforeBinding**: put into a special options property to simplify the kb-inject attribute syntax (eg. no need to specify viewModel: for the properties to seed your view model with) and allow to be included on the viewModel
 - bug fix: fixed case where kb.injectViewModels (formerly kb.injectApps) could be called before page scripts loaded.
 - bug fix: fixed case where kb.Observable set 0 to null (issue 44).
 - added headers to all components and stack versions.
@@ -205,9 +205,9 @@ Please refer to the following release notes when upgrading your version of Knock
 
 ## 0.16.2
 
-- **major changes to kb.CollectionObservable**: added support for observable mappings (sort_attribute, sorted_index_fn and filters), removed defer, removed optional collection reference counting, removed Backbone.Events (use ko.subscription instead, removed wrappedObject in the collection).
+- **major changes to kb.CollectionObservable**: added support for observable mappings (sortAttribute, sorted_index_fn and filters), removed defer, removed optional collection reference counting, removed Backbone.Events (use ko.subscription instead, removed wrappedObject in the collection).
 
-- **added app and view_model injection**: you are now able to inject an application using a kb-app attribute on a dom element and inject into a view model using an 'inject' data-bind attribute.
+- **added app and viewModel injection**: you are now able to inject an application using a kb-app attribute on a dom element and inject into a view model using an 'inject' data-bind attribute.
 
 - **added validators**: you can use kb.valueValidator, kb.inputValidator, or kb.formValidator to add validations. Currently only the following are support: 'required', 'url', 'number', 'email' and you can extend by adding properties to kb.validators
 
@@ -246,7 +246,7 @@ window.ThingCellCollectionObservable = kb.CollectionObservable.extend({
   constructor: function(collection, options) {
     // return ko.observableArray instead of 'this'
     return kb.CollectionObservable.prototype.constructor.call(this, collection, {
-      view_model: ThingCellViewModel,
+      viewModel: ThingCellViewModel,
       options: options
     });
   }
@@ -256,7 +256,7 @@ window.ThingCellCollectionObservable = kb.CollectionObservable.extend({
 window.ThingCellCollectionObservable = kb.CollectionObservable.extend({
   constructor: function(collection, options) {
     kb.CollectionObservable.prototype.constructor.call(this, collection, {
-      view_model: ThingCellViewModel,
+      viewModel: ThingCellViewModel,
       options: options
     });
 
@@ -267,17 +267,17 @@ window.ThingCellCollectionObservable = kb.CollectionObservable.extend({
 
 ```
 
-- **added 'models_only' option to kb.CollectionObservable**: rather than deducing whether ViewModels should be created for a kbCollectionObservable, now you must explicitly state that you would only like models to be created or else a default kb.ViewModel will be created for each model.
+- **added 'modelsOnly' option to kb.CollectionObservable**: rather than deducing whether ViewModels should be created for a kbCollectionObservable, now you must explicitly state that you would only like models to be created or else a default kb.ViewModel will be created for each model.
 
 - **added 'filters' option to kb.CollectionObservable**: now in addition to per-collection observable sorting, you can also filter a collection independent of the Backbone.Collection.
 
-- **added factories option to kb.CollectionObservable and kb.ViewModel**: you can specify a constructor, create function, or models_only flag for a path. For example:
+- **added factories option to kb.CollectionObservable and kb.ViewModel**: you can specify a constructor, create function, or modelsOnly flag for a path. For example:
 
 ```
-var view_model = {
-  kb_view_models: kb.collectionObservable(collection),
-  no_view_models: kb.collectionObservable(collection, { factories: {
-    'models': { models_only: true }
+var viewModel = {
+  kb_viewModels: kb.collectionObservable(collection),
+  no_viewModels: kb.collectionObservable(collection, { factories: {
+    'models': { modelsOnly: true }
   }}),
   nested_different: kb.collectionObservable(collection, { factories: {
     'models': PersonViewModel
@@ -299,22 +299,22 @@ var view_model = {
 - **added convention for linking the lifecycle of DOM nodes and ViewModels**: added the following functions to auto release nodes when their element is removed using ko.removeNode(el):
 
 ```
-kb.releaseOnNodeRemove(view_model, node) -> binds kb.release to be called when ko.removeNode is called on the node.
+kb.releaseOnNodeRemove(viewModel, node) -> binds kb.release to be called when ko.removeNode is called on the node.
 
-kb.renderAutoReleasedTemplate(template_name, view_model, options) -> renders a template and binds auto-release to the template node
+kb.renderAutoReleasedTemplate(template_name, viewModel, options) -> renders a template and binds auto-release to the template node
 
-kb.applyBindings(view_model, node) -> applies bindings and binds auto-release to the node
+kb.applyBindings(viewModel, node) -> applies bindings and binds auto-release to the node
 ```
 
 - **added support for attribute changing types**: if you use kb.ViewModel or kb.Observable, when a Backbone.Model's attribute changes type, the corresponding observable will change types too.
 
 ```
 var model = new Backbone.Model({reused: null});
-var view_model = kb.viewModel(model);
-kb.utils.valueType(view_model.reused); // kb.TYPE_SIMPLE
+var viewModel = kb.viewModel(model);
+kb.utils.valueType(viewModel.reused); // kb.TYPE_SIMPLE
 
 model.set({reused: new Backbone.Model()});
-kb.utils.valueType(view_model.reused); // kb.TYPE_MODEL
+kb.utils.valueType(viewModel.reused); // kb.TYPE_MODEL
 ```
 
 - **added support for recursive options.options**: rather than requiring manual merging of options when you derive from kb.ViewModel and kb.CollectionObservable, you can pass options as a property on the options:
@@ -355,18 +355,18 @@ collection_observable_shared = kb.collectionObservable(new Backbone.Collection()
 
 - **replace kb.utils.release with kb.release**: simplified the naming of this common function.
 
-- **kb.ViewModel and kb.CollectionObservable options**: view_model_create(model), create(model, key), children have been replaced by the mappings options as explained above. This change was made to simplify and standardize the way to override custom ViewModels. You will need to use mappings + paths + one of 'constructor' or 'create: function(model, options)' or 'models_only: true' as demonstrated above.
+- **kb.ViewModel and kb.CollectionObservable options**: viewModel_create(model), create(model, key), children have been replaced by the mappings options as explained above. This change was made to simplify and standardize the way to override custom ViewModels. You will need to use mappings + paths + one of 'constructor' or 'create: function(model, options)' or 'modelsOnly: true' as demonstrated above.
 
-- **kb.CollectionObservable explicit models_only**: previously, if you did not specify a view_model for your collection, the kb.CollectionObservable stored models instead of ViewModels. Now you must explicitly pass the models_only option. This change was made to provide better default behavior for nested collections meaning a kb.ViewModel is automatically created for each nested Model unless otherwise specified.
-
-```
-var collection_observable = kb.collectionObservable(collection, {models_only: true});
-```
-
-- **custom factories for nested models**: if you were using 'view_model_create' or 'children' for specifying view models for nested models, you need to replace them with the 'factories' options as follows:
+- **kb.CollectionObservable explicit modelsOnly**: previously, if you did not specify a viewModel for your collection, the kb.CollectionObservable stored models instead of ViewModels. Now you must explicitly pass the modelsOnly option. This change was made to provide better default behavior for nested collections meaning a kb.ViewModel is automatically created for each nested Model unless otherwise specified.
 
 ```
-var view_model = kb.viewModel(model, {
+var collection_observable = kb.collectionObservable(collection, {modelsOnly: true});
+```
+
+- **custom factories for nested models**: if you were using 'viewModel_create' or 'children' for specifying view models for nested models, you need to replace them with the 'factories' options as follows:
+
+```
+var viewModel = kb.viewModel(model, {
   factories: {
     'friends.models': FriendViewModel,
     'friends.models.friends.models': FriendViewModel
@@ -399,7 +399,7 @@ kb.viewModel(model, {keys: ['key1', 'key2']});
 
 - **merged kb.AttributeConnector functionality into kb.Observable**: use kb.Observable instead.
 
-- **nested model 'view_model_create' and 'children' factories replaced with constructor option factories**: see above.
+- **nested model 'viewModel_create' and 'children' factories replaced with constructor option factories**: see above.
 
 ## 0.15.0
 
@@ -409,7 +409,7 @@ kb.viewModel(model, {keys: ['key1', 'key2']});
 
 - **kb.LocalizedObservable now uses Backbone.extend**: now JavaScript inheritance is possible so read/write options have been deprecated
 
-- **kb.ViewModel now handles nested models** (like self-referencing Backbone-Relational.js models). **Related tutorials**: [Relational Models](http://kmalakoff.github.com/knockback/tutorial_relational_models.html) [kb.ViewModel](http://kmalakoff.github.com/knockback/tutorial_kb_view_model.html)
+- **kb.ViewModel now handles nested models** (like self-referencing Backbone-Relational.js models). **Related tutorials**: [Relational Models](http://kmalakoff.github.com/knockback/tutorial_relational_models.html) [kb.ViewModel](http://kmalakoff.github.com/knockback/tutorial_kb_viewModel.html)
 
 ```
 var Person = Backbone.RelationalModel.extend({
@@ -431,36 +431,36 @@ var paul = new Person({
   friends: ['person-1']
 });
 
-var john_view_model = kb.viewModel(john);
+var john_viewModel = kb.viewModel(john);
 
-var friend_view_model = john_view_model.friends()[0];
-kb.utils.wrappedModel(friend_view_model);                     // paul
-kb.utils.wrappedModel(friend_view_model.friends()[0]);        // john
+var friend_viewModel = john_viewModel.friends()[0];
+kb.utils.wrappedModel(friend_viewModel);                     // paul
+kb.utils.wrappedModel(friend_viewModel.friends()[0]);        // john
 ```
 
 - **kb.CollectionObservable is now a ko.observableArray**: you no longer need to supply the second parameter
 
 ```
 // WAS:
-var view_model = {
+var viewModel = {
   property: ko.observableArray()
   collection_observable: kb.collectionObservable(collection, observable_array, options)
 };
 
-var view_model;
-for (var i = 0, len = view_model.property().length; i < len; i++) {
-  view_model = view_model.property()[i];
+var viewModel;
+for (var i = 0, len = viewModel.property().length; i < len; i++) {
+  viewModel = viewModel.property()[i];
   ...
 }
 
 // IS NOW:
-var view_model = {
+var viewModel = {
   property: kb.collectionObservable(collection, options)
 };
 
-var view_model;
-for (var i = 0, len = view_model.property().length; i < len; i++) {
-  view_model = view_model.property()[i];
+var viewModel;
+for (var i = 0, len = viewModel.property().length; i < len; i++) {
+  viewModel = viewModel.property()[i];
   ...
 }
 ```
@@ -474,9 +474,9 @@ for (var i = 0, len = view_model.property().length; i < len; i++) {
 
 - **kb.utils.wrappedObservable(instance {, observable})** replaces **Knockback.wrappedObservable(instance)**
 
-- **kb.utils.wrappedModel(view_model {, observable})** replaces **Knockback.viewModelGetModel(view_model)** and **Knockback.vmModel(view_model)**
+- **kb.utils.wrappedModel(viewModel {, observable})** replaces **Knockback.viewModelGetModel(viewModel)** and **Knockback.vmModel(viewModel)**
 
-- **kb.utils.release(obj)** replaces **Knockback.vmRelease(view_model)** and **Knockback.vmReleaseObservable(observable)**
+- **kb.utils.release(obj)** replaces **Knockback.vmRelease(viewModel)** and **Knockback.vmReleaseObservable(observable)**
 
 - was replaced by kb.utils.release(obj)
 
@@ -484,7 +484,7 @@ for (var i = 0, len = view_model.property().length; i < len; i++) {
 
 ```
 var MyLocalizer = kb.LocalizedObservable.extend({
-  constructor: function(value, options, view_model) {
+  constructor: function(value, options, viewModel) {
     kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
     return kb.utils.wrappedObservable(this);
   },

@@ -122,20 +122,20 @@ export function setFactory(obj: KBObject, value: Factory): Factory {
 
 // Event watcher
 export function getEventWatcher(obj: KBObject): EventWatcher | undefined {
-  return get(obj, 'event_watcher');
+  return get(obj, 'eventWatcher');
 }
 
 export function setEventWatcher(obj: KBObject, value: EventWatcher): EventWatcher {
-  return set(obj, 'event_watcher', value);
+  return set(obj, 'eventWatcher', value);
 }
 
 // Event watcher ownership
 export function getEventWatcherIsOwned(obj: KBObject): boolean | undefined {
-  return get(obj, 'event_watcher_is_owned');
+  return get(obj, 'eventWatcher_is_owned');
 }
 
 export function setEventWatcherIsOwned(obj: KBObject, value: boolean): boolean {
-  return set(obj, 'event_watcher_is_owned', value);
+  return set(obj, 'eventWatcher_is_owned', value);
 }
 
 // =============================================================================

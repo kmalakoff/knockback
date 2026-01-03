@@ -108,7 +108,7 @@ export class Store {
       return createFromDefaultCreator(obj, options as ViewModelOptions);
     }
 
-    if ((creator as { models_only?: boolean }).models_only) {
+    if ((creator as { modelsOnly?: boolean }).modelsOnly) {
       return obj;
     }
 

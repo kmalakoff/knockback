@@ -1,7 +1,7 @@
 import type * as Backbone from 'backbone';
 
 // Creator types - union of different creator patterns
-export type CreatorObject<T = unknown> = { create?: (obj: unknown, options: CreateOptions) => T; models_only?: boolean };
+export type CreatorObject<T = unknown> = { create?: (obj: unknown, options: CreateOptions) => T; modelsOnly?: boolean };
 export type CreatorConstructor<T = unknown> = new (obj: unknown, options: CreateOptions) => T;
 export type CreatorFunction<T = unknown> = (obj: unknown, options: CreateOptions) => T;
 

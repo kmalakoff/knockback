@@ -163,7 +163,7 @@ export class TypedValue {
         value = store.retainOrCreate(newValue, createOptions, true);
       } else {
         // Create manually
-        if (isCreatorObject(creator) && creator.models_only) {
+        if (isCreatorObject(creator) && creator.modelsOnly) {
           value = newValue;
           valueType = TYPE_SIMPLE;
         } else if (isCreatorObject(creator)) {

@@ -9,8 +9,8 @@ export default function disposeMetadata(obj: KBObject): void {
   if (!obj.__kb) return;
 
   // Release event watcher callbacks
-  if (obj.__kb.event_watcher) {
-    obj.__kb.event_watcher.releaseCallbacks(obj);
+  if (obj.__kb.eventWatcher) {
+    obj.__kb.eventWatcher.releaseCallbacks(obj);
   }
 
   // Clear reference to break cycles
@@ -30,10 +30,10 @@ export default function disposeMetadata(obj: KBObject): void {
   __kb.factory = undefined;
 
   // Release owned event watcher
-  if (__kb.event_watcher_is_owned && __kb.event_watcher) {
-    __kb.event_watcher.dispose();
+  if (__kb.eventWatcher_is_owned && __kb.eventWatcher) {
+    __kb.eventWatcher.dispose();
   }
-  __kb.event_watcher = undefined;
+  __kb.eventWatcher = undefined;
 
   // Release owned store
   if (__kb.store_is_owned && __kb.store) {

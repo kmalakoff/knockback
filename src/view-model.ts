@@ -8,7 +8,7 @@ import { Store } from './store.ts';
 import type { InternalCreateOptions, InternalViewModelOptions, KBMetadata, ObservableOptions, ViewModelOptions, ViewModel as ViewModelType } from './types.ts';
 import { attachDispose, collapseOptions, disposeDisposableKeys, disposeMetadata, resolveModel, wrappedEventWatcher, wrappedFactory, wrappedObject, wrappedStore } from './utils.ts';
 
-const KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'static_defaults'] as const;
+const KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'staticDefaults'] as const;
 
 /**
  * Extended metadata for ViewModels
@@ -16,12 +16,12 @@ const KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'static_defaul
  * @internal
  */
 interface ViewModelMetadata extends KBMetadata {
-  view_model?: Record<string, unknown>;
+  viewModel?: Record<string, unknown>; // Internal: reference to the view model instance
   keys?: string[] | Record<string, ObservableOptions>;
   internals?: string[];
   excludes?: string[];
   statics?: string[];
-  static_defaults?: Record<string, unknown>;
+  staticDefaults?: Record<string, unknown>; // Renamed from staticDefaults
   path?: string;
   create_options?: InternalCreateOptions;
   vm_keys?: Record<string, boolean>;
@@ -32,7 +32,7 @@ function assignViewModelKey(vm: ViewModelClass, key: string): string | undefined
   const __kb = vm.__kb as ViewModelMetadata;
   const vmKey = __kb.internals && __kb.internals.indexOf(key) >= 0 ? `_${key}` : key;
 
-  const viewModel = __kb.view_model as Record<string, unknown>;
+  const viewModel = __kb.viewModel as Record<string, unknown>;
   if (Object.hasOwn(viewModel, vmKey)) {
     return undefined; // Already exists
   }
@@ -51,7 +51,7 @@ function createObservable(vm: ViewModelClass, model: Backbone.Model | null, key:
   const vmKey = assignViewModelKey(vm, key);
   if (!vmKey) return;
 
-  const viewModel = __kb.view_model as Record<string, unknown>;
+  const viewModel = __kb.viewModel as Record<string, unknown>;
   (vm as Record<string, unknown>)[vmKey] = viewModel[vmKey] = kbObservable(model, key, createOptions as ViewModelOptions, vm as unknown as Record<string, unknown>);
 }
 
@@ -64,12 +64,12 @@ function createStaticObservables(vm: ViewModelClass, model: Backbone.Model): voi
     const vmKey = assignViewModelKey(vm, key);
     if (!vmKey) continue;
 
-    const viewModel = __kb.view_model as Record<string, unknown>;
+    const viewModel = __kb.viewModel as Record<string, unknown>;
 
     if (model.has(vmKey)) {
       (vm as Record<string, unknown>)[vmKey] = viewModel[vmKey] = model.get(vmKey);
-    } else if (__kb.static_defaults && vmKey in __kb.static_defaults) {
-      (vm as Record<string, unknown>)[vmKey] = viewModel[vmKey] = __kb.static_defaults[vmKey];
+    } else if (__kb.staticDefaults && vmKey in __kb.staticDefaults) {
+      (vm as Record<string, unknown>)[vmKey] = viewModel[vmKey] = __kb.staticDefaults[vmKey];
     } else {
       delete viewModel[vmKey];
     }
@@ -129,7 +129,7 @@ export class ViewModelClass {
     }
 
     const __kb = this.__kb as ViewModelMetadata;
-    __kb.view_model = viewModel || this;
+    __kb.viewModel = viewModel || this;
 
     // Collapse options
     const mergedOptions = collapseOptions(opts) as InternalViewModelOptions;
@@ -195,7 +195,7 @@ export class ViewModelClass {
       store: wrappedStore(this),
       factory: wrappedFactory(this),
       path: __kb.path,
-      event_watcher: wrappedEventWatcher(this),
+      eventWatcher: wrappedEventWatcher(this),
     };
 
     // Create observables
@@ -239,14 +239,14 @@ export class ViewModelClass {
     const __kb = this.__kb as ViewModelMetadata;
 
     // Clear external references
-    if (__kb.view_model !== this && __kb.vm_keys) {
-      const viewModel = __kb.view_model as Record<string, unknown>;
+    if (__kb.viewModel !== this && __kb.vm_keys) {
+      const viewModel = __kb.viewModel as Record<string, unknown>;
       for (const vmKey in __kb.vm_keys) {
         viewModel[vmKey] = null;
       }
     }
 
-    __kb.view_model = undefined;
+    __kb.viewModel = undefined;
     __kb.create_options = undefined;
 
     disposeDisposableKeys(this as unknown as Record<string, unknown>);
@@ -306,7 +306,7 @@ export class ViewModelClass {
           mappingInfo = { ...mappingInfo, key: mappingInfo.key || vmKey };
         }
 
-        const viewModel = __kb.view_model as Record<string, unknown>;
+        const viewModel = __kb.viewModel as Record<string, unknown>;
         (this as Record<string, unknown>)[vmKey] = viewModel[vmKey] = kbObservable(model, mappingInfo, __kb.create_options as ViewModelOptions, this as unknown as Record<string, unknown>);
       }
     }

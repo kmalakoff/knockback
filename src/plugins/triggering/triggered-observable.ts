@@ -12,7 +12,7 @@ const KEYS_PUBLISH = ['dispose'] as const;
 
 export interface TriggeredObservableInstance {
   [key: string]: unknown;
-  __kb: { observable?: ko.Observable; event_watcher?: EventWatcher };
+  __kb: { observable?: ko.Observable; eventWatcher?: EventWatcher };
   __kb_released?: boolean;
   event_selector: string;
   vo: ko.Observable<Backbone.Events | null>;

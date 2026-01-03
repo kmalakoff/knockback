@@ -76,8 +76,8 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
     }
 
     const createOptions = collapseOptions(options) as InternalObservableOptions;
-    const eventWatcher = createOptions.event_watcher;
-    delete createOptions.event_watcher;
+    const eventWatcher = createOptions.eventWatcher;
+    delete createOptions.eventWatcher;
 
     // Set up basics
     state._value = new TypedValue(createOptions);
@@ -168,7 +168,7 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
     (koObservable as ObservableInternal).model = state.model = modelComputed;
 
     // Set up event watcher
-    EventWatcher.useOptionsOrCreate({ event_watcher: eventWatcher }, model || null, state, {
+    EventWatcher.useOptionsOrCreate({ eventWatcher: eventWatcher }, model || null, state, {
       obj: state,
       emitter: (m: Backbone.Model | null) => state.model?.(m),
       update: () => ignore(() => update()),

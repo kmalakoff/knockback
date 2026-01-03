@@ -114,9 +114,9 @@ describe('@mcpeasy/knockback', () => {
       assert.strictEqual(co().length, 1);
     });
 
-    it('should support models_only option', () => {
+    it('should support modelsOnly option', () => {
       const collection = new Backbone.Collection([{ name: 'Bob' }]);
-      const co = kb.collectionObservable(collection, { models_only: true });
+      const co = kb.collectionObservable(collection, { modelsOnly: true });
 
       assert.strictEqual(co().length, 1);
       assert.ok(co()[0] instanceof Backbone.Model);

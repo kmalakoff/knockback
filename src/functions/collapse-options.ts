@@ -68,7 +68,7 @@ function mergeOptions(result: Record<string, unknown>, options?: ViewModelOption
         }
         break;
 
-      case 'static_defaults':
+      case 'staticDefaults':
         mergeObject(result, key, value as Record<string, unknown>);
         break;
 

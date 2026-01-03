@@ -211,7 +211,7 @@ export function inputValidator(
 
   const result = valueValidator(options.value, bindings, opts);
 
-  // If there is a name, add to the view_model with $ scoping
+  // If there is a name, add to the viewModel with $ scoping
   if (inputName && !opts.no_attach) {
     viewModel[`$${inputName}`] = result;
   }
@@ -311,7 +311,7 @@ export function formValidator(
   // Aggregate disabled
   results.$disabled = ko.computed(() => !results.$enabled?.());
 
-  // If there is a name, add to the view_model with $ scoping
+  // If there is a name, add to the viewModel with $ scoping
   if (formName) {
     viewModel[`$${formName}`] = results;
   }

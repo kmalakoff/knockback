@@ -103,7 +103,7 @@ describe('ViewModel advanced', () => {
     });
   });
 
-  describe('statics and static_defaults', () => {
+  describe('statics and staticDefaults', () => {
     it('should support statics option for non-observable values', () => {
       const stats = new kb.Statistics();
       kb.setStatistics(stats);
@@ -129,7 +129,7 @@ describe('ViewModel advanced', () => {
       kb.setStatistics(null);
     });
 
-    it('should support static_defaults option', () => {
+    it('should support staticDefaults option', () => {
       const stats = new kb.Statistics();
       kb.setStatistics(stats);
 
@@ -142,7 +142,7 @@ describe('ViewModel advanced', () => {
       const model = new Backbone.Model<{ name: string; age?: number }>({ name: 'Bob' });
       const vm = kb.viewModel<StaticDefaultsViewModel>(model, {
         statics: ['type', 'role'],
-        static_defaults: { type: 'guest', role: 'viewer' },
+        staticDefaults: { type: 'guest', role: 'viewer' },
       });
 
       assert.strictEqual(vm.type, 'guest', 'type has default value');

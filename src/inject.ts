@@ -7,7 +7,7 @@ import { applyBindings, ignore, releaseOnNodeRemove } from './kb.ts';
 // =============================================================================
 
 export interface InjectData {
-  view_model?: new (viewModel: unknown, element: Element, valueAccessor?: unknown, allBindingsAccessor?: unknown) => unknown;
+  viewModel?: new (viewModel: unknown, element: Element, valueAccessor?: unknown, allBindingsAccessor?: unknown) => unknown;
   create?: (viewModel: unknown, element: Element, valueAccessor?: unknown, allBindingsAccessor?: unknown) => void;
   options?: InjectOptions;
   [key: string]: unknown;
@@ -21,7 +21,7 @@ export interface InjectOptions {
 
 export interface InjectResult {
   el: Element;
-  view_model: unknown;
+  viewModel: unknown;
   binding?: string;
 }
 
@@ -63,16 +63,16 @@ export function inject(data: InjectData | (new (...args: unknown[]) => unknown),
       viewModel = new Constructor(viewModel, element, valueAccessor, allBindingsAccessor) as Record<string, unknown>;
       releaseOnNodeRemove(viewModel, element);
     } else {
-      // view_model constructor causes a scope change
-      if (injectData.view_model) {
-        const VMConstructor = injectData.view_model;
+      // viewModel constructor causes a scope change
+      if (injectData.viewModel) {
+        const VMConstructor = injectData.viewModel;
         viewModel = new VMConstructor(viewModel, element, valueAccessor, allBindingsAccessor) as Record<string, unknown>;
         releaseOnNodeRemove(viewModel, element);
       }
 
       // Resolve and merge in each key
       for (const key in injectData) {
-        if (key === 'view_model') continue;
+        if (key === 'viewModel') continue;
 
         const value = injectData[key];
 
@@ -117,7 +117,7 @@ export function injectViewModels(root?: Element | Document): InjectResult[] {
         const attr = Array.from(element.attributes).find((a) => a.name === 'kb-inject');
         if (attr) {
           element.__kb_injected = true;
-          results.push({ el: element, view_model: {}, binding: attr.value });
+          results.push({ el: element, viewModel: {}, binding: attr.value });
         }
       }
     }
@@ -166,9 +166,9 @@ export function injectViewModels(root?: Element | Document): InjectResult[] {
           delete data.options;
         }
 
-        app.view_model = inject(data, app.view_model as Record<string, unknown>, app.el, null, null, true);
+        app.viewModel = inject(data, app.viewModel as Record<string, unknown>, app.el, null, null, true);
 
-        const vm = app.view_model as { afterBinding?: InjectOptions['afterBinding']; beforeBinding?: InjectOptions['beforeBinding'] };
+        const vm = app.viewModel as { afterBinding?: InjectOptions['afterBinding']; beforeBinding?: InjectOptions['beforeBinding'] };
         afterBinding = vm.afterBinding || options.afterBinding;
         beforeBinding = vm.beforeBinding || options.beforeBinding;
       } catch (e) {
@@ -178,13 +178,13 @@ export function injectViewModels(root?: Element | Document): InjectResult[] {
 
     // Auto-bind
     if (beforeBinding) {
-      beforeBinding.call(app.view_model, app.view_model, app.el, options);
+      beforeBinding.call(app.viewModel, app.viewModel, app.el, options);
     }
 
-    applyBindings(app.view_model, app.el);
+    applyBindings(app.viewModel, app.el);
 
     if (afterBinding) {
-      afterBinding.call(app.view_model, app.view_model, app.el, options);
+      afterBinding.call(app.viewModel, app.viewModel, app.el, options);
     }
   }
 

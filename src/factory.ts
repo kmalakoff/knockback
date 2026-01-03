@@ -4,7 +4,7 @@ import type { InternalViewModelOptions } from './types.ts';
 import { pathJoin, wrappedFactory } from './utils.ts';
 
 interface PathMapping {
-  view_model?: Creator;
+  viewModel?: Creator;
   [key: string]: unknown;
 }
 
@@ -74,9 +74,9 @@ export class Factory {
   creatorForPath(_obj: unknown, path: string): Creator | undefined {
     const creator = this.paths[path];
     if (creator) {
-      // Handle view_model property wrapper
+      // Handle viewModel property wrapper
       const mapping = creator as PathMapping;
-      return mapping.view_model ? mapping.view_model : (creator as Creator);
+      return mapping.viewModel ? mapping.viewModel : (creator as Creator);
     }
 
     if (this.parent_factory) {

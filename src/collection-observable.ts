@@ -27,8 +27,8 @@ export interface CollectionObservableInstance {
   __kb: Record<string, unknown>;
   __kb_released?: boolean;
   in_edit: number;
-  models_only?: boolean;
-  auto_compact?: boolean;
+  modelsOnly?: boolean;
+  autoCompact?: boolean;
   path?: string;
   create_options?: InternalCreateOptions;
   collection?: ko.Computed<Backbone.Collection | null>;
@@ -67,7 +67,7 @@ export function compare(valueA: unknown, valueB: unknown): number {
  * @param options - Additional options
  * @returns A Knockout observable array with Knockback extensions
  */
-export function collectionObservable<T = unknown>(inputCollection: Backbone.Collection | Backbone.Model[] | Record<string, unknown>[], viewModelOrOptions?: CollectionObservableOptions<T> | CollectionObservableOptions<T>['view_model'], options?: CollectionObservableOptions<T>): CollectionObservable<T>;
+export function collectionObservable<T = unknown>(inputCollection: Backbone.Collection | Backbone.Model[] | Record<string, unknown>[], viewModelOrOptions?: CollectionObservableOptions<T> | CollectionObservableOptions<T>['viewModel'], options?: CollectionObservableOptions<T>): CollectionObservable<T>;
 export function collectionObservable<T = unknown>(inputCollection?: Backbone.Collection | unknown[], viewModelOrOptions?: unknown, options?: CollectionObservableOptions<T>): CollectionObservable<T> {
   return ignore(() => {
     // Normalize arguments
@@ -83,7 +83,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
     // Handle viewModel as function
     let mergedOptions: CollectionObservableOptions<T> = {};
     if (typeof viewModelOrOptions === 'function') {
-      mergedOptions = { view_model: viewModelOrOptions as Creator<T> };
+      mergedOptions = { viewModel: viewModelOrOptions as Creator<T> };
     } else if (viewModelOrOptions && typeof viewModelOrOptions === 'object') {
       Object.assign(mergedOptions, viewModelOrOptions);
     }
@@ -96,8 +96,8 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
       __kb: {},
       __kb_released: false,
       in_edit: 0,
-      models_only: undefined,
-      auto_compact: undefined,
+      modelsOnly: undefined,
+      autoCompact: undefined,
       path: undefined,
 
       dispose,
@@ -122,13 +122,13 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
 
     // Options
     mergedOptions = collapseOptions(mergedOptions) as CollectionObservableOptions<T>;
-    if (mergedOptions.auto_compact) {
-      state.auto_compact = true;
+    if (mergedOptions.autoCompact) {
+      state.autoCompact = true;
     }
 
     // Comparator
-    if (mergedOptions.sort_attribute) {
-      _comparator = ko.observable(attributeComparator(mergedOptions.sort_attribute));
+    if (mergedOptions.sortAttribute) {
+      _comparator = ko.observable(attributeComparator(mergedOptions.sortAttribute));
     } else {
       _comparator = ko.observable(mergedOptions.comparator || null);
     }
@@ -152,10 +152,10 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
     createOptions.factory = wrappedFactory(observable, shareOrCreateFactory(mergedOptions as InternalCollectionObservableOptions));
     createOptions.path = pathJoin(mergedOptions.path, 'models');
 
-    // Check for models_only
+    // Check for modelsOnly
     createOptions.creator = (createOptions.factory as Factory).creatorForPath(null, createOptions.path);
     if (createOptions.creator) {
-      state.models_only = (createOptions.creator as { models_only?: boolean }).models_only;
+      state.modelsOnly = (createOptions.creator as { modelsOnly?: boolean }).modelsOnly;
     }
 
     // Publish methods
@@ -226,7 +226,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
         if (comparatorFn) {
           viewModels = filteredModels.map((model: Backbone.Model) => createViewModel(model)).sort(comparatorFn);
         } else {
-          if (state.models_only) {
+          if (state.modelsOnly) {
             viewModels = filterList.length ? filteredModels : filteredModels.slice();
           } else {
             viewModels = filteredModels.map((model: Backbone.Model) => createViewModel(model));
@@ -311,7 +311,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
     }
 
     function viewModelByModel(model: Backbone.Model): unknown | null {
-      if (state.models_only) return null;
+      if (state.modelsOnly) return null;
 
       const idAttribute = Object.hasOwn(model, model.idAttribute) ? model.idAttribute : 'cid';
       const obs = getObservable(state) as ko.ObservableArray;
@@ -330,7 +330,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
     }
 
     function hasViewModels(): boolean {
-      return !state.models_only;
+      return !state.modelsOnly;
     }
 
     function compact(): void {
@@ -372,14 +372,14 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
 
       // Set up default creator
       if (!factory.creatorForPath(null, absoluteModelsPath)) {
-        if (Object.hasOwn(opts, 'models_only')) {
-          if (opts.models_only) {
-            factory.addPathMapping(absoluteModelsPath, { models_only: true });
+        if (Object.hasOwn(opts, 'modelsOnly')) {
+          if (opts.modelsOnly) {
+            factory.addPathMapping(absoluteModelsPath, { modelsOnly: true });
           } else {
             factory.addPathMapping(absoluteModelsPath, viewModelFactory as unknown as Creator);
           }
-        } else if (opts.view_model) {
-          factory.addPathMapping(absoluteModelsPath, opts.view_model);
+        } else if (opts.viewModel) {
+          factory.addPathMapping(absoluteModelsPath, opts.viewModel);
         } else if (opts.create) {
           factory.addPathMapping(absoluteModelsPath, { create: opts.create });
         } else {
@@ -396,7 +396,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
 
         switch (event) {
           case 'reset':
-            if (state.auto_compact) {
+            if (state.autoCompact) {
               compact();
             } else {
               _collection.notifySubscribers(_collection());
@@ -440,7 +440,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
               return;
             }
 
-            const vm = state.models_only ? arg : viewModelByModel(arg);
+            const vm = state.modelsOnly ? arg : viewModelByModel(arg);
             if (!vm) {
               onCollectionChange('add', arg);
               return;
@@ -459,7 +459,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
     }
 
     function onModelRemove(model: Backbone.Model): void {
-      const vm = state.models_only ? model : viewModelByModel(model);
+      const vm = state.modelsOnly ? model : viewModelByModel(model);
       if (!vm) return;
 
       const obs = getObservable(state) as ko.ObservableArray;
@@ -481,7 +481,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
         let viewModels = modelsOrViewModels;
         let models: Backbone.Model[];
 
-        if (state.models_only) {
+        if (state.modelsOnly) {
           models = hasFilters ? (modelsOrViewModels.filter((model) => selectModel(model as Backbone.Model)) as Backbone.Model[]) : (modelsOrViewModels as Backbone.Model[]);
         } else {
           if (hasFilters) viewModels = [];
@@ -525,7 +525,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
         return compare(modelA.get(attributeName), modelB.get(attributeName));
       };
 
-      if (state.models_only) {
+      if (state.modelsOnly) {
         return modelAttributeCompare;
       }
 
@@ -535,7 +535,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
     }
 
     function createViewModel(model: Backbone.Model): unknown {
-      if (state.models_only) return model;
+      if (state.modelsOnly) return model;
       if (!state.create_options) throw new NotInitializedError('CollectionObservable', 'create_options');
       const store = state.create_options.store as Store;
       return store.retainOrCreate(model, state.create_options);

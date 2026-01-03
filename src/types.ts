@@ -36,7 +36,7 @@ export interface ObservableOptions {
     ...args: unknown[]
   ) => unknown;
   /** Factory mappings for nested view models */
-  factories?: Record<string, unknown> | { create?: (obj: unknown, options: { path?: string; creator?: unknown }) => unknown; models_only?: boolean } | (new (obj: unknown, options: { path?: string; creator?: unknown }) => unknown) | ((obj: unknown, options: { path?: string; creator?: unknown }) => unknown);
+  factories?: Record<string, unknown> | { create?: (obj: unknown, options: { path?: string; creator?: unknown }) => unknown; modelsOnly?: boolean } | (new (obj: unknown, options: { path?: string; creator?: unknown }) => unknown) | ((obj: unknown, options: { path?: string; creator?: unknown }) => unknown);
   /** Path for nested view model creation */
   path?: string;
 }
@@ -52,19 +52,21 @@ export interface ViewModelOptions {
   /** Keys to copy as static values (not observables) */
   statics?: string[];
   /** Default values for static keys */
-  static_defaults?: Record<string, unknown>;
+  staticDefaults?: Record<string, unknown>;
   /** Required keys that must exist on the model */
   requires?: string[];
   /** Per-key observable options */
   mappings?: Record<string, ObservableOptions>;
   /** Factory mappings for nested view models */
-  factories?: Record<string, unknown> | { create?: (obj: unknown, options: { path?: string; creator?: unknown }) => unknown; models_only?: boolean } | (new (obj: unknown, options: { path?: string; creator?: unknown }) => unknown) | ((obj: unknown, options: { path?: string; creator?: unknown }) => unknown);
+  factories?: Record<string, unknown> | { create?: (obj: unknown, options: { path?: string; creator?: unknown }) => unknown; modelsOnly?: boolean } | (new (obj: unknown, options: { path?: string; creator?: unknown }) => unknown) | ((obj: unknown, options: { path?: string; creator?: unknown }) => unknown);
   /** Path for nested view model creation */
   path?: string;
   /** Custom creator for this view model */
-  creator?: { create?: (obj: unknown, options: { path?: string; creator?: unknown }) => unknown; models_only?: boolean } | (new (obj: unknown, options: { path?: string; creator?: unknown }) => unknown) | ((obj: unknown, options: { path?: string; creator?: unknown }) => unknown);
+  creator?: { create?: (obj: unknown, options: { path?: string; creator?: unknown }) => unknown; modelsOnly?: boolean } | (new (obj: unknown, options: { path?: string; creator?: unknown }) => unknown) | ((obj: unknown, options: { path?: string; creator?: unknown }) => unknown);
   /** Nested options (for inheritance) */
   options?: ViewModelOptions;
+  /** Event watcher for model events */
+  eventWatcher?: unknown;
   /**
    * Extend the view model after observables are created.
    *
@@ -98,21 +100,21 @@ export interface CollectionObservableOptions<T = unknown> {
   /** Shared factory for nested mappings */
   factory?: unknown;
   /** View model constructor or creator for collection items */
-  view_model?: { create?: (obj: unknown, options: { path?: string; creator?: unknown }) => T; models_only?: boolean } | (new (obj: unknown, options: { path?: string; creator?: unknown }) => T) | ((obj: unknown, options: { path?: string; creator?: unknown }) => T);
+  viewModel?: { create?: (obj: unknown, options: { path?: string; creator?: unknown }) => T; modelsOnly?: boolean } | (new (obj: unknown, options: { path?: string; creator?: unknown }) => T) | ((obj: unknown, options: { path?: string; creator?: unknown }) => T);
   /** Custom create function for collection items */
   create?: (model: Backbone.Model, options: { path?: string; creator?: unknown }) => T;
   /** If true, array contains models instead of view models */
-  models_only?: boolean;
+  modelsOnly?: boolean;
   /** Auto-compact the store when items are removed */
-  auto_compact?: boolean;
+  autoCompact?: boolean;
   /** Comparator function for sorting */
   comparator?: (a: T, b: T) => number;
   /** Model attribute to sort by */
-  sort_attribute?: string;
+  sortAttribute?: string;
   /** Filter(s) for which models to include */
   filters?: string | ((model: Backbone.Model) => boolean) | Array<string | ((model: Backbone.Model) => boolean)>;
   /** Factory mappings for nested view models */
-  factories?: Record<string, unknown> | { create?: (obj: unknown, options: { path?: string; creator?: unknown }) => T; models_only?: boolean } | (new (obj: unknown, options: { path?: string; creator?: unknown }) => T) | ((obj: unknown, options: { path?: string; creator?: unknown }) => T);
+  factories?: Record<string, unknown> | { create?: (obj: unknown, options: { path?: string; creator?: unknown }) => T; modelsOnly?: boolean } | (new (obj: unknown, options: { path?: string; creator?: unknown }) => T) | ((obj: unknown, options: { path?: string; creator?: unknown }) => T);
   /** Path for nested view model creation */
   path?: string;
 }
@@ -281,8 +283,8 @@ export interface KBMetadata {
   store?: Store;
   store_is_owned?: boolean;
   factory?: Factory;
-  event_watcher?: EventWatcher;
-  event_watcher_is_owned?: boolean;
+  eventWatcher?: EventWatcher;
+  eventWatcher_is_owned?: boolean;
   stores_references?: StoreReference[];
 }
 
@@ -364,13 +366,13 @@ export interface ObservableBase {
 // =============================================================================
 
 /**
- * Internal create options with store/factory/event_watcher
+ * Internal create options with store/factory/eventWatcher
  * @internal
  */
 export interface InternalCreateOptions extends CreateOptions {
   store?: Store;
   factory?: Factory;
-  event_watcher?: EventWatcher;
+  eventWatcher?: EventWatcher;
 }
 
 /**
@@ -380,7 +382,7 @@ export interface InternalCreateOptions extends CreateOptions {
 export interface InternalObservableOptions extends ObservableOptions {
   store?: Store;
   factory?: Factory;
-  event_watcher?: EventWatcher;
+  eventWatcher?: EventWatcher;
 }
 
 /**

@@ -5,7 +5,7 @@ import ko from 'knockout';
 
 describe('CollectionObservable advanced', () => {
   describe('sorting', () => {
-    it('should sort by sort_attribute', () => {
+    it('should sort by sortAttribute', () => {
       const stats = new kb.Statistics();
       kb.setStatistics(stats);
 
@@ -19,7 +19,7 @@ describe('CollectionObservable advanced', () => {
         { name: 'Bob', age: 35 },
       ]);
 
-      const co = kb.collectionObservable<NameViewModel>(collection, { sort_attribute: 'name' });
+      const co = kb.collectionObservable<NameViewModel>(collection, { sortAttribute: 'name' });
       const names = co().map((vm) => vm.name());
 
       assert.deepStrictEqual(names, ['Alice', 'Bob', 'Charlie'], 'Sorted by name');
@@ -72,7 +72,7 @@ describe('CollectionObservable advanced', () => {
         { name: 'Bob', priority: 3 },
       ]);
 
-      const co = kb.collectionObservable<NameViewModel>(collection, { sort_attribute: 'priority' });
+      const co = kb.collectionObservable<NameViewModel>(collection, { sortAttribute: 'priority' });
 
       let names = co().map((vm) => vm.name());
       assert.deepStrictEqual(names, ['Alice', 'Charlie', 'Bob'], 'Initial sort');
@@ -208,7 +208,7 @@ describe('CollectionObservable advanced', () => {
       kb.setStatistics(stats);
 
       const collection = new Backbone.Collection([{ name: 'Alice' }]);
-      const co = kb.collectionObservable<Backbone.Model>(collection, { models_only: true });
+      const co = kb.collectionObservable<Backbone.Model>(collection, { modelsOnly: true });
 
       assert.strictEqual(co().length, 1);
 
@@ -232,7 +232,7 @@ describe('CollectionObservable advanced', () => {
       const alice = new Backbone.Model({ name: 'Alice' });
       const bob = new Backbone.Model({ name: 'Bob' });
       const collection = new Backbone.Collection([alice, bob]);
-      const co = kb.collectionObservable<Backbone.Model>(collection, { models_only: true });
+      const co = kb.collectionObservable<Backbone.Model>(collection, { modelsOnly: true });
 
       assert.strictEqual(co().length, 2);
 
@@ -250,7 +250,7 @@ describe('CollectionObservable advanced', () => {
       kb.setStatistics(stats);
 
       const collection = new Backbone.Collection([{ name: 'Alice' }, { name: 'Bob' }]);
-      const co = kb.collectionObservable<Backbone.Model>(collection, { models_only: true });
+      const co = kb.collectionObservable<Backbone.Model>(collection, { modelsOnly: true });
 
       assert.strictEqual(co().length, 2);
 
@@ -271,7 +271,7 @@ describe('CollectionObservable advanced', () => {
 
       const models = [new Backbone.Model({ name: 'Alice' }), new Backbone.Model({ name: 'Bob' })];
 
-      const co = kb.collectionObservable<Backbone.Model>(models, { models_only: true });
+      const co = kb.collectionObservable<Backbone.Model>(models, { modelsOnly: true });
 
       assert.strictEqual(co().length, 2);
       assert.ok(co.collection() instanceof Backbone.Collection, 'Collection was created');

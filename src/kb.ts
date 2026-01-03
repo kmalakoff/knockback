@@ -160,11 +160,11 @@ export function dispose(obj: unknown): void {
 }
 
 /** Binds a callback to the node that disposes the view model when the node is removed */
-export function releaseOnNodeRemove(view_model: unknown, node: Node): void {
-  if (!view_model) _throwUnexpected('kb', 'missing view model');
+export function releaseOnNodeRemove(viewModel: unknown, node: Node): void {
+  if (!viewModel) _throwUnexpected('kb', 'missing view model');
   if (!node) _throwUnexpected('kb', 'missing node');
   ko.utils.domNodeDisposal.addDisposeCallback(node, () => {
-    (view_model as { dispose?: () => void }).dispose?.();
+    (viewModel as { dispose?: () => void }).dispose?.();
   });
 }
 
@@ -173,7 +173,7 @@ export function releaseOnNodeRemove(view_model: unknown, node: Node): void {
 // =============================================================================
 
 /** Renders a template and binds automatic disposal */
-export function renderTemplate(template: string, view_model: { afterRender?: (el: Element) => void }, options: { afterRender?: () => void } = {}): Element | null {
+export function renderTemplate(template: string, viewModel: { afterRender?: (el: Element) => void }, options: { afterRender?: () => void } = {}): Element | null {
   if (!globalWindow?.document) {
     console?.log?.('renderTemplate: document is undefined');
     return null;
@@ -181,7 +181,7 @@ export function renderTemplate(template: string, view_model: { afterRender?: (el
   const doc = globalWindow.document;
 
   let el: Element = doc.createElement('div');
-  const observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
+  const observable = ko.renderTemplate(template, viewModel, options, el, 'replaceChildren');
 
   if (el.childNodes.length === 1) {
     el = el.childNodes[0] as Element;
@@ -197,18 +197,18 @@ export function renderTemplate(template: string, view_model: { afterRender?: (el
     }
   }
 
-  releaseOnNodeRemove(view_model, el);
+  releaseOnNodeRemove(viewModel, el);
   observable.dispose();
 
-  if (view_model.afterRender && !options.afterRender) {
-    view_model.afterRender(el);
+  if (viewModel.afterRender && !options.afterRender) {
+    viewModel.afterRender(el);
   }
 
   return el;
 }
 
 /** Applies bindings and binds automatic disposal */
-export function applyBindings(view_model: unknown, node: Element | NodeList | HTMLCollection): Element {
+export function applyBindings(viewModel: unknown, node: Element | NodeList | HTMLCollection): Element {
   // Convert NodeList/HTMLCollection to root element
   if ('length' in node) {
     if (!globalWindow?.document) {
@@ -222,8 +222,8 @@ export function applyBindings(view_model: unknown, node: Element | NodeList | HT
     }
   }
 
-  ko.applyBindings(view_model, node as Element);
-  releaseOnNodeRemove(view_model, node as Element);
+  ko.applyBindings(viewModel, node as Element);
+  releaseOnNodeRemove(viewModel, node as Element);
   return node as Element;
 }
 

@@ -112,6 +112,37 @@ const vm = kb.viewModel<PersonViewModel>(model, {
 Now, the greeting updates as you type!
 
 
+## Breaking Changes in v2.0
+
+Knockback v2.0 uses modern TypeScript conventions. All option names have been changed from snake_case to camelCase:
+
+| Old (v1.x)        | New (v2.0)       |
+|-------------------|------------------|
+| `static_defaults` | `staticDefaults` |
+| `event_watcher`   | `eventWatcher`   |
+| `view_model`      | `viewModel`      |
+| `models_only`     | `modelsOnly`     |
+| `auto_compact`    | `autoCompact`    |
+| `sort_attribute`  | `sortAttribute`  |
+
+**Migration example:**
+
+```typescript
+// v1.x (old)
+const co = kb.collectionObservable(collection, {
+  view_model: PersonViewModel,
+  sort_attribute: 'name',
+  auto_compact: true,
+});
+
+// v2.0 (new)
+const co = kb.collectionObservable(collection, {
+  viewModel: PersonViewModel,
+  sortAttribute: 'name',
+  autoCompact: true,
+});
+```
+
 ## API
 
 ### Core Functions
