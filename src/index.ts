@@ -58,6 +58,7 @@ export { Statistics };
 // =============================================================================
 
 export { TYPE_ARRAY, TYPE_COLLECTION, TYPE_MODEL, TYPE_SIMPLE, TYPE_UNKNOWN };
+export type { StatisticsLike } from './kb.ts';
 export type { LocalizedObservableOptions } from './plugins/localization/index.ts';
 export type { CollectionObservable, CollectionObservableOptions, LocaleManager, Observable, ObservableOptions, ViewModel, ViewModelOptions } from './types.ts';
 

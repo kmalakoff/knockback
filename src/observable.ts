@@ -6,7 +6,7 @@ import { _throwMissing, getValue, ignore, peek, publishMethods, setValue } from 
 import { TypedValue } from './typed-value.ts';
 import type { InternalObservableOptions, Observable, ObservableBase, ObservableInternal, ObservableOptions, ValueType, ViewModelOptions } from './types.ts';
 import { TYPE_UNKNOWN } from './types.ts';
-import { attachDispose, collapseOptions, getEventWatcher, pathJoin, setObservable, unwrapModels, wrappedFactory, wrappedStore } from './utils.ts';
+import { attachDispose, collapseOptions, disposeMetadata, getEventWatcher, pathJoin, setObservable, unwrapModels, wrappedFactory, wrappedStore } from './utils.ts';
 
 const KEYS_PUBLISH = ['value', 'valueType', 'dispose'] as const;
 const KEYS_INFO = ['args', 'read', 'write'] as const;
@@ -210,6 +210,7 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
       if (koObservable) {
         (koObservable as unknown as ObservableInternal).model = undefined;
       }
+      disposeMetadata(state);
     }
 
     function value(): unknown {

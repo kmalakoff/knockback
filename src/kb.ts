@@ -14,7 +14,7 @@ interface KoExtended {
 }
 
 // Statistics type (avoiding circular import)
-interface StatisticsLike {
+export interface StatisticsLike {
   register: (name: string, obj: unknown) => void;
   unregister: (name: string, obj: unknown) => void;
   addModelEvent: (event: unknown) => void;
