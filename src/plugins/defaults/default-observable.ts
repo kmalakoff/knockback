@@ -1,7 +1,7 @@
 import ko from 'knockout';
 import _ from 'underscore';
-import kb from '../../kb.ts';
-import utils from '../../utils.ts';
+import { publishMethods } from '../../kb.ts';
+import { attachDispose, disposeMetadata, getObservable, setObservable } from '../../utils.ts';
 
 const KEYS_PUBLISH = ['dispose', 'setToDefault'] as const;
 
@@ -42,7 +42,7 @@ export function defaultObservable<T>(targetObservable: ko.Observable<T>, default
     setToDefault,
   };
 
-  const observable = utils.setObservable(
+  const observable = setObservable(
     state,
     ko.computed({
       read: () => {
@@ -59,8 +59,8 @@ export function defaultObservable<T>(targetObservable: ko.Observable<T>, default
   ) as ko.Observable<T> & { dispose: () => void; setToDefault: () => void };
 
   // Publish public interface on the observable
-  kb.publishMethods(observable, state, KEYS_PUBLISH);
-  utils.attachDispose(observable, dispose);
+  publishMethods(observable, state, KEYS_PUBLISH);
+  attachDispose(observable, dispose);
 
   return observable;
 
@@ -71,11 +71,11 @@ export function defaultObservable<T>(targetObservable: ko.Observable<T>, default
   function dispose(): void {
     if (state.__kb_released) return;
     state.__kb_released = true;
-    utils.disposeMetadata(state);
+    disposeMetadata(state);
   }
 
   function setToDefault(): void {
-    const obs = utils.getObservable(state) as ko.Observable;
+    const obs = getObservable(state) as ko.Observable;
     if (obs) {
       obs(state.dv);
     }

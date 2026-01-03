@@ -1,8 +1,8 @@
 import type * as Backbone from 'backbone';
 import ko from 'knockout';
-import kb from './kb.ts';
+import { _throwMissing, _throwUnexpected, settings, wasReleased } from './kb.ts';
 import type { EventCallbackInfo, EventWatcher as EventWatcherInterface, KBMetadata } from './types.ts';
-import utils from './utils.ts';
+import { disposeMetadata, wrappedEventWatcher, wrappedEventWatcherIsOwned } from './utils.ts';
 
 /** @internal */
 export interface CallbackInfo extends EventCallbackInfo {
@@ -30,15 +30,15 @@ export class EventWatcher {
     if (options.event_watcher) {
       const ew = options.event_watcher;
       if (ew.emitter() !== emitter) {
-        kb._throwUnexpected('EventWatcher', 'emitter not matching');
+        _throwUnexpected('EventWatcher', 'emitter not matching');
       }
-      const watcher = utils.wrappedEventWatcher(obj, ew) as EventWatcher;
+      const watcher = wrappedEventWatcher(obj, ew) as EventWatcher;
       watcher.registerCallbacks(obj, callbackOptions);
       return watcher;
     }
 
-    utils.wrappedEventWatcherIsOwned(obj, true);
-    const watcher = utils.wrappedEventWatcher(obj, new EventWatcher(emitter)) as EventWatcher;
+    wrappedEventWatcherIsOwned(obj, true);
+    const watcher = wrappedEventWatcher(obj, new EventWatcher(emitter)) as EventWatcher;
     watcher.registerCallbacks(obj, callbackOptions);
     return watcher;
   }
@@ -60,7 +60,7 @@ export class EventWatcher {
     this.__kb_released = true;
     this.emitter(null);
     this.__kb.callbacks = null;
-    utils.disposeMetadata(this);
+    disposeMetadata(this);
   }
 
   // Get or set the emitter (model)
@@ -89,8 +89,8 @@ export class EventWatcher {
 
   // Register callbacks for model events
   registerCallbacks(obj: unknown, callbackInfo: CallbackInfo): this {
-    if (!obj) kb._throwMissing(this, 'obj');
-    if (!callbackInfo) kb._throwMissing(this, 'callback_info');
+    if (!obj) _throwMissing(this, 'obj');
+    if (!callbackInfo) _throwMissing(this, 'callback_info');
 
     const eventNames = callbackInfo.event_selector ? callbackInfo.event_selector.split(' ') : ['change'];
     const model = this.ee;
@@ -117,7 +117,7 @@ export class EventWatcher {
               }
 
               // Track statistics if available
-              const statistics = (kb as { statistics?: { addModelEvent: (e: unknown) => void } }).statistics;
+              const statistics = (globalThis as { statistics?: { addModelEvent: (e: unknown) => void } }).statistics;
               if (statistics) {
                 statistics.addModelEvent({
                   name: eventName,
@@ -156,7 +156,7 @@ export class EventWatcher {
     if (this.__kb.callbacks) {
       for (const eventName in this.__kb.callbacks) {
         const callbacks = this.__kb.callbacks[eventName];
-        this._unbindCallbacks(eventName, callbacks, kb.wasReleased(obj));
+        this._unbindCallbacks(eventName, callbacks, wasReleased(obj));
       }
     }
 
@@ -187,7 +187,7 @@ export class EventWatcher {
       for (const info of callbacks.list) {
         // ORM binding support
         if (!info.unbind_fn && info.key && info.update && info.path) {
-          const orm = kb.settings.orm;
+          const orm = settings.orm;
           if (orm?.bind) {
             info.unbind_fn = orm.bind(model, info.key as string, info.update, info.path) || null;
           }
@@ -230,7 +230,7 @@ export class EventWatcher {
         info.unbind_fn = null;
       }
 
-      if (info.emitter && !skipEmitter && !kb.wasReleased(info.obj)) {
+      if (info.emitter && !skipEmitter && !wasReleased(info.obj)) {
         info.emitter(null);
       }
     }

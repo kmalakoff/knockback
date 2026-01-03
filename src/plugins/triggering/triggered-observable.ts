@@ -1,8 +1,8 @@
 import type * as Backbone from 'backbone';
 import ko from 'knockout';
 import { EventWatcher } from '../../event-watcher.ts';
-import kb from '../../kb.ts';
-import utils from '../../utils.ts';
+import { _throwMissing, publishMethods } from '../../kb.ts';
+import { attachDispose, disposeMetadata, setEventWatcher, setObservable } from '../../utils.ts';
 
 const KEYS_PUBLISH = ['dispose'] as const;
 
@@ -49,10 +49,10 @@ export interface TriggeredObservableInstance {
  */
 export function triggeredObservable(emitter: Backbone.Events, eventSelector: string): ko.Observable & { dispose: () => void } {
   if (!emitter) {
-    kb._throwMissing({ constructor: { name: 'TriggeredObservable' } }, 'emitter');
+    _throwMissing({ constructor: { name: 'TriggeredObservable' } }, 'emitter');
   }
   if (!eventSelector) {
-    kb._throwMissing({ constructor: { name: 'TriggeredObservable' } }, 'event_selector');
+    _throwMissing({ constructor: { name: 'TriggeredObservable' } }, 'event_selector');
   }
 
   // Instance state (closure-based)
@@ -64,7 +64,7 @@ export function triggeredObservable(emitter: Backbone.Events, eventSelector: str
     ee: null,
   };
 
-  const observable = utils.setObservable(
+  const observable = setObservable(
     state,
     ko.computed(() => state.vo())
   ) as ko.Observable & { dispose: () => void };
@@ -73,18 +73,18 @@ export function triggeredObservable(emitter: Backbone.Events, eventSelector: str
   const dispose = () => {
     if (state.__kb_released) return;
     state.__kb_released = true;
-    utils.disposeMetadata(state);
+    disposeMetadata(state);
   };
 
   const stateWithMethods = state as unknown as Record<string, unknown>;
   stateWithMethods.dispose = dispose;
 
   // Publish public interface on the observable
-  kb.publishMethods(observable, stateWithMethods, KEYS_PUBLISH);
-  utils.attachDispose(observable, dispose);
+  publishMethods(observable, stateWithMethods, KEYS_PUBLISH);
+  attachDispose(observable, dispose);
 
   // Create emitter observable via EventWatcher
-  utils.setEventWatcher(
+  setEventWatcher(
     state,
     new EventWatcher(emitter as Backbone.Model, state, {
       obj: state,

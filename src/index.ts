@@ -2,10 +2,8 @@
 // Copyright (c) 2011-2024 Kevin Malakoff.
 // License: MIT (http://www.opensource.org/licenses/mit-license.php)
 
-import type * as Backbone from 'backbone';
-import type * as ko from 'knockout';
 import { collectionObservable } from './collection-observable.ts';
-import kbCore from './kb.ts';
+import { applyBindings, dispose, getLocaleManager, getStatistics, isCollection, isModel, isReleaseable, isViewModel, releaseOnNodeRemove, renderTemplate, setLocaleManager, setStatistics, VERSION } from './kb.ts';
 import { observable } from './observable.ts';
 import { defaultObservable } from './plugins/defaults/index.ts';
 import { formattedObservable, parseFormattedString, toFormattedString } from './plugins/formatting/index.ts';
@@ -13,38 +11,27 @@ import { localizedObservable } from './plugins/localization/index.ts';
 import { triggeredObservable } from './plugins/triggering/index.ts';
 import { formValidator, minLengthFn, valid, valueValidator } from './plugins/validation/index.ts';
 import { Statistics } from './statistics.ts';
-import type { LocaleManager } from './types.ts';
 import { TYPE_ARRAY, TYPE_COLLECTION, TYPE_MODEL, TYPE_SIMPLE, TYPE_UNKNOWN } from './types.ts';
-import { ViewModelClass, viewModel } from './view-model.ts';
+import { viewModel } from './view-model.ts';
 
 // =============================================================================
 // Core API (named exports, tree-shakeable)
 // =============================================================================
 
-export { observable, viewModel, collectionObservable };
-export const VERSION = kbCore.VERSION;
+export { collectionObservable, observable, viewModel };
+export { VERSION };
 
 // =============================================================================
 // Memory Management
 // =============================================================================
 
-export const releaseOnNodeRemove = kbCore.releaseOnNodeRemove.bind(kbCore);
-export const applyBindings = kbCore.applyBindings.bind(kbCore);
-export const renderTemplate = kbCore.renderTemplate.bind(kbCore);
-export const isReleaseable = kbCore.isReleaseable.bind(kbCore);
-export const isModel = kbCore.isModel.bind(kbCore);
-export const isCollection = kbCore.isCollection.bind(kbCore);
-export const isViewModel = kbCore.isViewModel.bind(kbCore);
-export const dispose = kbCore.dispose.bind(kbCore);
+export { applyBindings, dispose, isCollection, isModel, isReleaseable, isViewModel, releaseOnNodeRemove, renderTemplate } from './kb.ts';
 
 // =============================================================================
 // Localization
 // =============================================================================
 
-export const getLocaleManager = <T extends LocaleManager = LocaleManager>(): T | null => kbCore.locale_manager as T | null;
-export const setLocaleManager = <T extends LocaleManager>(manager: T | null): void => {
-  kbCore.locale_manager = manager;
-};
+export { getLocaleManager, setLocaleManager } from './kb.ts';
 export { localizedObservable };
 
 // =============================================================================
@@ -57,16 +44,13 @@ export { defaultObservable, formattedObservable, parseFormattedString, toFormatt
 // Validation
 // =============================================================================
 
-export { valueValidator, formValidator, minLengthFn, valid };
+export { formValidator, minLengthFn, valid, valueValidator };
 
 // =============================================================================
 // Debugging
 // =============================================================================
 
-export const getStatistics = (): Statistics | null => kbCore.statistics as Statistics | null;
-export const setStatistics = (stats: Statistics | null): void => {
-  kbCore.statistics = stats;
-};
+export { getStatistics, setStatistics } from './kb.ts';
 export { Statistics };
 
 // =============================================================================
@@ -83,15 +67,19 @@ export type { CollectionObservable, CollectionObservableOptions, LocaleManager, 
 
 export namespace kb {
   export type Observable<T = unknown> = import('./types.ts').Observable<T>;
-  export type Computed<T = unknown> = ko.Computed<T>;
-  export type ObservableArray<T = unknown> = ko.ObservableArray<T>;
+  export type Computed<T = unknown> = import('knockout').Computed<T>;
+  export type ObservableArray<T = unknown> = import('knockout').ObservableArray<T>;
   export type CollectionObservable<T = unknown> = import('./types.ts').CollectionObservable<T>;
   export type ViewModel<T extends object = Record<string, unknown>> = import('./types.ts').ViewModel<T>;
 }
 
 // =============================================================================
-// Default export (compat namespace)
+// Default export (backward compatibility)
 // =============================================================================
+
+import type * as Backbone from 'backbone';
+import type * as ko from 'knockout';
+import { ViewModelClass } from './view-model.ts';
 
 export const kb: {
   ViewModel: new (
@@ -104,7 +92,7 @@ export const kb: {
   observable: typeof observable;
   viewModel: typeof viewModel;
   collectionObservable: typeof collectionObservable;
-  VERSION: typeof VERSION;
+  VERSION: string;
   TYPE_ARRAY: typeof TYPE_ARRAY;
   TYPE_COLLECTION: typeof TYPE_COLLECTION;
   TYPE_MODEL: typeof TYPE_MODEL;
@@ -134,56 +122,85 @@ export const kb: {
   setStatistics: typeof setStatistics;
   Statistics: typeof Statistics;
 } = {
+  // Core
   observable,
   viewModel,
-  ViewModel: ViewModelClass,
   collectionObservable,
+  ViewModel: ViewModelClass,
   VERSION,
-  TYPE_ARRAY,
-  TYPE_COLLECTION,
-  TYPE_MODEL,
-  TYPE_SIMPLE,
-  TYPE_UNKNOWN,
-  releaseOnNodeRemove,
+
+  // Memory Management
   applyBindings,
-  renderTemplate,
-  isReleaseable,
-  isModel,
-  isCollection,
-  isViewModel,
   dispose,
+  isCollection,
+  isModel,
+  isReleaseable,
+  isViewModel,
+  releaseOnNodeRemove,
+  renderTemplate,
+
+  // Localization
   getLocaleManager,
   setLocaleManager,
   localizedObservable,
+
+  // Plugins
   defaultObservable,
   formattedObservable,
   parseFormattedString,
   toFormattedString,
   triggeredObservable,
-  valueValidator,
+
+  // Validation
   formValidator,
   minLengthFn,
   valid,
+  valueValidator,
+
+  // Debugging
   getStatistics,
   setStatistics,
   Statistics,
+
+  // Types
+  TYPE_ARRAY,
+  TYPE_COLLECTION,
+  TYPE_MODEL,
+  TYPE_SIMPLE,
+  TYPE_UNKNOWN,
 };
 
 Object.defineProperties(kb, {
   locale_manager: {
     enumerable: true,
-    get: () => kbCore.locale_manager,
-    set: (manager: LocaleManager | null) => {
-      kbCore.locale_manager = manager;
+    get: () => getLocaleManager(),
+    set: (manager) => {
+      setLocaleManager(manager);
     },
   },
   statistics: {
     enumerable: true,
-    get: () => kbCore.statistics as Statistics | null,
-    set: (stats: Statistics | null) => {
-      kbCore.statistics = stats;
+    get: () => getStatistics(),
+    set: (stats) => {
+      setStatistics(stats);
     },
   },
 });
+
+// Set globalThis.kb for plugin compatibility
+if (typeof globalThis !== 'undefined') {
+  (globalThis as { kb?: typeof kb }).kb = kb;
+
+  // Set up property forwarding for statistics
+  Object.defineProperty(globalThis, 'statistics', {
+    get() {
+      return getStatistics();
+    },
+    set(stats) {
+      setStatistics(stats);
+    },
+    configurable: true,
+  });
+}
 
 export default kb;

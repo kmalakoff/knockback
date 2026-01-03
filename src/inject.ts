@@ -1,6 +1,6 @@
 import ko from 'knockout';
 import _ from 'underscore';
-import kb from './kb.ts';
+import { applyBindings, ignore, releaseOnNodeRemove } from './kb.ts';
 
 // =============================================================================
 // Types
@@ -61,13 +61,13 @@ export function inject(data: InjectData | (new (...args: unknown[]) => unknown),
       // Use 'new' to allow for classes in addition to functions
       const Constructor = injectData as new (vm: unknown, el: Element, va?: unknown, aba?: unknown) => unknown;
       viewModel = new Constructor(viewModel, element, valueAccessor, allBindingsAccessor) as Record<string, unknown>;
-      kb.releaseOnNodeRemove(viewModel, element);
+      releaseOnNodeRemove(viewModel, element);
     } else {
       // view_model constructor causes a scope change
       if (injectData.view_model) {
         const VMConstructor = injectData.view_model;
         viewModel = new VMConstructor(viewModel, element, valueAccessor, allBindingsAccessor) as Record<string, unknown>;
-        kb.releaseOnNodeRemove(viewModel, element);
+        releaseOnNodeRemove(viewModel, element);
       }
 
       // Resolve and merge in each key
@@ -97,7 +97,7 @@ export function inject(data: InjectData | (new (...args: unknown[]) => unknown),
   };
 
   // In recursive calls, we are already protected from propagating dependencies
-  return nested ? doInject(data) : kb.ignore(() => doInject(data));
+  return nested ? doInject(data) : ignore(() => doInject(data));
 }
 
 /**
@@ -181,7 +181,7 @@ export function injectViewModels(root?: Element | Document): InjectResult[] {
       beforeBinding.call(app.view_model, app.view_model, app.el, options);
     }
 
-    kb.applyBindings(app.view_model, app.el);
+    applyBindings(app.view_model, app.el);
 
     if (afterBinding) {
       afterBinding.call(app.view_model, app.view_model, app.el, options);

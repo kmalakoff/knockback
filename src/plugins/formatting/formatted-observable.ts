@@ -1,6 +1,6 @@
 import ko from 'knockout';
 import _ from 'underscore';
-import utils from '../../utils.ts';
+import { attachDispose, disposeMetadata, setObservable } from '../../utils.ts';
 
 // =============================================================================
 // Utility Functions
@@ -132,7 +132,7 @@ export function formattedObservable(format: string | ko.Observable<string>, ...a
 
   const observableArgs = args;
 
-  const observable = utils.setObservable(
+  const observable = setObservable(
     state,
     ko.computed({
       read: () => {
@@ -152,7 +152,7 @@ export function formattedObservable(format: string | ko.Observable<string>, ...a
     })
   ) as ko.Observable<string> & { dispose: () => void };
 
-  utils.attachDispose(observable, dispose);
+  attachDispose(observable, dispose);
 
   return observable;
 
@@ -163,7 +163,7 @@ export function formattedObservable(format: string | ko.Observable<string>, ...a
   function dispose(): void {
     if (state.__kb_released) return;
     state.__kb_released = true;
-    utils.disposeMetadata(state);
+    disposeMetadata(state);
   }
 }
 

@@ -2,11 +2,11 @@ import type * as Backbone from 'backbone';
 import ko from 'knockout';
 import { EventWatcher } from './event-watcher.ts';
 import { Factory } from './factory.ts';
-import kb from './kb.ts';
+import { _throwUnexpected, ignore, isModel, settings, wasReleased } from './kb.ts';
 import { observable as kbObservable } from './observable.ts';
 import { Store } from './store.ts';
 import type { InternalCreateOptions, InternalViewModelOptions, KBMetadata, ObservableOptions, ViewModelOptions, ViewModel as ViewModelType } from './types.ts';
-import utils from './utils.ts';
+import { attachDispose, collapseOptions, disposeDisposableKeys, disposeMetadata, resolveModel, wrappedEventWatcher, wrappedFactory, wrappedObject, wrappedStore } from './utils.ts';
 
 const KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'static_defaults'] as const;
 
@@ -100,15 +100,15 @@ export class ViewModelClass {
     // Initialize metadata first
     this.__kb = {};
 
-    // Run initialization inside kb.ignore to prevent unwanted dependency tracking
-    kb.ignore(() => this._initialize(model, options, viewModel));
+    // Run initialization inside ignore to prevent unwanted dependency tracking
+    ignore(() => this._initialize(model, options, viewModel));
   }
 
   // Internal initialization (called in constructor)
   private _initialize(model: Backbone.Model | null, options: ViewModelOptions | string[], viewModel?: ViewModelType<Record<string, unknown>>): void {
     // Validate model
-    if (model && !kb.isModel(model)) {
-      kb._throwUnexpected(this, 'not a model');
+    if (model && !isModel(model)) {
+      _throwUnexpected(this, 'not a model');
     }
 
     // Convert array shorthand to keys option
@@ -132,7 +132,7 @@ export class ViewModelClass {
     __kb.view_model = viewModel || this;
 
     // Collapse options
-    const mergedOptions = utils.collapseOptions(opts) as InternalViewModelOptions;
+    const mergedOptions = collapseOptions(opts) as InternalViewModelOptions;
 
     // Copy relevant options to __kb
     for (const key of KEYS_OPTIONS) {
@@ -156,11 +156,11 @@ export class ViewModelClass {
     this.model = ko.computed({
       read: () => ko.utils.unwrapObservable(_model),
       write: (newModel: Backbone.Model | null) => {
-        kb.ignore(() => {
-          if (kb.wasReleased(this) || !eventWatcher) return;
+        ignore(() => {
+          if (wasReleased(this) || !eventWatcher) return;
 
-          const store = utils.wrappedStore(this) as Store;
-          store.reuse(this, utils.resolveModel(newModel));
+          const store = wrappedStore(this) as Store;
+          store.reuse(this, resolveModel(newModel));
           eventWatcher.emitter(newModel);
           _model(eventWatcher.ee);
 
@@ -172,13 +172,13 @@ export class ViewModelClass {
     });
 
     // Event watcher
-    eventWatcher = utils.wrappedEventWatcher(
+    eventWatcher = wrappedEventWatcher(
       this,
       new EventWatcher(model || null, this, {
         obj: this,
         emitter: (m: Backbone.Model | null) => _model(m),
         update: () => {
-          kb.ignore(() => {
+          ignore(() => {
             if (eventWatcher?.ee) {
               this.createObservables(eventWatcher.ee);
             }
@@ -187,15 +187,15 @@ export class ViewModelClass {
       })
     ) as EventWatcher;
 
-    utils.wrappedObject(this, model || null);
+    wrappedObject(this, model || null);
     _model(eventWatcher.ee);
 
     // Create options for child observables
     __kb.create_options = {
-      store: utils.wrappedStore(this),
-      factory: utils.wrappedFactory(this),
+      store: wrappedStore(this),
+      factory: wrappedFactory(this),
       path: __kb.path,
-      event_watcher: utils.wrappedEventWatcher(this),
+      event_watcher: wrappedEventWatcher(this),
     };
 
     // Create observables
@@ -224,10 +224,10 @@ export class ViewModelClass {
       }
     }
 
-    utils.attachDispose(this, this.dispose.bind(this));
+    attachDispose(this, this.dispose.bind(this));
 
     // Statistics tracking
-    const statistics = (kb as { statistics?: { register: (name: string, obj: unknown) => void } }).statistics;
+    const statistics = (globalThis as { statistics?: { register: (name: string, obj: unknown) => void } }).statistics;
     if (statistics) {
       statistics.register('ViewModel', this);
     }
@@ -250,10 +250,10 @@ export class ViewModelClass {
     __kb.view_model = undefined;
     __kb.create_options = undefined;
 
-    utils.disposeDisposableKeys(this as unknown as Record<string, unknown>);
-    utils.disposeMetadata(this);
+    disposeDisposableKeys(this as unknown as Record<string, unknown>);
+    disposeMetadata(this);
 
-    const statistics = (kb as { statistics?: { unregister: (name: string, obj: unknown) => void } }).statistics;
+    const statistics = (globalThis as { statistics?: { unregister: (name: string, obj: unknown) => void } }).statistics;
     if (statistics) {
       statistics.unregister('ViewModel', this);
     }
@@ -262,8 +262,8 @@ export class ViewModelClass {
   // Get share options for creating related observables
   shareOptions(): { store: unknown; factory: unknown } {
     return {
-      store: utils.wrappedStore(this),
-      factory: utils.wrappedFactory(this),
+      store: wrappedStore(this),
+      factory: wrappedFactory(this),
     };
   }
 
@@ -283,7 +283,7 @@ export class ViewModelClass {
       }
 
       // ORM relationship keys
-      const orm = kb.settings.orm;
+      const orm = settings.orm;
       if (orm?.keys) {
         const relKeys = orm.keys(model);
         if (relKeys) {

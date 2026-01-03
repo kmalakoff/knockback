@@ -5,7 +5,7 @@ import collapseOptions from './functions/collapse-options.ts';
 import disposeMetadata from './functions/dispose-metadata.ts';
 import unwrapModels from './functions/unwrap-models.ts';
 import type { Creator } from './internal-types.ts';
-import kb from './kb.ts';
+import { isCollection, isModel, isViewModel, peek } from './kb.ts';
 import type { EventWatcher, Factory, KBMetadata, ObservableBase, Store, ValueType, ViewModelOptions } from './types.ts';
 import { TYPE_ARRAY, TYPE_COLLECTION, TYPE_MODEL, TYPE_SIMPLE, TYPE_UNKNOWN } from './types.ts';
 
@@ -229,13 +229,13 @@ function disposeValue(value: unknown): void {
   }
 
   if (ko.isObservable(value)) {
-    const peekValue = kb.peek(value as ko.Observable);
+    const peekValue = peek(value as ko.Observable);
     if (Array.isArray(peekValue)) {
       disposeArray(peekValue);
     }
   }
 
-  if (kb.isViewModel(value) || isDisposable(value)) {
+  if (isViewModel(value) || isDisposable(value)) {
     (value as { dispose?: () => void }).dispose?.();
     return;
   }
@@ -249,7 +249,7 @@ export function disposeArray(arr: unknown[]): void {
   for (let i = 0; i < arr.length; i++) {
     const item = arr[i];
     disposeValue(item);
-    if (kb.isViewModel(item) || isDisposable(item)) {
+    if (isViewModel(item) || isDisposable(item)) {
       arr[i] = null;
     }
   }
@@ -260,7 +260,7 @@ export function disposeDisposableKeys(vm: Record<string, unknown>): void {
     if (key === '__kb') continue;
     const value = vm[key];
     disposeValue(value);
-    if (kb.isViewModel(value) || isDisposable(value)) {
+    if (isViewModel(value) || isDisposable(value)) {
       vm[key] = null;
     }
   }
@@ -277,7 +277,7 @@ export function valueType(observable: unknown): ValueType {
   if (obs.__kb_is_co || observable instanceof Backbone.Collection) {
     return TYPE_COLLECTION;
   }
-  if (kb.isViewModel(observable) || observable instanceof Backbone.Model) {
+  if (isViewModel(observable) || observable instanceof Backbone.Model) {
     return TYPE_MODEL;
   }
   if (Array.isArray(observable)) {
@@ -309,10 +309,10 @@ export function inferCreator(value: unknown, factory: Factory | undefined, path:
 
   // These will be set later when ViewModel and CollectionObservable are defined
   if (value instanceof Backbone.Model) {
-    return (kb as { ViewModel?: Creator }).ViewModel || null;
+    return (globalThis as { ViewModel?: Creator }).ViewModel || null;
   }
   if (value instanceof Backbone.Collection) {
-    return (kb as { CollectionObservable?: Creator }).CollectionObservable || null;
+    return (globalThis as { CollectionObservable?: Creator }).CollectionObservable || null;
   }
 
   return null;
@@ -320,12 +320,12 @@ export function inferCreator(value: unknown, factory: Factory | undefined, path:
 
 /** Create observable based on value type */
 export function createFromDefaultCreator(obj: unknown, options: ViewModelOptions): unknown {
-  if (kb.isModel(obj)) {
-    const viewModel = (kb as { viewModel?: (m: unknown, o: unknown) => unknown }).viewModel;
+  if (isModel(obj)) {
+    const viewModel = (globalThis as { viewModel?: (m: unknown, o: unknown) => unknown }).viewModel;
     return viewModel ? viewModel(obj, options) : ko.observable(obj);
   }
-  if (kb.isCollection(obj)) {
-    const collectionObservable = (kb as { collectionObservable?: (c: unknown, o: unknown) => unknown }).collectionObservable;
+  if (isCollection(obj)) {
+    const collectionObservable = (globalThis as { collectionObservable?: (c: unknown, o: unknown) => unknown }).collectionObservable;
     return collectionObservable ? collectionObservable(obj, options) : ko.observableArray([]);
   }
   if (Array.isArray(obj)) {
@@ -340,63 +340,7 @@ export function resolveModel(model: unknown): Backbone.Model | null {
 }
 
 // =============================================================================
-// Default export: utils object (for backwards compatibility)
+// Re-export functions for convenience
 // =============================================================================
 
-const utils = {
-  // Core
-  get,
-  set,
-  orSet,
-  has,
-
-  // New API
-  getObservable,
-  setObservable,
-  getObject,
-  setObject,
-  getCreator,
-  setCreator,
-  getModel,
-  setModel,
-  getStore,
-  setStore,
-  getStoreIsOwned,
-  setStoreIsOwned,
-  getFactory,
-  setFactory,
-  getEventWatcher,
-  setEventWatcher,
-  getEventWatcherIsOwned,
-  setEventWatcherIsOwned,
-
-  // Legacy (deprecated)
-  wrappedObservable,
-  wrappedObject,
-  wrappedCreator,
-  wrappedModel,
-  wrappedStore,
-  wrappedStoreIsOwned,
-  wrappedFactory,
-  wrappedEventWatcher,
-  wrappedEventWatcherIsOwned,
-
-  // Cleanup
-  disposeMetadata,
-
-  // Utilities
-  attachDispose,
-  disposeArray,
-  disposeDisposableKeys,
-  isDisposable,
-  valueType,
-  pathJoin,
-  optionsPathJoin,
-  inferCreator,
-  createFromDefaultCreator,
-  collapseOptions,
-  unwrapModels,
-  resolveModel,
-};
-
-export default utils;
+export { collapseOptions, disposeMetadata, unwrapModels };

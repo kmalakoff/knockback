@@ -1,7 +1,7 @@
 import ko from 'knockout';
-import kb from '../../kb.ts';
+import { _throwMissing, _throwUnexpected, publishMethods } from '../../kb.ts';
 import type { LocaleManager } from '../../types.ts';
-import utils from '../../utils.ts';
+import { attachDispose, disposeMetadata, getObservable, setObservable } from '../../utils.ts';
 import { defaultObservable } from '../defaults/default-observable.ts';
 
 const KEYS_PUBLISH = ['dispose', 'observedValue', 'resetToCurrent'] as const;
@@ -65,10 +65,10 @@ interface LocalizedObservableState {
 export function localizedObservable(value: unknown, options: LocalizedObservableOptions, viewModel?: Record<string, unknown>): ko.Observable & { dispose: () => void; observedValue: (value?: unknown) => unknown; resetToCurrent: () => void } {
   // Validate required options
   if (!options?.read) {
-    kb._throwMissing({ constructor: { name: 'localizedObservable' } }, 'options.read');
+    _throwMissing({ constructor: { name: 'localizedObservable' } }, 'options.read');
   }
-  if (!kb.locale_manager) {
-    kb._throwMissing({ constructor: { name: 'localizedObservable' } }, 'kb.locale_manager');
+  if (!globalThis.kb?.locale_manager) {
+    _throwMissing({ constructor: { name: 'localizedObservable' } }, 'kb.locale_manager');
   }
 
   // Instance state (closure-based)
@@ -91,7 +91,7 @@ export function localizedObservable(value: unknown, options: LocalizedObservable
     state.vo(state.readFn(unwrappedValue));
   }
 
-  const observable = utils.setObservable(
+  const observable = setObservable(
     state,
     ko.computed({
       read: () => {
@@ -103,7 +103,7 @@ export function localizedObservable(value: unknown, options: LocalizedObservable
       },
       write: (val: unknown) => {
         if (!state.writeFn) {
-          kb._throwUnexpected({ constructor: { name: 'localizedObservable' } }, 'writing to read-only');
+          _throwUnexpected({ constructor: { name: 'localizedObservable' } }, 'writing to read-only');
         }
         state.writeFn(val, ko.utils.unwrapObservable(state.value));
         state.vo(val);
@@ -122,11 +122,11 @@ export function localizedObservable(value: unknown, options: LocalizedObservable
   stateWithMethods.resetToCurrent = resetToCurrent;
 
   // Publish public interface on the observable
-  kb.publishMethods(observable, stateWithMethods, KEYS_PUBLISH);
-  utils.attachDispose(observable, dispose);
+  publishMethods(observable, stateWithMethods, KEYS_PUBLISH);
+  attachDispose(observable, dispose);
 
   // Start listening to locale changes
-  const localeManager = kb.locale_manager as LocaleManager;
+  const localeManager = (globalThis as unknown as { kb?: { locale_manager?: LocaleManager } }).kb?.locale_manager as LocaleManager | undefined;
   if (localeManager?.on && state.__kb._onLocaleChange) {
     localeManager.on('change', state.__kb._onLocaleChange);
   }
@@ -147,16 +147,16 @@ export function localizedObservable(value: unknown, options: LocalizedObservable
   function dispose(): void {
     if (state.__kb_released) return;
     state.__kb_released = true;
-    const localeManager = kb.locale_manager as LocaleManager;
+    const localeManager = (globalThis as unknown as { kb?: { locale_manager?: LocaleManager } }).kb?.locale_manager as LocaleManager | undefined;
     if (localeManager?.off && state.__kb._onLocaleChange) {
       localeManager.off('change', state.__kb._onLocaleChange);
     }
     state.vm = {};
-    utils.disposeMetadata(state);
+    disposeMetadata(state);
   }
 
   function resetToCurrent(): void {
-    const obs = utils.getObservable(state) as ko.Observable;
+    const obs = getObservable(state) as ko.Observable;
     const currentValue = state.value ? state.readFn(ko.utils.unwrapObservable(state.value)) : null;
 
     if (obs() === currentValue) {

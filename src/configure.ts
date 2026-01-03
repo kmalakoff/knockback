@@ -1,5 +1,5 @@
 import _ from 'underscore';
-import kb from './kb.ts';
+import { settings } from './kb.ts';
 
 export interface ORM {
   isAvailable(): boolean;
@@ -39,16 +39,16 @@ export function configure(options: ConfigureOptions = {}): void {
             console.log(`Knockback configure: could not enable orm ${value}. Make sure it is included before Knockback`);
             continue;
           }
-          kb.settings.orm = orm;
+          settings.orm = orm;
         }
         // Set by functions/object
         else {
-          kb.settings.orm = value as ORM | null;
+          settings.orm = value as ORM | null;
         }
         break;
 
       default:
-        (kb.settings as Record<string, unknown>)[key] = value;
+        (settings as Record<string, unknown>)[key] = value;
     }
   }
 }
@@ -61,8 +61,8 @@ export function configure(options: ConfigureOptions = {}): void {
 export function registerORM(name: string, orm: ORM | null): void {
   ALL_ORMS[name] = orm;
   // If this ORM is available and we don't have one set, use it
-  if (orm?.isAvailable() && !kb.settings.orm) {
-    kb.settings.orm = orm;
+  if (orm?.isAvailable() && !settings.orm) {
+    settings.orm = orm;
   }
 }
 

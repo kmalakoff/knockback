@@ -2,9 +2,9 @@ import ko from 'knockout';
 import _ from 'underscore';
 import type { CreateOptions, Creator } from './internal-types.ts';
 import { isCreatorConstructor, isCreatorObject } from './internal-types.ts';
-import kb from './kb.ts';
+import { ignore, isModel, settings } from './kb.ts';
 import type { InternalCreateOptions, InternalViewModelOptions, ObservableBase, StoreReference, ViewModelOptions } from './types.ts';
-import utils from './utils.ts';
+import { createFromDefaultCreator, disposeDisposableKeys, get, inferCreator, orSet, wrappedCreator, wrappedObject, wrappedStore, wrappedStoreIsOwned } from './utils.ts';
 
 interface ObservableRecord {
   [cid: string]: unknown;
@@ -21,10 +21,10 @@ export class Store {
   // Use existing store from options or create a new one
   static useOptionsOrCreate(options: InternalViewModelOptions, obj: unknown, observable: ObservableBase): Store {
     if (!options.store) {
-      utils.wrappedStoreIsOwned(observable, true);
+      wrappedStoreIsOwned(observable, true);
     }
 
-    const store = utils.wrappedStore(observable, (options.store as Store) || new Store()) as Store;
+    const store = wrappedStore(observable, (options.store as Store) || new Store()) as Store;
     store.retain(observable, obj, options.creator);
     return store;
   }
@@ -104,7 +104,7 @@ export class Store {
   retainOrCreate(obj: unknown, options: InternalCreateOptions, deepRetain?: boolean): unknown {
     const creator = this._creator(obj, options);
     if (!creator) {
-      return utils.createFromDefaultCreator(obj, options as ViewModelOptions);
+      return createFromDefaultCreator(obj, options as ViewModelOptions);
     }
 
     if ((creator as { models_only?: boolean }).models_only) {
@@ -113,7 +113,7 @@ export class Store {
 
     const existing = this.find(obj, creator);
     if (existing) {
-      if (deepRetain && kb.settings.deep_retain) {
+      if (deepRetain && settings.deep_retain) {
         return this.retain(existing, obj, creator);
       }
       return existing;
@@ -131,7 +131,7 @@ export class Store {
       throw new Error(`Invalid factory for "${options.path}"`);
     }
 
-    const newObservable = kb.ignore(() => {
+    const newObservable = ignore(() => {
       const createOptions = { store: this, creator, ...options };
       let result: unknown;
 
@@ -152,7 +152,7 @@ export class Store {
 
   // Reuse an observable with a different object
   reuse(observable: unknown, obj: unknown): void {
-    const currentObj = utils.wrappedObject(observable);
+    const currentObj = wrappedObject(observable);
     if (currentObj === obj) return;
 
     if (!this._canRegister(observable)) {
@@ -163,7 +163,7 @@ export class Store {
       throw new Error(`Trying to change a shared view model. Ref count: ${this._refCount(observable)}`);
     }
 
-    const creator = utils.wrappedCreator(observable) || (observable as { constructor: Creator }).constructor;
+    const creator = wrappedCreator(observable) || (observable as { constructor: Creator }).constructor;
     const currentObservable = !_.isUndefined(currentObj) ? this.find(currentObj, creator) : undefined;
 
     this.retain(observable, obj, creator);
@@ -197,7 +197,7 @@ export class Store {
       if (typeof disposable.dispose === 'function') {
         disposable.dispose();
       } else if (observable && typeof observable === 'object') {
-        utils.disposeDisposableKeys(observable as Record<string, unknown>);
+        disposeDisposableKeys(observable as Record<string, unknown>);
       }
     }
   }
@@ -225,7 +225,7 @@ export class Store {
       return 0;
     }
 
-    const storesReferences = utils.get(observable, 'stores_references') as StoreReference[] | undefined;
+    const storesReferences = get(observable, 'stores_references') as StoreReference[] | undefined;
     if (!storesReferences) return 1;
 
     return storesReferences.reduce((memo, ref) => memo + ref.ref_count, 0);
@@ -269,14 +269,14 @@ export class Store {
 
   // Get store references for this store
   private _storeReferences(observable: unknown): StoreReference | undefined {
-    const storesReferences = utils.get(observable, 'stores_references') as StoreReference[] | undefined;
+    const storesReferences = get(observable, 'stores_references') as StoreReference[] | undefined;
     if (!storesReferences) return undefined;
     return storesReferences.find((ref) => ref.store === this);
   }
 
   // Get or create store references
   private _getOrCreateStoreReferences(observable: unknown): StoreReference {
-    const storesReferences = utils.orSet(observable, 'stores_references', []) as StoreReference[];
+    const storesReferences = orSet(observable, 'stores_references', []) as StoreReference[];
     let storeRef = storesReferences.find((ref) => ref.store === this);
 
     if (!storeRef) {
@@ -312,8 +312,8 @@ export class Store {
   // Add observable to store
   private _add(observable: unknown, obj: unknown, creator?: Creator): void {
     creator = creator || (observable as { constructor: Creator }).constructor;
-    utils.wrappedObject(observable, obj as Backbone.Model | Backbone.Collection | null);
-    utils.wrappedCreator(observable, creator);
+    wrappedObject(observable, obj as Backbone.Model | Backbone.Collection | null);
+    wrappedCreator(observable, creator);
 
     const creatorId = this._creatorId(creator);
     this.observable_records[creatorId] = this.observable_records[creatorId] || {};
@@ -322,8 +322,8 @@ export class Store {
 
   // Remove observable from store
   private _remove(observable: unknown): void {
-    const creator = utils.wrappedCreator(observable) || (observable as { constructor: Creator }).constructor;
-    const obj = utils.wrappedObject(observable);
+    const creator = wrappedCreator(observable) || (observable as { constructor: Creator }).constructor;
+    const obj = wrappedObject(observable);
 
     const currentObservable = this.find(obj, creator);
     if (currentObservable === observable) {
@@ -331,19 +331,19 @@ export class Store {
       delete this.observable_records[creatorId][this._cid(obj)];
     }
 
-    utils.wrappedObject(observable, null);
-    utils.wrappedCreator(observable, undefined);
+    wrappedObject(observable, null);
+    wrappedCreator(observable, undefined);
   }
 
   // Get creator for object
   private _creator(obj: unknown, options: InternalCreateOptions): Creator | undefined {
     if (options.creator) return options.creator;
 
-    const creator = utils.inferCreator(obj, options.factory, options.path || '');
+    const creator = inferCreator(obj, options.factory, options.path || '');
     if (creator) return creator;
 
-    if (kb.isModel(obj)) {
-      return (kb as { ViewModel?: Creator }).ViewModel;
+    if (isModel(obj)) {
+      return (globalThis as { ViewModel?: Creator }).ViewModel;
     }
 
     return undefined;

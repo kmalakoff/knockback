@@ -1,2 +1,4 @@
-// UMD entry point: default export only to avoid named+default export warning.
-export { default } from './index.ts';
+// UMD entry point: Re-export all named exports as default for UMD compatibility
+import * as knockback from './index.ts';
+
+export default knockback;

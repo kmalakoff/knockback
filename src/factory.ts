@@ -1,7 +1,7 @@
 import _ from 'underscore';
 import type { Creator, FactoriesOption } from './internal-types.ts';
 import type { InternalViewModelOptions } from './types.ts';
-import utils from './utils.ts';
+import { pathJoin, wrappedFactory } from './utils.ts';
 
 interface PathMapping {
   view_model?: Creator;
@@ -19,12 +19,12 @@ export class Factory {
     if (options.factory) {
       const factory = options.factory as Factory;
       if (!options.factories || factory.hasPathMappings(options.factories, ownerPath)) {
-        return utils.wrappedFactory(obj, factory) as Factory;
+        return wrappedFactory(obj, factory) as Factory;
       }
     }
 
     // Create new factory
-    const factory = utils.wrappedFactory(obj, new Factory(options.factory as Factory)) as Factory;
+    const factory = wrappedFactory(obj, new Factory(options.factory as Factory)) as Factory;
     if (options.factories) {
       factory.addPathMappings(options.factories, ownerPath);
     }
@@ -53,7 +53,7 @@ export class Factory {
 
     for (const path in factories as Record<string, Creator>) {
       const createInfo = (factories as Record<string, Creator>)[path];
-      this.paths[utils.pathJoin(ownerPath, path)] = createInfo;
+      this.paths[pathJoin(ownerPath, path)] = createInfo;
     }
   }
 
@@ -64,7 +64,7 @@ export class Factory {
     let allExist = true;
     for (const path in factories as Record<string, Creator>) {
       const creator = (factories as Record<string, Creator>)[path];
-      const existingCreator = this.creatorForPath(null, utils.pathJoin(ownerPath, path));
+      const existingCreator = this.creatorForPath(null, pathJoin(ownerPath, path));
       allExist = allExist && !!existingCreator && creator === existingCreator;
     }
     return allExist;

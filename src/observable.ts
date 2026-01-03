@@ -2,11 +2,11 @@ import type * as Backbone from 'backbone';
 import ko from 'knockout';
 import { EventWatcher } from './event-watcher.ts';
 import { Factory } from './factory.ts';
-import kb from './kb.ts';
+import { _throwMissing, getValue, ignore, peek, publishMethods, setValue } from './kb.ts';
 import { TypedValue } from './typed-value.ts';
 import type { InternalObservableOptions, Observable, ObservableBase, ObservableInternal, ObservableOptions, ValueType, ViewModelOptions } from './types.ts';
 import { TYPE_UNKNOWN } from './types.ts';
-import utils from './utils.ts';
+import { attachDispose, collapseOptions, getEventWatcher, pathJoin, setObservable, unwrapModels, wrappedFactory, wrappedStore } from './utils.ts';
 
 const KEYS_PUBLISH = ['value', 'valueType', 'dispose'] as const;
 const KEYS_INFO = ['args', 'read', 'write'] as const;
@@ -51,8 +51,8 @@ export interface ObservableInstance {
  * @returns A Knockout observable with Knockback extensions
  */
 export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo: string | ObservableOptions, options?: ViewModelOptions, vm: Record<string, unknown> = {}): Observable<T> {
-  return kb.ignore(() => {
-    if (!keyOrInfo) kb._throwMissing({ constructor: { name: 'Observable' } }, 'key_or_info');
+  return ignore(() => {
+    if (!keyOrInfo) _throwMissing({ constructor: { name: 'Observable' } }, 'key_or_info');
 
     const info = typeof keyOrInfo === 'string' ? { key: keyOrInfo } : keyOrInfo;
 
@@ -75,7 +75,7 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
       }
     }
 
-    const createOptions = utils.collapseOptions(options) as InternalObservableOptions;
+    const createOptions = collapseOptions(options) as InternalObservableOptions;
     const eventWatcher = createOptions.event_watcher;
     delete createOptions.event_watcher;
 
@@ -83,7 +83,7 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
     state._value = new TypedValue(createOptions);
     state._model = ko.observable(null);
 
-    const koObservable = utils.setObservable(
+    const koObservable = setObservable(
       state,
       ko.computed({
         read: () => {
@@ -95,29 +95,29 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
           }
 
           // Update event watcher
-          const ew = utils.getEventWatcher(state);
+          const ew = getEventWatcher(state);
           ew?.emitter(_model || null);
 
           if (state.read) {
             updateWithValue(state.read.apply(state._vm, args));
           } else if (_model !== undefined) {
-            kb.ignore(() => updateWithValue(kb.getValue(_model, kb.peek(state.key), state.args)));
+            ignore(() => updateWithValue(getValue(_model, peek(state.key), state.args)));
           }
 
           return state._value?.value();
         },
 
         write: (newValue: unknown) => {
-          kb.ignore(() => {
-            const unwrappedNewValue = utils.unwrapModels(newValue);
+          ignore(() => {
+            const unwrappedNewValue = unwrapModels(newValue);
             if (!state._model) return;
-            const _model = kb.peek(state._model);
+            const _model = peek(state._model);
 
             if (state.write) {
               state.write.call(state._vm, unwrappedNewValue);
-              newValue = kb.getValue(_model, kb.peek(state.key), state.args);
+              newValue = getValue(_model, peek(state.key), state.args);
             } else if (_model) {
-              kb.setValue(_model, kb.peek(state.key), unwrappedNewValue);
+              setValue(_model, peek(state.key), unwrappedNewValue);
             }
 
             updateWithValue(newValue);
@@ -129,12 +129,12 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
     ) as Observable;
 
     (koObservable as ObservableBase).__kb_is_o = true;
-    createOptions.store = utils.wrappedStore(koObservable, createOptions.store);
-    createOptions.path = utils.pathJoin(createOptions.path, state.key as string);
+    createOptions.store = wrappedStore(koObservable, createOptions.store);
+    createOptions.path = pathJoin(createOptions.path, state.key as string);
 
     // Handle factories
     if (createOptions.factories && (typeof createOptions.factories === 'function' || (createOptions.factories as { create?: unknown }).create)) {
-      createOptions.factory = utils.wrappedFactory(koObservable, new Factory(createOptions.factory as Factory));
+      createOptions.factory = wrappedFactory(koObservable, new Factory(createOptions.factory as Factory));
       (createOptions.factory as Factory).addPathMapping(createOptions.path, createOptions.factories);
     } else {
       createOptions.factory = Factory.useOptionsOrCreate(createOptions, koObservable, createOptions.path);
@@ -142,18 +142,18 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
     delete createOptions.factories;
 
     // Publish methods
-    kb.publishMethods(koObservable, state, KEYS_PUBLISH);
-    utils.attachDispose(koObservable, dispose);
+    publishMethods(koObservable, state, KEYS_PUBLISH);
+    attachDispose(koObservable, dispose);
 
     // Create model computed
     const modelComputed = ko.computed({
       read: () => ko.utils.unwrapObservable(state._model),
       write: (newModel: Backbone.Model | null) => {
-        kb.ignore(() => {
+        ignore(() => {
           if (!state._model) return;
-          if (state.__kb_released || kb.peek(state._model) === newModel) return;
+          if (state.__kb_released || peek(state._model) === newModel) return;
 
-          const newValue = kb.getValue(newModel, kb.peek(state.key), state.args);
+          const newValue = getValue(newModel, peek(state.key), state.args);
           state._model?.(newModel);
 
           if (!newModel) {
@@ -171,7 +171,7 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
     EventWatcher.useOptionsOrCreate({ event_watcher: eventWatcher }, model || null, state, {
       obj: state,
       emitter: (m: Backbone.Model | null) => state.model?.(m),
-      update: () => kb.ignore(() => update()),
+      update: () => ignore(() => update()),
       key: state.key as string,
       path: createOptions.path,
     });
@@ -189,8 +189,7 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
     }
 
     // Wrap with default observable if specified (plugin support)
-    const kbWithPlugins = kb as Record<string, unknown>;
-    const defaultObservableFn = kbWithPlugins.defaultObservable;
+    const defaultObservableFn = (globalThis as { defaultObservable?: unknown }).defaultObservable;
     if (typeof defaultObservableFn === 'function' && Object.hasOwn(info, 'default')) {
       result = (defaultObservableFn as (obs: unknown, defaultVal: unknown) => unknown)(result, info.default);
     }
@@ -203,16 +202,14 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
 
     function dispose(): void {
       if (state.__kb_released) return;
-      const obs = utils.getObservable(state);
       state.__kb_released = true;
       state._value?.dispose();
       state._value = undefined;
       state.model?.dispose();
       state.model = undefined;
-      if (obs) {
-        (obs as unknown as ObservableInternal).model = undefined;
+      if (koObservable) {
+        (koObservable as unknown as ObservableInternal).model = undefined;
       }
-      utils.disposeMetadata(state);
     }
 
     function value(): unknown {
@@ -221,7 +218,7 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
 
     function valueType(): ValueType {
       if (!state._value || !state._model) return TYPE_UNKNOWN;
-      return state._value.valueType(kb.peek(state._model), kb.peek(state.key));
+      return state._value.valueType(peek(state._model), peek(state.key));
     }
 
     // Update with explicit value (avoids arguments.length check)
@@ -233,7 +230,7 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
     // Update by reading from model (no argument)
     function update(): void {
       if (state.__kb_released || !state._model) return;
-      const newValue = kb.getValue(kb.peek(state._model), kb.peek(state.key));
+      const newValue = getValue(peek(state._model), peek(state.key));
       state._value?.update(newValue);
     }
   }) as Observable<T>;
