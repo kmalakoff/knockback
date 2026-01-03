@@ -2,6 +2,15 @@ import ko from 'knockout';
 import _ from 'underscore';
 import { attachDispose, disposeMetadata, setObservable } from '../../utils.ts';
 
+const KEYS_PUBLISH = ['dispose'] as const;
+
+// Dispose state constants (matches kb.ts)
+const KB_DISPOSE_STATE = {
+  ACTIVE: 0, // Not disposed, ready to use
+  DISPOSING: 1, // Currently disposing (prevents re-entry)
+  DISPOSED: 2, // Disposal complete (prevents double-disposal)
+} as const;
+
 // =============================================================================
 // Utility Functions
 // =============================================================================
@@ -103,7 +112,7 @@ export function parseFormattedString(string: string, format: string): string[] {
 
 export interface FormattedObservableInstance {
   __kb: { observable?: ko.Observable };
-  __kb_released?: boolean;
+  __kb_dispose?: number;
   dispose(): void;
 }
 
@@ -126,7 +135,6 @@ export function formattedObservable(format: string | ko.Observable<string>, ...a
   // Instance state (closure-based)
   const state: FormattedObservableInstance = {
     __kb: {},
-    __kb_released: false,
     dispose,
   };
 
@@ -161,8 +169,8 @@ export function formattedObservable(format: string | ko.Observable<string>, ...a
   // =============================================================================
 
   function dispose(): void {
-    if (state.__kb_released) return;
-    state.__kb_released = true;
+    if (state.__kb_dispose && state.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) return;
+    state.__kb_dispose = KB_DISPOSE_STATE.DISPOSED;
     disposeMetadata(state);
   }
 }

@@ -219,7 +219,7 @@ export interface LocaleManager {
  * @internal
  */
 export interface Store {
-  __kb_released?: boolean;
+  __kb_dispose?: number;
   dispose(): void;
   clear(): void;
   compact(): void;
@@ -250,7 +250,7 @@ export interface Factory {
  */
 export interface EventWatcher {
   __kb: { callbacks?: Record<string, unknown> | null };
-  __kb_released?: boolean;
+  __kb_dispose?: number;
   ee: Backbone.Model | null;
   dispose(): void;
   emitter(): Backbone.Model | null;
@@ -307,7 +307,7 @@ export interface StoreReference {
 export interface ObservableInternal<T = unknown> extends Omit<Observable<T>, 'model'> {
   __kb?: KBMetadata;
   __kb_is_o?: boolean;
-  __kb_released?: boolean;
+  __kb_dispose?: number;
   /** Writable during construction, readonly after */
   model: ko.Computed<Backbone.Model | null> & ((value: Backbone.Model | null) => void);
 }
@@ -320,7 +320,7 @@ export interface ObservableInternal<T = unknown> extends Omit<Observable<T>, 'mo
 export interface CollectionObservableInternal<T = unknown> extends Omit<CollectionObservable<T>, 'collection'> {
   __kb?: KBMetadata;
   __kb_is_co?: boolean;
-  __kb_released?: boolean;
+  __kb_dispose?: number;
   /** Writable during construction, readonly after */
   collection: ko.Computed<Backbone.Collection | null> & ((value: Backbone.Collection | null) => void);
 }
@@ -340,7 +340,7 @@ export interface ViewModelInternal
   > {
   __kb?: KBMetadata;
   __kb_is_vm?: boolean;
-  __kb_released?: boolean;
+  __kb_dispose?: number;
   /** Writable during construction, readonly after */
   model: ko.Computed<Backbone.Model | null> & ((value: Backbone.Model | null) => void);
 }
@@ -355,7 +355,7 @@ export interface ObservableBase {
   __kb_is_o?: boolean;
   __kb_is_co?: boolean;
   __kb_is_vm?: boolean;
-  __kb_released?: boolean;
+  __kb_dispose?: number;
   dispose?: () => void;
   valueType?: () => ValueType;
   model?: ko.Computed<Backbone.Model | null>;

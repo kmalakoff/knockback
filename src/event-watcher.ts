@@ -19,10 +19,17 @@ interface EventWatcherMetadata extends KBMetadata {
   callbacks?: Record<string, CallbackRecord> | null;
 }
 
+// Dispose state constants (matches kb.ts)
+const KB_DISPOSE_STATE = {
+  ACTIVE: 0, // Not disposed, ready to use
+  DISPOSING: 1, // Currently disposing (prevents re-entry)
+  DISPOSED: 2, // Disposal complete (prevents double-disposal)
+} as const;
+
 // Aggregates model events for efficient event handling
 export class EventWatcher {
   __kb: EventWatcherMetadata;
-  __kb_released = false;
+  __kb_dispose?: number;
   ee: Backbone.Model | null = null;
 
   // Use existing event watcher from options or create a new one
@@ -56,8 +63,8 @@ export class EventWatcher {
 
   // Clean up
   dispose(): void {
-    if (this.__kb_released) return;
-    this.__kb_released = true;
+    if (this.__kb_dispose && this.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) return;
+    this.__kb_dispose = KB_DISPOSE_STATE.DISPOSED;
     this.emitter(null);
     this.__kb.callbacks = null;
     disposeMetadata(this);

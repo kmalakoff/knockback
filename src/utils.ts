@@ -214,10 +214,15 @@ export function attachDispose<T extends object>(obj: T, dispose: () => void): vo
 }
 
 export function isDisposable(obj: unknown): boolean {
-  if (!obj || obj !== Object(obj) || (obj as { __kb_released?: boolean }).__kb_released) {
+  if (!obj || obj !== Object(obj)) {
     return false;
   }
-  return ko.isSubscribable(obj) || typeof (obj as { dispose?: () => void }).dispose === 'function';
+  const disposable = obj as { __kb_dispose?: number; dispose?: () => void };
+  // Check if already disposing or disposed (state >= 1)
+  if (disposable.__kb_dispose && disposable.__kb_dispose >= 1) {
+    return false;
+  }
+  return ko.isSubscribable(obj) || typeof disposable.dispose === 'function';
 }
 
 function disposeValue(value: unknown): void {

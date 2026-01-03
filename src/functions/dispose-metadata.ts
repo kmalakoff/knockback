@@ -44,7 +44,8 @@ export default function disposeMetadata(obj: KBObject): void {
   // Release store references
   if (__kb.stores_references) {
     for (let storeRef = __kb.stores_references.pop(); storeRef; storeRef = __kb.stores_references.pop()) {
-      if (!storeRef.store.__kb_released) {
+      // Check if store is not disposed (state < 1)
+      if (!storeRef.store.__kb_dispose || storeRef.store.__kb_dispose < 1) {
         storeRef.store.release(obj);
       }
     }

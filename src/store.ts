@@ -11,11 +11,18 @@ interface ObservableRecord {
   [cid: string]: unknown;
 }
 
+// Dispose state constants (matches kb.ts)
+const KB_DISPOSE_STATE = {
+  ACTIVE: 0, // Not disposed, ready to use
+  DISPOSING: 1, // Currently disposing (prevents re-entry)
+  DISPOSED: 2, // Disposal complete (prevents double-disposal)
+} as const;
+
 // Store for caching and sharing view models
 export class Store {
   static instances: Store[] = [];
 
-  __kb_released = false;
+  __kb_dispose?: number;
   observable_records: Record<string, ObservableRecord> = {};
   replaced_observables: unknown[] = [];
 
@@ -36,8 +43,8 @@ export class Store {
 
   // Clean up the store
   dispose(): void {
-    if (this.__kb_released) return;
-    this.__kb_released = true;
+    if (this.__kb_dispose && this.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) return;
+    this.__kb_dispose = KB_DISPOSE_STATE.DISPOSED;
     this.clear();
 
     const index = Store.instances.indexOf(this);
@@ -62,7 +69,8 @@ export class Store {
     this.replaced_observables = [];
 
     for (const observable of replacedObservables) {
-      if (!(observable as { __kb_released?: boolean }).__kb_released) {
+      const disposable = observable as { __kb_dispose?: number };
+      if (!disposable.__kb_dispose || disposable.__kb_dispose < KB_DISPOSE_STATE.DISPOSING) {
         this.release(observable, true);
       }
     }
@@ -73,7 +81,8 @@ export class Store {
     for (const creatorId in this.observable_records) {
       const records = this.observable_records[creatorId];
       for (const cid in records) {
-        if ((records[cid] as { __kb_released?: boolean }).__kb_released) {
+        const disposable = records[cid] as { __kb_dispose?: number };
+        if (disposable.__kb_dispose && disposable.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) {
           delete records[cid];
         }
       }
@@ -191,7 +200,8 @@ export class Store {
 
     this._remove(observable);
 
-    if ((observable as { __kb_released?: boolean }).__kb_released) return;
+    const disposable = observable as { __kb_dispose?: number };
+    if (disposable.__kb_dispose && disposable.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) return;
 
     if (force || this._refCount(observable) <= 1) {
       const disposable = observable as { dispose?: () => void };
@@ -211,9 +221,12 @@ export class Store {
     const cid = this._cid(obj);
     const observable = records[cid];
 
-    if (observable && (observable as { __kb_released?: boolean }).__kb_released) {
-      delete records[cid];
-      return null;
+    if (observable) {
+      const disposable = observable as { __kb_dispose?: number };
+      if (disposable.__kb_dispose && disposable.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) {
+        delete records[cid];
+        return null;
+      }
     }
 
     return observable || null;
@@ -221,8 +234,9 @@ export class Store {
 
   // Get total reference count across all stores
   private _refCount(observable: unknown): number {
-    if ((observable as { __kb_released?: boolean }).__kb_released) {
-      console?.log?.('Observable already released');
+    const disposable = observable as { __kb_dispose?: number };
+    if (disposable.__kb_dispose && disposable.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) {
+      console?.log?.('Observable already disposed');
       return 0;
     }
 

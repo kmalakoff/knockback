@@ -15,6 +15,13 @@ const KEYS_INFO = ['args', 'read', 'write'] as const;
 // Observable Interface
 // =============================================================================
 
+// Dispose state constants (matches kb.ts)
+const KB_DISPOSE_STATE = {
+  ACTIVE: 0, // Not disposed, ready to use
+  DISPOSING: 1, // Currently disposing (prevents re-entry)
+  DISPOSED: 2, // Disposal complete (prevents double-disposal)
+} as const;
+
 export interface ObservableInstance {
   // Index signature for dynamic property access
   [key: string]: unknown;
@@ -27,7 +34,7 @@ export interface ObservableInstance {
   _value?: TypedValue;
   _model?: ko.Observable<Backbone.Model | null>;
   model?: ko.Computed<Backbone.Model | null>;
-  __kb_released?: boolean;
+  __kb_dispose?: number;
   __kb?: unknown;
 
   // Methods
@@ -60,7 +67,6 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
     const state: ObservableInstance = {
       key: info.key || (keyOrInfo as string),
       _vm: vm,
-      __kb_released: false,
 
       dispose,
       value,
@@ -151,7 +157,7 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
       write: (newModel: Backbone.Model | null) => {
         ignore(() => {
           if (!state._model) return;
-          if (state.__kb_released || peek(state._model) === newModel) return;
+          if ((state.__kb_dispose && state.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) || peek(state._model) === newModel) return;
 
           const newValue = getValue(newModel, peek(state.key), state.args);
           state._model?.(newModel);
@@ -200,8 +206,8 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
     // =============================================================================
 
     function dispose(): void {
-      if (state.__kb_released) return;
-      state.__kb_released = true;
+      if (state.__kb_dispose && state.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) return;
+      state.__kb_dispose = KB_DISPOSE_STATE.DISPOSED;
       state._value?.dispose();
       state._value = undefined;
       state.model?.dispose();
@@ -223,13 +229,13 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
 
     // Update with explicit value (avoids arguments.length check)
     function updateWithValue(newValue: unknown): void {
-      if (state.__kb_released) return;
+      if (state.__kb_dispose && state.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) return;
       state._value?.update(newValue);
     }
 
     // Update by reading from model (no argument)
     function update(): void {
-      if (state.__kb_released || !state._model) return;
+      if ((state.__kb_dispose && state.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) || !state._model) return;
       const newValue = getValue(peek(state._model), peek(state.key));
       state._value?.update(newValue);
     }

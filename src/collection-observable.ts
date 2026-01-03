@@ -16,6 +16,13 @@ const COMPARE_DESCENDING = 1;
 
 const KEYS_PUBLISH = ['dispose', 'shareOptions', 'filters', 'comparator', 'sortAttribute', 'viewModelByModel', 'hasViewModels'] as const;
 
+// Dispose state constants (matches kb.ts)
+const KB_DISPOSE_STATE = {
+  ACTIVE: 0, // Not disposed, ready to use
+  DISPOSING: 1, // Currently disposing (prevents re-entry)
+  DISPOSED: 2, // Disposal complete (prevents double-disposal)
+} as const;
+
 type ComparatorFn = (a: unknown, b: unknown) => number;
 type FilterFn = (model: Backbone.Model) => boolean;
 
@@ -25,7 +32,7 @@ type FilterFn = (model: Backbone.Model) => boolean;
 
 export interface CollectionObservableInstance {
   __kb: Record<string, unknown>;
-  __kb_released?: boolean;
+  __kb_dispose?: number;
   in_edit: number;
   modelsOnly?: boolean;
   autoCompact?: boolean;
@@ -94,7 +101,6 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
     // Instance state (closure-based)
     const state: CollectionObservableInstance = {
       __kb: {},
-      __kb_released: false,
       in_edit: 0,
       modelsOnly: undefined,
       autoCompact: undefined,
@@ -255,8 +261,8 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
     // =============================================================================
 
     function dispose(): void {
-      if (state.__kb_released) return;
-      state.__kb_released = true;
+      if (state.__kb_dispose && state.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) return;
+      state.__kb_dispose = KB_DISPOSE_STATE.DISPOSED;
       const obs = getObservable(state) as Observable & ko.ObservableArray;
       const coll = peek(_collection);
 

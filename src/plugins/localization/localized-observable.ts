@@ -6,6 +6,13 @@ import { defaultObservable } from '../defaults/default-observable.ts';
 
 const KEYS_PUBLISH = ['dispose', 'observedValue', 'resetToCurrent'] as const;
 
+// Dispose state constants (matches kb.ts)
+const KB_DISPOSE_STATE = {
+  ACTIVE: 0, // Not disposed, ready to use
+  DISPOSING: 1, // Currently disposing (prevents re-entry)
+  DISPOSED: 2, // Disposal complete (prevents double-disposal),
+} as const;
+
 // Re-export LocaleManager type for backwards compatibility
 export type { LocaleManager };
 
@@ -26,7 +33,7 @@ interface LocalizedObservableState {
     _onLocaleChange?: () => void;
     _onChange?: (value: unknown) => void;
   };
-  __kb_released?: boolean;
+  __kb_dispose?: number;
   value: unknown;
   vo: ko.Observable<unknown>;
   vm: Record<string, unknown>;
@@ -74,7 +81,6 @@ export function localizedObservable(value: unknown, options: LocalizedObservable
   // Instance state (closure-based)
   const state: LocalizedObservableState = {
     __kb: {},
-    __kb_released: false,
     value,
     vo: ko.observable(null),
     vm: viewModel || {},
@@ -145,8 +151,8 @@ export function localizedObservable(value: unknown, options: LocalizedObservable
   // =============================================================================
 
   function dispose(): void {
-    if (state.__kb_released) return;
-    state.__kb_released = true;
+    if (state.__kb_dispose && state.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) return;
+    state.__kb_dispose = KB_DISPOSE_STATE.DISPOSED;
     const localeManager = (globalThis as unknown as { kb?: { locale_manager?: LocaleManager } }).kb?.locale_manager as LocaleManager | undefined;
     if (localeManager?.off && state.__kb._onLocaleChange) {
       localeManager.off('change', state.__kb._onLocaleChange);

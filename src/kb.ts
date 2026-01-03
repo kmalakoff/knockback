@@ -1,6 +1,7 @@
 import Backbone from 'backbone';
 import ko from 'knockout';
 import { MissingPropertyError, UnexpectedValueError } from './errors/index.ts';
+import type { Statistics } from './statistics.ts';
 import type { KBSettings, LocaleManager } from './types.ts';
 
 // Get global window object (works in browser and Node)
@@ -35,7 +36,7 @@ export const settings: KBSettings = {};
 let _locale_manager: LocaleManager | null = null;
 
 /** Statistics tracker for debugging/testing (internal storage) */
-let _statistics: StatisticsLike | null = null;
+let _statistics: Statistics | null = null;
 
 /** Get locale manager */
 export function getLocaleManager<T extends LocaleManager = LocaleManager>(): T | null {
@@ -48,12 +49,12 @@ export function setLocaleManager<T extends LocaleManager>(manager: T | null): vo
 }
 
 /** Get statistics */
-export function getStatistics(): StatisticsLike | null {
+export function getStatistics(): Statistics | null {
   return _statistics;
 }
 
 /** Set statistics */
-export function setStatistics(stats: StatisticsLike | null): void {
+export function setStatistics(stats: Statistics | null): void {
   _statistics = stats;
 }
 
@@ -106,26 +107,34 @@ export function isViewModel(obj: unknown): boolean {
 // Memory management
 // =============================================================================
 
-/** Checks if an object has been released (internal) */
+/** Checks if an object has been disposed (internal) */
 export function wasReleased(obj: unknown): boolean {
-  return !obj || (obj as { __kb_released?: boolean }).__kb_released === true;
+  if (!obj) return true;
+  const disposable = obj as { __kb_dispose?: number };
+  // Check if disposing or disposed (state >= 1)
+  return disposable.__kb_dispose !== undefined && disposable.__kb_dispose >= 1;
 }
+
+// Dispose state constants
+const KB_DISPOSE_STATE = {
+  ACTIVE: 0, // Not disposed, ready to use
+  DISPOSING: 1, // Currently disposing (prevents re-entry)
+  DISPOSED: 2, // Disposal complete (prevents double-disposal)
+} as const;
 
 /** Checks if an object can be disposed */
 export function isReleaseable(obj: unknown): boolean {
   return !!obj && (ko.isSubscribable(obj) || typeof (obj as { dispose?: () => void }).dispose === 'function');
 }
 
-/** Disposes an object or collection (public helper for plain objects) */
-export function dispose(obj: unknown): void {
-  if (!obj) return;
+/**
+ * Internal helper: Traverse object properties and dispose Knockback children
+ * @private
+ */
+function _traverseAndDisposeChildren(obj: unknown): void {
+  if (!obj || obj !== Object(obj)) return;
 
-  const disposable = obj as { dispose?: () => void };
-  if (typeof disposable.dispose === 'function') {
-    disposable.dispose();
-    return;
-  }
-
+  // Handle arrays
   if (Array.isArray(obj)) {
     for (let i = 0; i < obj.length; i++) {
       const value = obj[i];
@@ -137,25 +146,106 @@ export function dispose(obj: unknown): void {
     return;
   }
 
-  if (obj === Object(obj)) {
-    for (const key in obj as Record<string, unknown>) {
-      if (key === '__kb') continue;
-      const value = (obj as Record<string, unknown>)[key];
-      if (Array.isArray(value)) {
-        for (let i = 0; i < value.length; i++) {
-          const item = value[i];
-          if (isReleaseable(item)) {
-            value[i] = null;
-            (item as { dispose?: () => void }).dispose?.();
-          }
+  // Handle plain objects - dispose enumerable properties
+  for (const key in obj as Record<string, unknown>) {
+    if (key === '__kb' || key === '__kb_dispose') continue;
+
+    const value = (obj as Record<string, unknown>)[key];
+
+    // Dispose arrays of disposables
+    if (Array.isArray(value)) {
+      for (let i = 0; i < value.length; i++) {
+        const item = value[i];
+        if (isReleaseable(item)) {
+          value[i] = null;
+          (item as { dispose?: () => void }).dispose?.();
         }
-        continue;
       }
-      if (isReleaseable(value)) {
-        (obj as Record<string, unknown>)[key] = null;
-        (value as { dispose?: () => void }).dispose?.();
-      }
+      continue;
     }
+
+    // Dispose single disposable property
+    if (isReleaseable(value)) {
+      (obj as Record<string, unknown>)[key] = null;
+      (value as { dispose?: () => void }).dispose?.();
+    }
+  }
+}
+
+/**
+ * Dispose an object and all its Knockback children.
+ *
+ * Handles multiple cases automatically:
+ * - Objects with dispose(): Calls it, prevents infinite loops
+ * - Plain objects: Traverses and disposes all disposable properties
+ * - Already disposing/disposed: Returns immediately (re-entry protection)
+ *
+ * Uses a single __kb_dispose property with 3 states:
+ * - 0 (ACTIVE): Not disposed, will begin disposal
+ * - 1 (DISPOSING): Currently disposing, prevents re-entry
+ * - 2 (DISPOSED): Disposal complete, prevents double-disposal
+ *
+ * @param obj - The object to dispose
+ *
+ * @example
+ * // Case 1: Object with custom dispose
+ * class MyViewModel {
+ *   people = kb.collectionObservable(collection);
+ *
+ *   dispose() {
+ *     kb.dispose(this);  // Safe - won't infinite loop
+ *     console.log('cleaned up');
+ *   }
+ * }
+ * kb.dispose(vm);
+ *
+ * @example
+ * // Case 2: Plain object
+ * const vm = {
+ *   name: kb.observable(model, 'name'),
+ *   people: kb.collectionObservable(collection)
+ * };
+ * kb.dispose(vm);  // Traverses and disposes name & people
+ *
+ * @example
+ * // Case 3: Manual disposal (most efficient)
+ * class MyViewModel {
+ *   people = kb.collectionObservable(collection);
+ *
+ *   dispose() {
+ *     this.people.dispose();  // Targeted, no traversal
+ *   }
+ * }
+ */
+export function dispose(obj: unknown): void {
+  if (!obj) return;
+
+  const disposable = obj as {
+    dispose?: () => void;
+    __kb_dispose?: number;
+  };
+
+  // Already disposing or disposed - prevent re-entry and double-disposal
+  if (disposable.__kb_dispose && disposable.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) {
+    return;
+  }
+
+  // Mark as disposing (prevents infinite loop if dispose() calls kb.dispose(this))
+  disposable.__kb_dispose = KB_DISPOSE_STATE.DISPOSING;
+
+  try {
+    // If object has dispose() method, call it
+    if (typeof disposable.dispose === 'function') {
+      disposable.dispose();
+      // dispose() should handle cleanup
+      // If it called kb.dispose(this), the state flag prevented re-entry
+    }
+
+    // Always traverse children (safe because children check their own state)
+    _traverseAndDisposeChildren(obj);
+  } finally {
+    // Mark as fully disposed
+    disposable.__kb_dispose = KB_DISPOSE_STATE.DISPOSED;
   }
 }
 

@@ -5,6 +5,13 @@ import { attachDispose, disposeMetadata, getObservable, setObservable } from '..
 
 const KEYS_PUBLISH = ['dispose', 'setToDefault'] as const;
 
+// Dispose state constants (matches kb.ts)
+const KB_DISPOSE_STATE = {
+  ACTIVE: 0, // Not disposed, ready to use
+  DISPOSING: 1, // Currently disposing (prevents re-entry)
+  DISPOSED: 2, // Disposal complete (prevents double-disposal)
+} as const;
+
 // =============================================================================
 // Interface
 // =============================================================================
@@ -12,7 +19,7 @@ const KEYS_PUBLISH = ['dispose', 'setToDefault'] as const;
 export interface DefaultObservableInstance {
   [key: string]: unknown;
   __kb: { observable?: ko.Observable };
-  __kb_released?: boolean;
+  __kb_dispose?: number;
   dv: unknown;
   dispose(): void;
   setToDefault(): void;
@@ -36,7 +43,6 @@ export function defaultObservable<T>(targetObservable: ko.Observable<T>, default
   // Instance state (closure-based)
   const state: DefaultObservableInstance = {
     __kb: {},
-    __kb_released: false,
     dv: defaultValue,
     dispose,
     setToDefault,
@@ -69,8 +75,8 @@ export function defaultObservable<T>(targetObservable: ko.Observable<T>, default
   // =============================================================================
 
   function dispose(): void {
-    if (state.__kb_released) return;
-    state.__kb_released = true;
+    if (state.__kb_dispose && state.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) return;
+    state.__kb_dispose = KB_DISPOSE_STATE.DISPOSED;
     disposeMetadata(state);
   }
 

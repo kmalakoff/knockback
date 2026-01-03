@@ -10,6 +10,13 @@ import { attachDispose, collapseOptions, disposeDisposableKeys, disposeMetadata,
 
 const KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'staticDefaults'] as const;
 
+// Dispose state constants (matches kb.ts)
+const KB_DISPOSE_STATE = {
+  ACTIVE: 0, // Not disposed, ready to use
+  DISPOSING: 1, // Currently disposing (prevents re-entry)
+  DISPOSED: 2, // Disposal complete (prevents double-disposal)
+} as const;
+
 /**
  * Extended metadata for ViewModels
  * @hidden
@@ -91,7 +98,7 @@ export class ViewModelClass {
   /** @hidden */
   __kb: ViewModelMetadata;
   /** @hidden */
-  __kb_released?: boolean;
+  __kb_dispose?: number;
   /** @hidden */
   __kb_is_vm = true;
   model!: ko.Computed<Backbone.Model | null>;
@@ -234,8 +241,8 @@ export class ViewModelClass {
 
   // Clean up
   dispose(): void {
-    if (this.__kb_released) return;
-    this.__kb_released = true;
+    if (this.__kb_dispose && this.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) return;
+    this.__kb_dispose = KB_DISPOSE_STATE.DISPOSED;
     const __kb = this.__kb as ViewModelMetadata;
 
     // Clear external references

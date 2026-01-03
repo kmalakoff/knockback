@@ -8,9 +8,16 @@ import type { InternalCreateOptions, Observable, ObservableBase, Store, ValueTyp
 import { TYPE_ARRAY, TYPE_COLLECTION, TYPE_MODEL, TYPE_SIMPLE, TYPE_UNKNOWN } from './types.ts';
 import { inferCreator, resolveModel, valueType, wrappedCreator, wrappedObject } from './utils.ts';
 
+// Dispose state constants (matches kb.ts)
+const KB_DISPOSE_STATE = {
+  ACTIVE: 0, // Not disposed, ready to use
+  DISPOSING: 1, // Currently disposing (prevents re-entry)
+  DISPOSED: 2, // Disposal complete (prevents double-disposal)
+} as const;
+
 // Internal class for managing typed observable values
 export class TypedValue {
-  __kb_released = false;
+  __kb_dispose?: number;
   __kb_value: unknown;
   value_type?: ValueType;
   create_options?: InternalCreateOptions;
@@ -22,8 +29,8 @@ export class TypedValue {
   }
 
   dispose(): void {
-    if (this.__kb_released) return;
-    this.__kb_released = true;
+    if (this.__kb_dispose && this.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) return;
+    this.__kb_dispose = KB_DISPOSE_STATE.DISPOSED;
     const previousValue = this.__kb_value;
 
     if (previousValue) {
@@ -61,7 +68,7 @@ export class TypedValue {
 
   // Update with a new value
   update(newValue?: unknown): void {
-    if (this.__kb_released) return;
+    if (this.__kb_dispose && this.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) return;
 
     // Ensure null instead of undefined
     if (newValue === undefined) {
@@ -70,8 +77,9 @@ export class TypedValue {
 
     const newType = valueType(newValue);
 
-    // Check if previous value was released
-    if ((this.__kb_value as { __kb_released?: boolean })?.__kb_released) {
+    // Check if previous value was disposed
+    const disposable = this.__kb_value as { __kb_dispose?: number } | undefined;
+    if (disposable?.__kb_dispose && disposable.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) {
       this.__kb_value = undefined;
       this.value_type = undefined;
     }

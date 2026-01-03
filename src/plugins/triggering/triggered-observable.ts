@@ -6,6 +6,13 @@ import { attachDispose, disposeMetadata, setEventWatcher, setObservable } from '
 
 const KEYS_PUBLISH = ['dispose'] as const;
 
+// Dispose state constants (matches kb.ts)
+const KB_DISPOSE_STATE = {
+  ACTIVE: 0, // Not disposed, ready to use
+  DISPOSING: 1, // Currently disposing (prevents re-entry)
+  DISPOSED: 2, // Disposal complete (prevents double-disposal)
+} as const;
+
 // =============================================================================
 // Interface
 // =============================================================================
@@ -13,7 +20,7 @@ const KEYS_PUBLISH = ['dispose'] as const;
 export interface TriggeredObservableInstance {
   [key: string]: unknown;
   __kb: { observable?: ko.Observable; eventWatcher?: EventWatcher };
-  __kb_released?: boolean;
+  __kb_dispose?: number;
   event_selector: string;
   vo: ko.Observable<Backbone.Events | null>;
   ee: Backbone.Events | null;
@@ -58,7 +65,6 @@ export function triggeredObservable(emitter: Backbone.Events, eventSelector: str
   // Instance state (closure-based)
   const state: TriggeredObservableInstance = {
     __kb: {},
-    __kb_released: false,
     event_selector: eventSelector,
     vo: ko.observable(null),
     ee: null,
@@ -71,8 +77,8 @@ export function triggeredObservable(emitter: Backbone.Events, eventSelector: str
 
   // Add dispose method to state for publishMethods
   const dispose = () => {
-    if (state.__kb_released) return;
-    state.__kb_released = true;
+    if (state.__kb_dispose && state.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) return;
+    state.__kb_dispose = KB_DISPOSE_STATE.DISPOSED;
     disposeMetadata(state);
   };
 
