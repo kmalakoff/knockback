@@ -156,11 +156,11 @@ const kb = {
   getValue(model: Backbone.Model | null, key: string, args?: unknown[]): unknown {
     if (!model) return undefined;
 
-    // Check if ORM wants to use a function
-    // biome-ignore lint/suspicious/noExplicitAny: Backbone Model may have custom methods
-    const modelAny = model as any;
-    if (typeof modelAny[key] === 'function' && kb.settings.orm?.useFunction?.(model, key)) {
-      return modelAny[key]();
+    // Check if ORM wants to use a function (for Backbone ORMs with custom accessors)
+    const modelWithDynamicProps = model as unknown as Record<string, unknown>;
+    const prop = modelWithDynamicProps[key];
+    if (typeof prop === 'function' && kb.settings.orm?.useFunction?.(model, key)) {
+      return (prop as () => unknown)();
     }
 
     if (!args) {
@@ -168,19 +168,18 @@ const kb = {
     }
 
     const allArgs = [key, ...args].map((value) => kb.peek(value));
-    // biome-ignore lint/suspicious/noExplicitAny: Using get with spread args
-    return (model.get as any).apply(model, allArgs);
+    return (model.get as (...args: unknown[]) => unknown).apply(model, allArgs);
   },
 
   // Set value on model
   setValue(model: Backbone.Model | null, key: string, value: unknown): void {
     if (!model) return;
 
-    // Check if ORM wants to use a function
-    // biome-ignore lint/suspicious/noExplicitAny: Backbone Model may have custom methods
-    const modelAny = model as any;
-    if (typeof modelAny[key] === 'function' && kb.settings.orm?.useFunction?.(model, key)) {
-      modelAny[key](value);
+    // Check if ORM wants to use a function (for Backbone ORMs with custom accessors)
+    const modelWithDynamicProps = model as unknown as Record<string, unknown>;
+    const prop = modelWithDynamicProps[key];
+    if (typeof prop === 'function' && kb.settings.orm?.useFunction?.(model, key)) {
+      (prop as (val: unknown) => void)(value);
       return;
     }
 

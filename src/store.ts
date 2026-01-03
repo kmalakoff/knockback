@@ -1,6 +1,7 @@
 import ko from 'knockout';
 import _ from 'underscore';
 import type { CreateOptions, Creator } from './internal-types.ts';
+import { isCreatorConstructor, isCreatorObject } from './internal-types.ts';
 import kb from './kb.ts';
 import type { InternalCreateOptions, InternalViewModelOptions, ObservableBase, StoreReference, ViewModelOptions } from './types.ts';
 import utils from './utils.ts';
@@ -118,14 +119,30 @@ export class Store {
       return existing;
     }
 
-    const createFn = (creator as { create?: (o: unknown, opts: CreateOptions) => unknown }).create || creator;
-    if (!_.isFunction(createFn)) {
+    // Determine the create function based on creator type
+    let createFn: ((obj: unknown, opts: CreateOptions) => unknown) | undefined;
+    if (isCreatorObject(creator)) {
+      createFn = creator.create;
+    } else if (typeof creator === 'function') {
+      createFn = creator as (obj: unknown, opts: CreateOptions) => unknown;
+    }
+
+    if (!createFn) {
       throw new Error(`Invalid factory for "${options.path}"`);
     }
 
     const newObservable = kb.ignore(() => {
       const createOptions = { store: this, creator, ...options };
-      const result = (creator as { create?: (o: unknown, opts: CreateOptions) => unknown }).create ? (creator as { create: (o: unknown, opts: CreateOptions) => unknown }).create(obj, createOptions) : new (creator as new (o: unknown, opts: CreateOptions) => unknown)(obj, createOptions);
+      let result: unknown;
+
+      if (isCreatorObject(creator)) {
+        result = creator.create(obj, createOptions);
+      } else if (isCreatorConstructor(creator)) {
+        result = new creator(obj, createOptions);
+      } else {
+        result = creator(obj, createOptions);
+      }
+
       return result || ko.observable(null);
     });
 
@@ -234,7 +251,7 @@ export class Store {
 
   // Get or create id for creator
   private _creatorId(creator: Creator): string {
-    const createFn = (creator as { create?: unknown }).create || creator;
+    const createFn = isCreatorObject(creator) ? creator.create : creator;
     const fnWithCids = createFn as { __kb_cids?: Array<{ create: unknown; cid: string }> };
 
     fnWithCids.__kb_cids = fnWithCids.__kb_cids || [];

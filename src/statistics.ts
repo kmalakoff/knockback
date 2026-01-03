@@ -167,9 +167,9 @@ export class Statistics {
    */
   static eventsStats(obj: unknown, key?: string): { count: number; [key: string]: number } {
     const stats: { count: number; [key: string]: number } = { count: 0 };
-    // biome-ignore lint/suspicious/noExplicitAny: Backbone internals
-    const objAny = obj as any;
-    const events = objAny._events || objAny._callbacks || {};
+    // Access Backbone's internal event structure
+    const objWithEvents = obj as { _events?: Record<string, unknown>; _callbacks?: Record<string, unknown> };
+    const events = objWithEvents._events || objWithEvents._callbacks || {};
     const keys = key ? [key] : Object.keys(events);
 
     for (const eventKey of keys) {

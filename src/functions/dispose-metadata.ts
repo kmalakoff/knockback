@@ -19,8 +19,7 @@ export default function disposeMetadata(obj: KBObject): void {
 
   // Clean up nested observable
   if (__kb.observable) {
-    // biome-ignore lint/suspicious/noExplicitAny: Clearing dynamic properties
-    const obs = __kb.observable as any;
+    const obs = __kb.observable as unknown as Record<string, unknown>;
     obs.dispose = undefined;
     obs.release = undefined;
     disposeMetadata(__kb.observable as unknown as KBObject);

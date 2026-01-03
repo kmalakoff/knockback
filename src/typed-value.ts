@@ -1,7 +1,8 @@
 import type * as Backbone from 'backbone';
 import ko from 'knockout';
 import _ from 'underscore';
-import type { CreateOptions, Creator } from './internal-types.ts';
+import type { Creator } from './internal-types.ts';
+import { isCreatorConstructor, isCreatorObject } from './internal-types.ts';
 import kb from './kb.ts';
 import type { InternalCreateOptions, Observable, ObservableBase, Store, ValueType } from './types.ts';
 import { TYPE_ARRAY, TYPE_COLLECTION, TYPE_MODEL, TYPE_SIMPLE, TYPE_UNKNOWN } from './types.ts';
@@ -163,14 +164,15 @@ export class TypedValue {
         value = store.retainOrCreate(newValue, createOptions, true);
       } else {
         // Create manually
-        const creatorWithModels = creator as { models_only?: boolean; create?: (o: unknown, opts: CreateOptions) => unknown };
-        if (creatorWithModels.models_only) {
+        if (isCreatorObject(creator) && creator.models_only) {
           value = newValue;
           valueType = TYPE_SIMPLE;
-        } else if (creatorWithModels.create) {
-          value = creatorWithModels.create(newValue, createOptions);
+        } else if (isCreatorObject(creator)) {
+          value = creator.create(newValue, createOptions);
+        } else if (isCreatorConstructor(creator)) {
+          value = new creator(newValue, createOptions);
         } else {
-          value = new (creator as new (o: unknown, opts: CreateOptions) => unknown)(newValue, createOptions);
+          value = creator(newValue, createOptions);
         }
       }
     } else {

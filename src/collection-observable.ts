@@ -115,9 +115,8 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
     let _filters: ko.ObservableArray<unknown>;
     let _mapper: ko.Computed<void>;
 
-    // Create the observable array
-    // biome-ignore lint/suspicious/noExplicitAny: Observable needs dynamic collection property
-    const observable = utils.setObservable(state, ko.observableArray([])) as any;
+    // Create the observable array - cast to internal type to allow property assignments
+    const observable = utils.setObservable(state, ko.observableArray([])) as unknown as CollectionObservableInternal<T>;
     observable.__kb_is_co = true;
 
     // Options
@@ -322,8 +321,9 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
         kb.peek(obs).find((test: unknown) => {
           const testObj = test as { __kb?: { object?: Backbone.Model } };
           if (testObj?.__kb?.object) {
-            // biome-ignore lint/suspicious/noExplicitAny: Dynamic property access on Backbone.Model
-            return (testObj.__kb.object as any)[idAttribute] === (model as any)[idAttribute];
+            const testModel = testObj.__kb.object as unknown as Record<string, unknown>;
+            const sourceModel = model as unknown as Record<string, unknown>;
+            return testModel[idAttribute] === sourceModel[idAttribute];
           }
           return false;
         }) || null

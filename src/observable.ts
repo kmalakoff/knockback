@@ -188,11 +188,11 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
       result = new info.localizer(result);
     }
 
-    // Wrap with default observable if specified
-    // biome-ignore lint/suspicious/noExplicitAny: Dynamic kb method access
-    const defaultObservableFn = (kb as any).defaultObservable;
-    if (defaultObservableFn && Object.hasOwn(info, 'default')) {
-      result = defaultObservableFn(result, info.default);
+    // Wrap with default observable if specified (plugin support)
+    const kbWithPlugins = kb as Record<string, unknown>;
+    const defaultObservableFn = kbWithPlugins.defaultObservable;
+    if (typeof defaultObservableFn === 'function' && Object.hasOwn(info, 'default')) {
+      result = (defaultObservableFn as (obs: unknown, defaultVal: unknown) => unknown)(result, info.default);
     }
 
     return result as Observable;
