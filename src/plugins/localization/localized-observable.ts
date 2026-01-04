@@ -47,13 +47,13 @@ interface LocalizedObservableState {
  * @example
  *   // Simple translation lookup
  *   const greeting = kb.localizedObservable('greeting_key', {
- *     read: (key) => kb.locale_manager.get(key)
+ *     read: (key) => kb.localeManager.get(key)
  *   });
  *
  * @example
  *   // Date formatting with write support
  *   const localizedDate = kb.localizedObservable(dateValue, {
- *     read: (date) => new Intl.DateTimeFormat(kb.locale_manager.getLocale()).format(date),
+ *     read: (date) => new Intl.DateTimeFormat(kb.localeManager.getLocale()).format(date),
  *     write: (str, date) => {
  *       const parsed = new Date(str);
  *       if (!isNaN(parsed.getTime())) date.setTime(parsed.getTime());
@@ -65,8 +65,8 @@ export function localizedObservable(value: unknown, options: LocalizedObservable
   if (!options?.read) {
     _throwMissing({ constructor: { name: 'localizedObservable' } }, 'options.read');
   }
-  if (!globalThis.kb?.locale_manager) {
-    _throwMissing({ constructor: { name: 'localizedObservable' } }, 'kb.locale_manager');
+  if (!globalThis.kb?.localeManager) {
+    _throwMissing({ constructor: { name: 'localizedObservable' } }, 'kb.localeManager');
   }
 
   // Instance state (closure-based)
@@ -123,7 +123,7 @@ export function localizedObservable(value: unknown, options: LocalizedObservable
   attachDispose(observable, dispose);
 
   // Start listening to locale changes
-  const localeManager = (globalThis as unknown as { kb?: { locale_manager?: LocaleManager } }).kb?.locale_manager as LocaleManager | undefined;
+  const localeManager = (globalThis as unknown as { kb?: { localeManager?: LocaleManager } }).kb?.localeManager as LocaleManager | undefined;
   if (localeManager?.on && state.__kb._onLocaleChange) {
     localeManager.on('change', state.__kb._onLocaleChange);
   }
@@ -144,7 +144,7 @@ export function localizedObservable(value: unknown, options: LocalizedObservable
   function dispose(): void {
     if (state.__kb_dispose && state.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) return;
     state.__kb_dispose = KB_DISPOSE_STATE.DISPOSED;
-    const localeManager = (globalThis as unknown as { kb?: { locale_manager?: LocaleManager } }).kb?.locale_manager as LocaleManager | undefined;
+    const localeManager = (globalThis as unknown as { kb?: { localeManager?: LocaleManager } }).kb?.localeManager as LocaleManager | undefined;
     if (localeManager?.off && state.__kb._onLocaleChange) {
       localeManager.off('change', state.__kb._onLocaleChange);
     }

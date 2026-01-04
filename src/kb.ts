@@ -34,19 +34,19 @@ export const VERSION = '2.0.0';
 export const settings: KBSettings = {};
 
 /** Locale manager for localized observables (internal storage) */
-let _locale_manager: LocaleManager | null = null;
+let _localeManager: LocaleManager | null = null;
 
 /** Statistics tracker for debugging/testing (internal storage) */
 let _statistics: Statistics | null = null;
 
 /** Get locale manager */
 export function getLocaleManager<T extends LocaleManager = LocaleManager>(): T | null {
-  return _locale_manager as T | null;
+  return _localeManager as T | null;
 }
 
 /** Set locale manager */
 export function setLocaleManager<T extends LocaleManager>(manager: T | null): void {
-  _locale_manager = manager;
+  _localeManager = manager;
 }
 
 /** Get statistics */

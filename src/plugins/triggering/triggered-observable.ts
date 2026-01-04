@@ -15,7 +15,7 @@ export interface TriggeredObservableInstance {
   [key: string]: unknown;
   __kb: { observable?: ko.Observable; eventWatcher?: EventWatcher };
   __kb_dispose?: number;
-  event_selector: string;
+  eventSelector: string;
   vo: ko.Observable<Backbone.Events | null>;
   ee: Backbone.Events | null;
 }
@@ -53,13 +53,13 @@ export function triggeredObservable(emitter: Backbone.Events, eventSelector: str
     _throwMissing({ constructor: { name: 'TriggeredObservable' } }, 'emitter');
   }
   if (!eventSelector) {
-    _throwMissing({ constructor: { name: 'TriggeredObservable' } }, 'event_selector');
+    _throwMissing({ constructor: { name: 'TriggeredObservable' } }, 'eventSelector');
   }
 
   // Instance state (closure-based)
   const state: TriggeredObservableInstance = {
     __kb: {},
-    event_selector: eventSelector,
+    eventSelector: eventSelector,
     vo: ko.observable(null),
     ee: null,
   };
@@ -90,7 +90,7 @@ export function triggeredObservable(emitter: Backbone.Events, eventSelector: str
       obj: state,
       emitter: (e: Backbone.Model | null) => setEmitter(e),
       update,
-      event_selector: state.event_selector,
+      eventSelector: state.eventSelector,
     })
   );
 

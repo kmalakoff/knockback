@@ -122,7 +122,7 @@ describe('knockback plugins', () => {
 
         const validation = result();
         assert.strictEqual(validation.required, true); // empty is required error
-        assert.strictEqual(validation.$error_count, 1);
+        assert.strictEqual(validation.$errorCount, 1);
         assert.strictEqual(validation.$valid, false);
       });
 
@@ -136,7 +136,7 @@ describe('knockback plugins', () => {
         const validation = result();
         assert.strictEqual(validation.required, false);
         assert.strictEqual(validation.email, false);
-        assert.strictEqual(validation.$error_count, 0);
+        assert.strictEqual(validation.$errorCount, 0);
         assert.strictEqual(validation.$valid, true);
       });
 
@@ -154,7 +154,7 @@ describe('knockback plugins', () => {
         // Initially enabled - should show error
         let validation = result();
         assert.strictEqual(validation.required, true, 'Error when enabled');
-        assert.strictEqual(validation.$error_count, 1);
+        assert.strictEqual(validation.$errorCount, 1);
         assert.strictEqual(validation.$enabled, true);
         assert.strictEqual(validation.$disable, false);
 
@@ -162,7 +162,7 @@ describe('knockback plugins', () => {
         disabled(true);
         validation = result();
         assert.strictEqual(validation.required, false, 'No error when disabled');
-        assert.strictEqual(validation.$error_count, 0);
+        assert.strictEqual(validation.$errorCount, 0);
         assert.strictEqual(validation.$enabled, false);
         assert.strictEqual(validation.$disable, true);
       });

@@ -7,7 +7,7 @@ import { disposeMetadata, wrappedEventWatcher, wrappedEventWatcherIsOwned } from
 
 /** @internal */
 export interface CallbackInfo extends EventCallbackInfo {
-  unbind_fn?: (() => void) | null;
+  unbindFn?: (() => void) | null;
 }
 
 interface CallbackRecord {
@@ -91,9 +91,9 @@ export class EventWatcher {
   // Register callbacks for model events
   registerCallbacks(obj: unknown, callbackInfo: CallbackInfo): this {
     if (!obj) _throwMissing(this, 'obj');
-    if (!callbackInfo) _throwMissing(this, 'callback_info');
+    if (!callbackInfo) _throwMissing(this, 'callbackInfo');
 
-    const eventNames = callbackInfo.event_selector ? callbackInfo.event_selector.split(' ') : ['change'];
+    const eventNames = callbackInfo.eventSelector ? callbackInfo.eventSelector.split(' ') : ['change'];
     const model = this.ee;
 
     for (const eventName of eventNames) {
@@ -186,10 +186,10 @@ export class EventWatcher {
       // Process each callback info
       for (const info of callbacks.list) {
         // ORM binding support
-        if (!info.unbind_fn && info.key && info.update && info.path) {
+        if (!info.unbindFn && info.key && info.update && info.path) {
           const orm = settings.orm;
           if (orm?.bind) {
-            info.unbind_fn = orm.bind(model, info.key as string, info.update, info.path) || null;
+            info.unbindFn = orm.bind(model, info.key as string, info.update, info.path) || null;
           }
         }
 
@@ -225,9 +225,9 @@ export class EventWatcher {
 
     // Clean up callback info
     for (const info of callbacks.list) {
-      if (info.unbind_fn) {
-        info.unbind_fn();
-        info.unbind_fn = null;
+      if (info.unbindFn) {
+        info.unbindFn();
+        info.unbindFn = null;
       }
 
       if (info.emitter && !skipEmitter && !wasReleased(info.obj)) {

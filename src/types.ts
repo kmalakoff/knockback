@@ -269,7 +269,7 @@ export interface EventCallbackInfo {
   path?: string;
   update?: () => void;
   emitter?: (model: Backbone.Model | null) => void;
-  event_selector?: string;
+  eventSelector?: string;
 }
 
 /**

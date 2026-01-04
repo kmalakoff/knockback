@@ -190,7 +190,7 @@ export const kb: {
 };
 
 Object.defineProperties(kb, {
-  locale_manager: {
+  localeManager: {
     enumerable: true,
     get: () => getLocaleManager(),
     set: (manager) => {

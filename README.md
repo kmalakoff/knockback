@@ -114,7 +114,9 @@ Now, the greeting updates as you type!
 
 ## Breaking Changes in v2.0
 
-Knockback v2.0 uses modern TypeScript conventions. All option names have been changed from snake_case to camelCase:
+Knockback v2.0 uses modern TypeScript conventions. All option names and API properties have been changed from snake_case to camelCase:
+
+**Core Options:**
 
 | Old (v1.x)        | New (v2.0)       |
 |-------------------|------------------|
@@ -124,6 +126,17 @@ Knockback v2.0 uses modern TypeScript conventions. All option names have been ch
 | `models_only`     | `modelsOnly`     |
 | `auto_compact`    | `autoCompact`    |
 | `sort_attribute`  | `sortAttribute`  |
+
+**Plugin Options:**
+
+| Old (v1.x)            | New (v2.0)          | Plugin        |
+|-----------------------|---------------------|---------------|
+| `kb.locale_manager`   | `kb.localeManager`  | Localization  |
+| `event_selector`      | `eventSelector`     | Triggering    |
+| `validation_options`  | `validationOptions` | Validation    |
+| `no_attach`           | `noAttach`          | Validation    |
+| `$error_count`        | `$errorCount`       | Validation    |
+| `$active_error`       | `$activeError`      | Validation    |
 
 **Migration example:**
 

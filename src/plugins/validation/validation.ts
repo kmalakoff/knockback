@@ -17,21 +17,21 @@ interface ValidationOptions {
   disable?: boolean | (() => boolean);
   enable?: boolean | (() => boolean);
   priorities?: string | string[];
-  no_attach?: boolean;
+  noAttach?: boolean;
 }
 
 interface ValidationResult {
   [key: string]: boolean | number | string | undefined;
-  $error_count: number;
+  $errorCount: number;
   $valid: boolean;
   $enabled: boolean;
   $disable: boolean;
-  $active_error?: string;
+  $activeError?: string;
 }
 
 interface FormValidationResult {
   [key: string]: ko.Computed<ValidationResult> | ko.Computed<number> | ko.Computed<boolean>;
-  $error_count: ko.Computed<number>;
+  $errorCount: ko.Computed<number>;
   $valid: ko.Computed<boolean>;
   $enabled: ko.Computed<boolean>;
   $disabled: ko.Computed<boolean>;
@@ -39,7 +39,7 @@ interface FormValidationResult {
 
 /**
  * Creates an observable that wraps all validators for a value and generates helpers
- * for $valid, $error_count, $enabled, $disabled, and $active_error.
+ * for $valid, $errorCount, $enabled, $disabled, and $activeError.
  *
  * @param value - The value to validate
  * @param bindings - Named validators to use
@@ -53,21 +53,21 @@ export function valueValidator(
     disable?: boolean | (() => boolean);
     enable?: boolean | (() => boolean);
     priorities?: string | string[];
-    no_attach?: boolean;
+    noAttach?: boolean;
   } = {}
 ): ko.Computed<{
   [key: string]: boolean | number | string | undefined;
-  $error_count: number;
+  $errorCount: number;
   $valid: boolean;
   $enabled: boolean;
   $disable: boolean;
-  $active_error?: string;
+  $activeError?: string;
 }> {
   const opts = typeof validationOptions === 'function' ? {} : validationOptions || {};
 
   return ko.computed(() => {
     const results: ValidationResult = {
-      $error_count: 0,
+      $errorCount: 0,
       $valid: true,
       $enabled: true,
       $disable: false,
@@ -98,7 +98,7 @@ export function valueValidator(
       results[identifier] = !disabled && !!callOrGet(validator, currentValue);
 
       if (results[identifier]) {
-        results.$error_count++;
+        results.$errorCount++;
 
         // Check priorities
         let identifierIndex = priorities.indexOf(identifier);
@@ -106,11 +106,11 @@ export function valueValidator(
           identifierIndex = priorities.length;
         }
 
-        if (results.$active_error && identifierIndex < activeIndex) {
-          results.$active_error = identifier;
+        if (results.$activeError && identifierIndex < activeIndex) {
+          results.$activeError = identifier;
           activeIndex = identifierIndex;
-        } else if (!results.$active_error) {
-          results.$active_error = identifier;
+        } else if (!results.$activeError) {
+          results.$activeError = identifier;
           activeIndex = identifierIndex;
         }
       }
@@ -119,7 +119,7 @@ export function valueValidator(
     // Add inverse and ensure boolean
     results.$enabled = !disabled;
     results.$disable = !!disabled;
-    results.$valid = results.$error_count === 0;
+    results.$valid = results.$errorCount === 0;
 
     return results;
   });
@@ -141,15 +141,15 @@ export function inputValidator(
     disable?: boolean | (() => boolean);
     enable?: boolean | (() => boolean);
     priorities?: string | string[];
-    no_attach?: boolean;
+    noAttach?: boolean;
   } = {}
 ): ko.Computed<{
   [key: string]: boolean | number | string | undefined;
-  $error_count: number;
+  $errorCount: number;
   $valid: boolean;
   $enabled: boolean;
   $disable: boolean;
-  $active_error?: string;
+  $activeError?: string;
 }> | null {
   const opts = typeof validationOptions === 'function' ? {} : validationOptions || {};
   const validators = valid;
@@ -167,7 +167,7 @@ export function inputValidator(
   // Parse data-bind attribute
   let options: {
     value?: ko.Observable;
-    validation_options?: ValidationOptions;
+    validationOptions?: ValidationOptions;
     validations?: Record<string, (value: unknown) => boolean | unknown>;
   };
   try {
@@ -183,9 +183,9 @@ export function inputValidator(
   }
 
   // Merge validation options
-  if (options.validation_options) {
-    _.defaults(options.validation_options, opts);
-    Object.assign(opts, options.validation_options);
+  if (options.validationOptions) {
+    _.defaults(options.validationOptions, opts);
+    Object.assign(opts, options.validationOptions);
   }
 
   // Collect validators
@@ -212,7 +212,7 @@ export function inputValidator(
   const result = valueValidator(options.value, bindings, opts);
 
   // If there is a name, add to the viewModel with $ scoping
-  if (inputName && !opts.no_attach) {
+  if (inputName && !opts.noAttach) {
     viewModel[`$${inputName}`] = result;
   }
 
@@ -221,7 +221,7 @@ export function inputValidator(
 
 /**
  * Creates an observable that wraps all validators for all inputs on an HTML form element.
- * Aggregates helpers for $valid, $error_count, $enabled, and $disabled.
+ * Aggregates helpers for $valid, $errorCount, $enabled, and $disabled.
  *
  * @param viewModel - The view model
  * @param el - The form element
@@ -234,16 +234,16 @@ export function formValidator(
   string,
   | ko.Computed<{
       [key: string]: boolean | number | string | undefined;
-      $error_count: number;
+      $errorCount: number;
       $valid: boolean;
       $enabled: boolean;
       $disable: boolean;
-      $active_error?: string;
+      $activeError?: string;
     }>
   | ko.Computed<number>
   | ko.Computed<boolean>
 > & {
-  $error_count: ko.Computed<number>;
+  $errorCount: ko.Computed<number>;
   $valid: ko.Computed<boolean>;
   $enabled: ko.Computed<boolean>;
   $disabled: ko.Computed<boolean>;
@@ -256,22 +256,22 @@ export function formValidator(
     formName = null;
   }
 
-  // Parse form's data-bind attribute for validation_options
+  // Parse form's data-bind attribute for validationOptions
   let validationOptions: ValidationOptions = {};
   const bindingsAttr = el.getAttribute('data-bind');
   if (bindingsAttr) {
     try {
       const fn = new Function('sc', `with(sc[0]) { return { ${bindingsAttr} } }`);
       const options = fn([viewModel]);
-      if (options?.validation_options) {
-        validationOptions = options.validation_options;
+      if (options?.validationOptions) {
+        validationOptions = options.validationOptions;
       }
     } catch {
       // Ignore parsing errors
     }
   }
 
-  validationOptions.no_attach = !!formName;
+  validationOptions.noAttach = !!formName;
 
   // Build up results from all inputs
   const inputs = el.getElementsByTagName('input');
@@ -288,16 +288,16 @@ export function formValidator(
   }
 
   // Aggregate error count
-  results.$error_count = ko.computed(() => {
+  results.$errorCount = ko.computed(() => {
     let errorCount = 0;
     for (const validator of validators) {
-      errorCount += validator().$error_count;
+      errorCount += validator().$errorCount;
     }
     return errorCount;
   });
 
   // Aggregate valid
-  results.$valid = ko.computed(() => results.$error_count?.() === 0);
+  results.$valid = ko.computed(() => results.$errorCount?.() === 0);
 
   // Aggregate enabled
   results.$enabled = ko.computed(() => {
