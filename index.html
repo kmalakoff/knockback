@@ -35,7 +35,8 @@
 </code><button type="button">Copy</button></pre>
 
 <p>Now, the greeting updates as you type!</p>
-<h2 id="breaking-changes-in-v20" class="tsd-anchor-link">Breaking Changes in v2.0<a href="#breaking-changes-in-v20" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>Knockback v2.0 uses modern TypeScript conventions. All option names have been changed from snake_case to camelCase:</p>
+<h2 id="breaking-changes-in-v20" class="tsd-anchor-link">Breaking Changes in v2.0<a href="#breaking-changes-in-v20" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h2><p>Knockback v2.0 uses modern TypeScript conventions. All option names and API properties have been changed from snake_case to camelCase:</p>
+<p><strong>Core Options:</strong></p>
 <table>
 <thead>
 <tr>
@@ -67,6 +68,48 @@
 <tr>
 <td><code>sort_attribute</code></td>
 <td><code>sortAttribute</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Plugin Options:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Old (v1.x)</th>
+<th>New (v2.0)</th>
+<th>Plugin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>kb.locale_manager</code></td>
+<td><code>kb.localeManager</code></td>
+<td>Localization</td>
+</tr>
+<tr>
+<td><code>event_selector</code></td>
+<td><code>eventSelector</code></td>
+<td>Triggering</td>
+</tr>
+<tr>
+<td><code>validation_options</code></td>
+<td><code>validationOptions</code></td>
+<td>Validation</td>
+</tr>
+<tr>
+<td><code>no_attach</code></td>
+<td><code>noAttach</code></td>
+<td>Validation</td>
+</tr>
+<tr>
+<td><code>$error_count</code></td>
+<td><code>$errorCount</code></td>
+<td>Validation</td>
+</tr>
+<tr>
+<td><code>$active_error</code></td>
+<td><code>$activeError</code></td>
+<td>Validation</td>
 </tr>
 </tbody>
 </table>
