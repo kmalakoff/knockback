@@ -3,6 +3,7 @@
 // License: MIT (http://www.opensource.org/licenses/mit-license.php)
 
 import { collectionObservable } from './collection-observable.ts';
+import { configure, getRegisteredORMs, registerORM } from './configure.ts';
 import { applyBindings, dispose, getLocaleManager, getStatistics, isCollection, isModel, isReleaseable, isViewModel, releaseOnNodeRemove, renderTemplate, setLocaleManager, setStatistics, VERSION } from './kb.ts';
 import { observable } from './observable.ts';
 import { defaultObservable } from './plugins/defaults/index.ts';
@@ -11,6 +12,7 @@ import { localizedObservable } from './plugins/localization/index.ts';
 import { triggeredObservable } from './plugins/triggering/index.ts';
 import { formValidator, minLengthFn, valid, valueValidator } from './plugins/validation/index.ts';
 import { Statistics } from './statistics.ts';
+import { Store } from './store.ts';
 import { TYPE_ARRAY, TYPE_COLLECTION, TYPE_MODEL, TYPE_SIMPLE, TYPE_UNKNOWN } from './types.ts';
 import { viewModel } from './view-model.ts';
 
@@ -20,6 +22,12 @@ import { viewModel } from './view-model.ts';
 
 export { collectionObservable, observable, viewModel };
 export { VERSION };
+
+// =============================================================================
+// Configuration
+// =============================================================================
+
+export { configure, getRegisteredORMs, registerORM } from './configure.ts';
 
 // =============================================================================
 // Memory Management
@@ -52,6 +60,7 @@ export { formValidator, minLengthFn, valid, valueValidator };
 
 export { getStatistics, setStatistics } from './kb.ts';
 export { Statistics };
+export { Store } from './store.ts';
 
 // =============================================================================
 // Errors
@@ -64,7 +73,9 @@ export { KnockbackError, MissingPropertyError, NotInitializedError, ReleasedObje
 // =============================================================================
 
 export { TYPE_ARRAY, TYPE_COLLECTION, TYPE_MODEL, TYPE_SIMPLE, TYPE_UNKNOWN };
+export type { ConfigureOptions, ORM } from './configure.ts';
 export type { LocalizedObservableOptions } from './plugins/localization/index.ts';
+export type { ObservableRecord } from './store.ts';
 export type { CollectionObservable, CollectionObservableOptions, LocaleManager, Observable, ObservableOptions, ViewModel, ViewModelOptions } from './types.ts';
 
 // =============================================================================
@@ -113,6 +124,9 @@ export const kb: {
   isCollection: typeof isCollection;
   isViewModel: typeof isViewModel;
   dispose: typeof dispose;
+  configure: typeof configure;
+  registerORM: typeof registerORM;
+  getRegisteredORMs: typeof getRegisteredORMs;
   getLocaleManager: typeof getLocaleManager;
   setLocaleManager: typeof setLocaleManager;
   localizedObservable: typeof localizedObservable;
@@ -128,6 +142,7 @@ export const kb: {
   getStatistics: typeof getStatistics;
   setStatistics: typeof setStatistics;
   Statistics: typeof Statistics;
+  Store: typeof Store;
   KnockbackError: typeof KnockbackError;
   MissingPropertyError: typeof MissingPropertyError;
   UnexpectedValueError: typeof UnexpectedValueError;
@@ -151,6 +166,11 @@ export const kb: {
   releaseOnNodeRemove,
   renderTemplate,
 
+  // Configuration
+  configure,
+  registerORM,
+  getRegisteredORMs,
+
   // Localization
   getLocaleManager,
   setLocaleManager,
@@ -173,6 +193,7 @@ export const kb: {
   getStatistics,
   setStatistics,
   Statistics,
+  Store,
 
   // Types
   TYPE_ARRAY,

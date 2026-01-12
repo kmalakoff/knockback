@@ -8,7 +8,11 @@ import { ignore, isModel, settings } from './kb.ts';
 import type { InternalCreateOptions, InternalViewModelOptions, ObservableBase, StoreReference, ViewModelOptions } from './types.ts';
 import { createFromDefaultCreator, disposeDisposableKeys, get, inferCreator, orSet, wrappedCreator, wrappedObject, wrappedStore, wrappedStoreIsOwned } from './utils.ts';
 
-interface ObservableRecord {
+/**
+ * Record of observables cached by model CID
+ * @internal
+ */
+export interface ObservableRecord {
   [cid: string]: unknown;
 }
 

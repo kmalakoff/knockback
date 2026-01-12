@@ -1,19 +1,39 @@
 import _ from 'underscore';
 import { settings } from './kb.ts';
+import BackboneRelationalORM from './orms/backbone-relational.ts';
+import type { ValueType } from './types.ts';
 
+/**
+ * ORM adapter interface for integrating with different Backbone ORMs
+ */
 export interface ORM {
+  /** Check if the ORM is available in the current environment */
   isAvailable(): boolean;
+  /** Get relationship keys for a model (optional) */
   keys?(model: unknown): string[] | null;
+  /** Determine the type of a relationship (optional) */
+  relationType?(model: unknown, key: string): ValueType | null;
+  /** Bind to relationship changes (optional) */
+  bind?(model: unknown, key: string, update: () => void, path: string): (() => void) | null;
+  /** Check if a function should be used instead of get/set (optional) */
+  useFunction?(model: unknown, key: string): boolean;
 }
 
+/**
+ * Configuration options for Knockback
+ */
 export interface ConfigureOptions {
+  /** ORM to use - either a string name or ORM object */
   orm?: string | ORM;
+  /** Additional configuration options */
   [key: string]: unknown;
 }
 
 // Available ORMs registry
 const ALL_ORMS: Record<string, ORM | null> = {
   default: null,
+  'backbone-orm': null, // BackboneORM uses default behavior
+  'backbone-relational': BackboneRelationalORM,
 };
 
 /**
