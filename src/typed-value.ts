@@ -5,7 +5,7 @@ import { KB_DISPOSE_STATE } from './constants.ts';
 import { NotInitializedError } from './errors/index.ts';
 import { isCreatorConstructor, isCreatorObject } from './internal-types.ts';
 import { getValue, isModel, peek } from './kb.ts';
-import type { InternalCreateOptions, Observable, ObservableBase, Store, ValueType } from './types.ts';
+import type { InternalCreateOptions, Observable, ObservableBase, StoreInternal, ValueType } from './types.ts';
 import { TYPE_ARRAY, TYPE_COLLECTION, TYPE_MODEL, TYPE_SIMPLE, TYPE_UNKNOWN } from './types.ts';
 import { inferCreator, resolveModel, valueType, wrappedCreator, wrappedObject } from './utils.ts';
 
@@ -29,7 +29,7 @@ export class TypedValue {
 
     if (previousValue) {
       this.__kb_value = undefined;
-      const store = this.create_options?.store as Store;
+      const store = this.create_options?.store as StoreInternal;
       if (store && wrappedCreator(previousValue)) {
         store.release(previousValue);
       } else {
@@ -154,13 +154,13 @@ export class TypedValue {
 
     if (newObservable) {
       value = newObservable;
-      const store = createOptions.store as Store;
+      const store = createOptions.store as StoreInternal;
       if (store) {
         store.retain(newObservable, newValue, creator);
       }
     } else if (creator) {
       // Have the store, use it to create
-      const store = createOptions.store as Store;
+      const store = createOptions.store as StoreInternal;
       if (store) {
         value = store.retainOrCreate(newValue, createOptions, true);
       } else {
@@ -204,7 +204,7 @@ export class TypedValue {
 
     // Release previous
     if (previousValue) {
-      const store = this.create_options?.store as Store;
+      const store = this.create_options?.store as StoreInternal;
       if (store) {
         store.release(previousValue);
       } else {

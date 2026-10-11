@@ -211,18 +211,44 @@ export interface LocaleManager {
 }
 
 // =============================================================================
+// Public Store interface
+// =============================================================================
+
+/**
+ * Store for caching and sharing view models.
+ *
+ * The Store provides view model caching for efficient memory usage when
+ * multiple observables reference the same underlying models.
+ *
+ * @example
+ * // Create a shared store for a collection of view models
+ * const store = new kb.Store();
+ * const vm = kb.collectionObservable(collection, { store });
+ *
+ * // Later, dispose the store and all cached view models
+ * kb.dispose(store);
+ */
+export interface Store {
+  /** Dispose and release all cached view models */
+  dispose(): void;
+  /** Clear all stored observables without disposing the store */
+  clear(): void;
+  /** Compact by removing already-disposed observables */
+  compact(): void;
+}
+
+// =============================================================================
 // Internal types - not part of public API
 // =============================================================================
 
 /**
- * Store for caching and sharing view models
+ * Internal Store interface with all methods (for internal knockback use)
  * @internal
  */
-export interface Store {
+export interface StoreInternal extends Store {
   __kb_dispose?: number;
-  dispose(): void;
-  clear(): void;
-  compact(): void;
+  observable_records: Record<string, unknown>;
+  replaced_observables: unknown[];
   release(observable: unknown, force?: boolean): void;
   retain(observable: unknown, obj: unknown, creator?: Creator): unknown;
   retainOrCreate(obj: unknown, options: InternalCreateOptions, deepRetain?: boolean): unknown;
@@ -280,7 +306,7 @@ export interface KBMetadata {
   observable?: ko.Observable | ko.Computed | ko.ObservableArray;
   object?: Backbone.Model | Backbone.Collection | null;
   creator?: Creator;
-  store?: Store;
+  store?: StoreInternal;
   store_is_owned?: boolean;
   factory?: Factory;
   eventWatcher?: EventWatcher;
@@ -293,7 +319,7 @@ export interface KBMetadata {
  * @internal
  */
 export interface StoreReference {
-  store: Store;
+  store: StoreInternal;
   ref_count: number;
   release: () => void;
 }
@@ -370,7 +396,7 @@ export interface ObservableBase {
  * @internal
  */
 export interface InternalCreateOptions extends CreateOptions {
-  store?: Store;
+  store?: StoreInternal;
   factory?: Factory;
   eventWatcher?: EventWatcher;
 }
@@ -380,7 +406,7 @@ export interface InternalCreateOptions extends CreateOptions {
  * @internal
  */
 export interface InternalObservableOptions extends ObservableOptions {
-  store?: Store;
+  store?: StoreInternal;
   factory?: Factory;
   eventWatcher?: EventWatcher;
 }
@@ -390,7 +416,7 @@ export interface InternalObservableOptions extends ObservableOptions {
  * @internal
  */
 export interface InternalViewModelOptions extends ViewModelOptions {
-  store?: Store;
+  store?: StoreInternal;
   factory?: Factory;
 }
 
@@ -399,6 +425,6 @@ export interface InternalViewModelOptions extends ViewModelOptions {
  * @internal
  */
 export interface InternalCollectionObservableOptions extends CollectionObservableOptions {
-  store?: Store;
+  store?: StoreInternal;
   factory?: Factory;
 }

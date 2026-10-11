@@ -6,7 +6,7 @@ import disposeMetadata from './functions/dispose-metadata.ts';
 import unwrapModels from './functions/unwrap-models.ts';
 import type { Creator } from './internal-types.ts';
 import { isCollection, isModel, isViewModel, peek } from './kb.ts';
-import type { EventWatcher, Factory, KBMetadata, ObservableBase, Store, ValueType, ViewModelOptions } from './types.ts';
+import type { EventWatcher, Factory, KBMetadata, ObservableBase, StoreInternal, ValueType, ViewModelOptions } from './types.ts';
 import { TYPE_ARRAY, TYPE_COLLECTION, TYPE_MODEL, TYPE_SIMPLE, TYPE_UNKNOWN } from './types.ts';
 
 /**
@@ -94,11 +94,11 @@ export function setModel(obj: KBObject, value: Backbone.Model | null): Backbone.
 }
 
 // Store
-export function getStore(obj: KBObject): Store | undefined {
+export function getStore(obj: KBObject): StoreInternal | undefined {
   return get(obj, 'store');
 }
 
-export function setStore(obj: KBObject, value: Store): Store {
+export function setStore(obj: KBObject, value: StoreInternal): StoreInternal {
   return set(obj, 'store', value);
 }
 
@@ -171,9 +171,9 @@ export function wrappedModel(obj: KBObject, value?: Backbone.Model | null): Back
 }
 
 /** @deprecated Use getStore/setStore instead */
-export function wrappedStore(obj: KBObject): Store | undefined;
-export function wrappedStore(obj: KBObject, value: Store): Store;
-export function wrappedStore(obj: KBObject, value?: Store): Store | undefined {
+export function wrappedStore(obj: KBObject): StoreInternal | undefined;
+export function wrappedStore(obj: KBObject, value: StoreInternal): StoreInternal;
+export function wrappedStore(obj: KBObject, value?: StoreInternal): StoreInternal | undefined {
   return value === undefined ? getStore(obj) : setStore(obj, value);
 }
 

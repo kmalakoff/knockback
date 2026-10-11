@@ -5,7 +5,7 @@ import { UnexpectedValueError } from './errors/index.ts';
 import type { CreateOptions, Creator } from './internal-types.ts';
 import { isCreatorConstructor, isCreatorObject } from './internal-types.ts';
 import { ignore, isModel, settings } from './kb.ts';
-import type { InternalCreateOptions, InternalViewModelOptions, ObservableBase, StoreReference, ViewModelOptions } from './types.ts';
+import type { InternalCreateOptions, InternalViewModelOptions, ObservableBase, StoreInternal, StoreReference, ViewModelOptions } from './types.ts';
 import { createFromDefaultCreator, disposeDisposableKeys, get, inferCreator, orSet, wrappedCreator, wrappedObject, wrappedStore, wrappedStoreIsOwned } from './utils.ts';
 
 /**
@@ -16,15 +16,28 @@ export interface ObservableRecord {
   [cid: string]: unknown;
 }
 
-// Store for caching and sharing view models
-export class Store {
+/**
+ * Store implementation for caching and sharing view models.
+ *
+ * The Store provides view model caching for efficient memory usage when
+ * multiple observables reference the same underlying models.
+ *
+ * @example
+ * // Create a shared store for a collection of view models
+ * const store = new kb.Store();
+ * const vm = kb.collectionObservable(collection, { store });
+ *
+ * // Later, dispose the store and all cached view models
+ * kb.dispose(store);
+ */
+export class Store implements StoreInternal {
   static instances: Store[] = [];
 
   __kb_dispose?: number;
   observable_records: Record<string, ObservableRecord> = {};
   replaced_observables: unknown[] = [];
 
-  // Use existing store from options or create a new one
+  /** @internal Use existing store from options or create a new one */
   static useOptionsOrCreate(options: InternalViewModelOptions, obj: unknown, observable: ObservableBase): Store {
     if (!options.store) {
       wrappedStoreIsOwned(observable, true);
@@ -87,7 +100,10 @@ export class Store {
     }
   }
 
-  // Retain an observable in the store
+  /**
+   * Retain an observable in the store
+   * @internal
+   */
   retain(observable: unknown, obj: unknown, creator?: Creator): unknown {
     if (!this._canRegister(observable)) return observable;
 
@@ -108,7 +124,10 @@ export class Store {
     return observable;
   }
 
-  // Find or create an observable
+  /**
+   * Find or create an observable
+   * @internal
+   */
   retainOrCreate(obj: unknown, options: InternalCreateOptions, deepRetain?: boolean): unknown {
     const creator = this._creator(obj, options);
     if (!creator) {
@@ -158,7 +177,10 @@ export class Store {
     return newObservable;
   }
 
-  // Reuse an observable with a different object
+  /**
+   * Reuse an observable with a different object
+   * @internal
+   */
   reuse(observable: unknown, obj: unknown): void {
     const currentObj = wrappedObject(observable);
     if (currentObj === obj) return;
@@ -181,7 +203,10 @@ export class Store {
     }
   }
 
-  // Release an observable
+  /**
+   * Release an observable
+   * @internal
+   */
   release(observable: unknown, force?: boolean): void {
     if (!this._canRegister(observable)) {
       (observable as { dispose?: () => void }).dispose?.();
@@ -211,7 +236,10 @@ export class Store {
     }
   }
 
-  // Find an observable by object and creator
+  /**
+   * Find an observable by object and creator
+   * @internal
+   */
   find(obj: unknown, creator: Creator): unknown {
     const records = this.observable_records[this._creatorId(creator)];
     if (!records) return null;
