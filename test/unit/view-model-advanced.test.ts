@@ -1,4 +1,4 @@
-import kb from '@mcpeasy/knockback';
+import kb, { type ObservableOptions } from '@mcpeasy/knockback';
 import assert from 'assert';
 import Backbone from 'backbone';
 import ko from 'knockout';
@@ -205,6 +205,26 @@ describe('ViewModel advanced', () => {
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
     });
+
+    it('should clear an ordinary model and its values', () => {
+      interface NameViewModel {
+        name: ko.Observable<string | null>;
+      }
+
+      const model = new Backbone.Model({ name: 'before' });
+      const vm = kb.viewModel<NameViewModel>(model, { keys: ['name'] });
+
+      vm.model(null);
+      assert.strictEqual(vm.model(), null);
+      assert.strictEqual(vm.name(), null);
+
+      model.set('name', 'after');
+      assert.strictEqual(vm.model(), null);
+      assert.strictEqual(vm.name(), null);
+
+      vm.dispose();
+      vm.dispose();
+    });
   });
 
   describe('model replacement', () => {
@@ -336,18 +356,66 @@ describe('ViewModel advanced', () => {
       const vm = kb.viewModel<DynamicViewModel>(model, { keys: ['name'] });
 
       assert.ok(ko.isObservable(vm.name), 'name exists');
-      assert.strictEqual(vm.age, undefined, 'age does not exist');
+      const ageBeforeCreation = vm.age;
+      assert.strictEqual(ageBeforeCreation, undefined, 'age does not exist');
 
       // Add age to model and create observable
       model.set('age', 30);
       vm.createObservables(model, ['age']);
 
-      assert.ok(ko.isObservable(vm.age), 'age now exists');
-      assert.strictEqual(vm.age?.(), 30);
+      const createdAge = vm.age;
+      assert.ok(ko.isObservable(createdAge), 'age now exists');
+      assert.strictEqual(createdAge?.(), 30);
 
       vm.dispose();
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
+    });
+
+    it('creates null-backed array and mapped keys from an undefined model without reviving after disposal', () => {
+      interface OptionalModelViewModel {
+        arrayValue?: kb.Observable<unknown>;
+        mappedValue?: kb.Observable<unknown>;
+        lateArrayValue?: kb.Observable<unknown>;
+        lateMappedValue?: kb.Observable<unknown>;
+        __kb?: Record<string, unknown> | null;
+        createObservables: (model: Backbone.Model | null | undefined, keys: string[] | Record<string, ObservableOptions>) => void;
+        shareOptions: () => { store: unknown; factory: unknown };
+      }
+
+      const previousStatistics = kb.getStatistics();
+      const statistics = new kb.Statistics();
+      kb.setStatistics(statistics);
+      const vm = kb.viewModel<OptionalModelViewModel>(null, { keys: [] });
+
+      try {
+        vm.createObservables(undefined, ['arrayValue']);
+        vm.createObservables(undefined, { mappedValue: { key: 'sourceValue' } });
+
+        assert.ok(ko.isObservable(vm.arrayValue));
+        assert.ok(ko.isObservable(vm.mappedValue));
+        assert.strictEqual(vm.arrayValue?.model(), null);
+        assert.strictEqual(vm.mappedValue?.model(), null);
+        assert.strictEqual(vm.arrayValue?.(), null);
+        assert.strictEqual(vm.mappedValue?.(), null);
+
+        vm.dispose();
+        const disposedMetadata = vm.__kb;
+        const disposedMetadataSnapshot = { ...disposedMetadata };
+
+        vm.createObservables(undefined, ['lateArrayValue']);
+        vm.createObservables(undefined, { lateMappedValue: { key: 'lateSourceValue' } });
+
+        assert.strictEqual(vm.lateArrayValue, undefined);
+        assert.strictEqual(vm.lateMappedValue, undefined);
+        assert.strictEqual(vm.__kb, disposedMetadata);
+        assert.deepStrictEqual(vm.__kb, disposedMetadataSnapshot);
+        assert.deepStrictEqual(vm.shareOptions(), { store: undefined, factory: undefined });
+        assert.strictEqual(statistics.registeredStatsString('all released'), 'all released');
+      } finally {
+        vm.dispose();
+        kb.setStatistics(previousStatistics);
+      }
     });
   });
 

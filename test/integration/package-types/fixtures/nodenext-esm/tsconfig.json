@@ -1,0 +1,13 @@
+{
+  "extends": "tsds-config/tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "dom"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "dist",
+    "rootDir": "src",
+    "types": []
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "knockback-complete-test-esm",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/esm/typecheck/all-tests.js",
+  "source": "typecheck/all-tests.ts",
+  "types": "dist/esm/typecheck/all-tests.d.ts",
+  "files": [
+    "dist"
+  ],
+  "tsds": {
+    "targets": [
+      "esm"
+    ]
+  }
+}

@@ -1,5 +1,6 @@
 import Backbone from 'backbone';
 import ko from 'knockout';
+import type { ORM } from './configure.ts';
 import { KB_DISPOSE_STATE } from './constants.ts';
 import { MissingPropertyError, UnexpectedValueError } from './errors/index.ts';
 import type { Statistics } from './statistics.ts';
@@ -9,9 +10,15 @@ import type { KBSettings, LocaleManager } from './types.ts';
 const globalWindow: (Window & typeof globalThis) | undefined = typeof window !== 'undefined' ? window : undefined;
 
 // Extended Knockout types for internal APIs
+interface Ignore {
+  <Return>(callback: (this: void) => Return): Return;
+  <Return, Target>(callback: (this: Target) => Return, callbackTarget: Target): Return;
+  <Return, Target, Args extends unknown[]>(callback: (this: Target, ...args: Args) => Return, callbackTarget: Target, callbackArgs: Args): Return;
+}
+
 interface KoExtended {
   dependencyDetection?: {
-    ignore: <T>(callback: () => T, callbackTarget?: unknown, callbackArgs?: unknown[]) => T;
+    ignore: Ignore;
   };
   storedBindingContextForNode?: (node: Node, context: unknown) => void;
 }
@@ -64,10 +71,10 @@ export function setStatistics(stats: Statistics | null): void {
 // =============================================================================
 
 /** Helper to ignore dependencies in a function */
-export const ignore: <T>(callback: () => T, callbackTarget?: unknown, callbackArgs?: unknown[]) => T =
+export const ignore: Ignore =
   (ko as unknown as KoExtended).dependencyDetection?.ignore ||
-  (<T>(callback: () => T, callbackTarget?: unknown, callbackArgs?: unknown[]): T => {
-    let value: T = null as T;
+  (<Return>(callback: (...args: unknown[]) => Return, callbackTarget?: unknown, callbackArgs?: unknown[]): Return => {
+    let value: Return = null as Return;
     ko.computed(() => {
       value = callback.apply(callbackTarget, callbackArgs || []);
     }).dispose();
@@ -316,13 +323,13 @@ export function applyBindings(viewModel: unknown, node: Element | NodeList | HTM
 // =============================================================================
 
 /** Get value from model */
-export function getValue(model: Backbone.Model | null, key: string, args?: unknown[]): unknown {
+export function getValue(model: Backbone.Model | null, key: string, args?: unknown[], orm?: ORM | null): unknown {
   if (!model) return undefined;
 
   // Check if ORM wants to use a function (for Backbone ORMs with custom accessors)
   const modelWithDynamicProps = model as unknown as Record<string, unknown>;
   const prop = modelWithDynamicProps[key];
-  if (typeof prop === 'function' && settings.orm?.useFunction?.(model, key)) {
+  if (typeof prop === 'function' && orm?.useFunction?.(model, key)) {
     return (prop as () => unknown)();
   }
 
@@ -335,13 +342,13 @@ export function getValue(model: Backbone.Model | null, key: string, args?: unkno
 }
 
 /** Set value on model */
-export function setValue(model: Backbone.Model | null, key: string, value: unknown): void {
+export function setValue(model: Backbone.Model | null, key: string, value: unknown, orm?: ORM | null): void {
   if (!model) return;
 
   // Check if ORM wants to use a function (for Backbone ORMs with custom accessors)
   const modelWithDynamicProps = model as unknown as Record<string, unknown>;
   const prop = modelWithDynamicProps[key];
-  if (typeof prop === 'function' && settings.orm?.useFunction?.(model, key)) {
+  if (typeof prop === 'function' && orm?.useFunction?.(model, key)) {
     (prop as (val: unknown) => void)(value);
     return;
   }

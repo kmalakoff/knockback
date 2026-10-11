@@ -10,6 +10,25 @@ const KEYS_PUBLISH = ['dispose', 'setToDefault'] as const;
 // Interface
 // =============================================================================
 
+interface ReadableKnockoutValue<Read> extends ko.Subscribable<Read> {
+  (): Read;
+}
+
+interface WritableKnockoutValue<Read, Write> extends ReadableKnockoutValue<Read> {
+  (value: Write): unknown;
+}
+
+type UnwrappedObservable<Value> = Value extends DefaultObservable<infer Read, infer _Write> ? Read : Value extends ko.Observable<infer Read> ? Read : Value extends ko.Computed<infer Read> ? Read : Value;
+type DefaultObservableValue<TargetRead, Default> = Exclude<UnwrappedObservable<TargetRead>, null | undefined> | UnwrappedObservable<Default>;
+
+type SplitComputedFactory = <Read, Write>(options: { read: () => Read; write: (value: Write) => void }) => DefaultObservable<Read, Write>;
+
+export interface DefaultObservable<Read, Write = Read> extends ko.ComputedFunctions<Read> {
+  (): Read;
+  (value: Write): this;
+  setToDefault(): void;
+}
+
 export interface DefaultObservableInstance {
   [key: string]: unknown;
   __kb: { observable?: ko.Observable };
@@ -19,23 +38,28 @@ export interface DefaultObservableInstance {
   setToDefault(): void;
 }
 
+type DefaultObservableState<Default> = DefaultObservableInstance & { dv: Default };
+
 // =============================================================================
 // Factory Function (Primary API)
 // =============================================================================
 
 /**
- * Creates an observable that provides a default value when the target is null, undefined, or empty.
+ * Creates a computed that provides a default value when the target is null or undefined.
  *
- * @param targetObservable - The observable to check for null, undefined, or empty string
- * @param defaultValue - The default value. Can be a value, string or ko.observable
- * @returns A ko.observable with default value support
+ * @param targetObservable - The observable or default computed to read and write
+ * @param defaultValue - The raw value, observable, or computed to write when resetting
+ * @returns A computed that reads the target or its unwrapped default value
  *
  * @example
  *   const wrapped_name = kb.defaultObservable(kb.observable(model, 'name'), '(no name)');
  */
-export function defaultObservable<T>(targetObservable: ko.Observable<T>, defaultValue: T): ko.Observable<T> & { dispose: () => void; setToDefault: () => void } {
+export function defaultObservable<Stored, Default extends Stored = Stored>(targetObservable: ko.Observable<Stored>, defaultValue: Default): DefaultObservable<DefaultObservableValue<Stored, Default>, Stored>;
+export function defaultObservable<TargetRead, TargetWrite, Default extends TargetWrite = TargetWrite>(targetObservable: DefaultObservable<TargetRead, TargetWrite>, defaultValue: Default): DefaultObservable<DefaultObservableValue<TargetRead, Default>, TargetWrite>;
+export function defaultObservable<TargetRead, TargetWrite, Default extends TargetWrite>(targetObservable: WritableKnockoutValue<TargetRead, TargetWrite>, defaultValue: Default): DefaultObservable<DefaultObservableValue<TargetRead, Default>, TargetWrite> {
+  type Read = DefaultObservableValue<TargetRead, Default>;
   // Instance state (closure-based)
-  const state: DefaultObservableInstance = {
+  const state: DefaultObservableState<Default> = {
     __kb: {},
     dv: defaultValue,
     dispose,
@@ -44,19 +68,20 @@ export function defaultObservable<T>(targetObservable: ko.Observable<T>, default
 
   const observable = setObservable(
     state,
-    ko.computed({
-      read: () => {
-        const currentTarget = ko.utils.unwrapObservable(targetObservable());
+    (ko.computed as unknown as SplitComputedFactory)<Read, TargetWrite>({
+      read: (): Read => {
+        const currentTarget = (ko.utils.unwrapObservable as <Value>(value: Value) => UnwrappedObservable<Value>)(targetObservable());
         if (_.isNull(currentTarget) || _.isUndefined(currentTarget)) {
-          return ko.utils.unwrapObservable(state.dv);
+          return (ko.utils.unwrapObservable as <Value>(value: Value) => UnwrappedObservable<Value>)(state.dv) as Read;
         }
-        return currentTarget;
+        return currentTarget as Read;
       },
-      write: (value: T) => {
+      write: (value: TargetWrite) => {
         targetObservable(value);
       },
     })
-  ) as ko.Observable<T> & { dispose: () => void; setToDefault: () => void };
+  ) as DefaultObservable<Read, TargetWrite>;
+  const disposeComputed = observable.dispose.bind(observable);
 
   // Publish public interface on the observable
   publishMethods(observable, state, KEYS_PUBLISH);
@@ -71,11 +96,12 @@ export function defaultObservable<T>(targetObservable: ko.Observable<T>, default
   function dispose(): void {
     if (state.__kb_dispose && state.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) return;
     state.__kb_dispose = KB_DISPOSE_STATE.DISPOSED;
+    disposeComputed();
     disposeMetadata(state);
   }
 
   function setToDefault(): void {
-    const obs = getObservable(state) as ko.Observable;
+    const obs = getObservable(state) as DefaultObservable<Read, TargetWrite> | undefined;
     if (obs) {
       obs(state.dv);
     }

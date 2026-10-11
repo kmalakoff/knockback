@@ -1,0 +1,18 @@
+{
+  "intentionallyNotExported": [
+    "CollectionCreatorConstructor",
+    "CollectionCreatorFunction",
+    "CollectionCreatorItem",
+    "CollectionCreatorObject",
+    "CollectionOptionsItem",
+    "CreateOptions",
+    "Creator",
+    "DefaultObservableValue",
+    "DirectCollectionCreator",
+    "FactoriesOption",
+    "ModelEvent",
+    "ObservableArguments",
+    "ViewModelClass"
+  ],
+  "tsconfig": "tsconfig.docs.json"
+}

@@ -4,6 +4,7 @@
 
 import { collectionObservable } from './collection-observable.ts';
 import { configure, getRegisteredORMs, registerORM } from './configure.ts';
+import type { KnockbackGlobal } from './internal-types.ts';
 import { applyBindings, dispose, getLocaleManager, getStatistics, isCollection, isModel, isReleaseable, isViewModel, releaseOnNodeRemove, renderTemplate, setLocaleManager, setStatistics, VERSION } from './kb.ts';
 import { observable } from './observable.ts';
 import { defaultObservable } from './plugins/defaults/index.ts';
@@ -12,7 +13,8 @@ import { localizedObservable } from './plugins/localization/index.ts';
 import { triggeredObservable } from './plugins/triggering/index.ts';
 import { formValidator, minLengthFn, valid, valueValidator } from './plugins/validation/index.ts';
 import { Statistics } from './statistics.ts';
-import { Store } from './store.ts';
+import { Store as StoreClass } from './store.ts';
+import type { Store } from './types.ts';
 import { TYPE_ARRAY, TYPE_COLLECTION, TYPE_MODEL, TYPE_SIMPLE, TYPE_UNKNOWN } from './types.ts';
 import { viewModel } from './view-model.ts';
 
@@ -20,8 +22,7 @@ import { viewModel } from './view-model.ts';
 // Core API (named exports, tree-shakeable)
 // =============================================================================
 
-export { collectionObservable, observable, viewModel };
-export { VERSION };
+export { collectionObservable, observable, VERSION, viewModel };
 
 // =============================================================================
 // Configuration
@@ -60,7 +61,6 @@ export { formValidator, minLengthFn, valid, valueValidator };
 
 export { getStatistics, setStatistics } from './kb.ts';
 export { Statistics };
-export { Store } from './store.ts';
 
 // =============================================================================
 // Errors
@@ -72,41 +72,34 @@ export { KnockbackError, MissingPropertyError, NotInitializedError, ReleasedObje
 // Types
 // =============================================================================
 
-export { TYPE_ARRAY, TYPE_COLLECTION, TYPE_MODEL, TYPE_SIMPLE, TYPE_UNKNOWN };
 export type { ConfigureOptions, ORM } from './configure.ts';
+export type { DefaultObservable } from './plugins/defaults/default-observable.ts';
 export type { LocalizedObservableOptions } from './plugins/localization/index.ts';
-export type { ObservableRecord } from './store.ts';
-export type { CollectionObservable, CollectionObservableOptions, LocaleManager, Observable, ObservableOptions, ViewModel, ViewModelOptions } from './types.ts';
+export type { ReadableObservable, ValidationResult } from './plugins/validation/index.ts';
+export type { CollectionCreator, CollectionObservable, CollectionObservableOptions, LocaleManager, ModelInput, ModelReference, Observable, ObservableOptions, Store, ValueType, ViewModel, ViewModelOptions } from './types.ts';
+export { TYPE_ARRAY, TYPE_COLLECTION, TYPE_MODEL, TYPE_SIMPLE, TYPE_UNKNOWN };
 
 // =============================================================================
 // Namespace types (kb.Observable, kb.ViewModel, etc.)
 // =============================================================================
 
 export namespace kb {
-  export type Observable<T = unknown> = import('./types.ts').Observable<T>;
+  export type Observable<T = unknown, M extends import('backbone').Model = import('backbone').Model> = import('./types.ts').Observable<T, M>;
   export type Computed<T = unknown> = import('knockout').Computed<T>;
   export type ObservableArray<T = unknown> = import('knockout').ObservableArray<T>;
   export type CollectionObservable<T = unknown> = import('./types.ts').CollectionObservable<T>;
-  export type ViewModel<T extends object = Record<string, unknown>> = import('./types.ts').ViewModel<T>;
+  export type ViewModel<T extends object = Record<string, unknown>, M extends import('backbone').Model = import('backbone').Model> = import('./types.ts').ViewModel<T, M>;
 }
 
 // =============================================================================
 // Default export (backward compatibility)
 // =============================================================================
 
-import type * as Backbone from 'backbone';
-import type * as ko from 'knockout';
 import { KnockbackError, MissingPropertyError, NotInitializedError, ReleasedObjectError, UnexpectedValueError } from './errors/index.ts';
 import { ViewModelClass } from './view-model.ts';
 
 export const kb: {
-  ViewModel: new (
-    ...args: unknown[]
-  ) => {
-    dispose(): void;
-    model: ko.Computed<Backbone.Model | null> & ((value: Backbone.Model | null) => void);
-    [key: string]: unknown;
-  };
+  ViewModel: typeof ViewModelClass;
   observable: typeof observable;
   viewModel: typeof viewModel;
   collectionObservable: typeof collectionObservable;
@@ -142,7 +135,7 @@ export const kb: {
   getStatistics: typeof getStatistics;
   setStatistics: typeof setStatistics;
   Statistics: typeof Statistics;
-  Store: typeof Store;
+  Store: new () => Store;
   KnockbackError: typeof KnockbackError;
   MissingPropertyError: typeof MissingPropertyError;
   UnexpectedValueError: typeof UnexpectedValueError;
@@ -193,7 +186,7 @@ export const kb: {
   getStatistics,
   setStatistics,
   Statistics,
-  Store,
+  Store: StoreClass,
 
   // Types
   TYPE_ARRAY,
@@ -227,27 +220,14 @@ Object.defineProperties(kb, {
   },
 });
 
-// Augment globalThis interface for type safety
-declare global {
-  interface GlobalThis {
-    kb: typeof kb;
-    statistics: Statistics | null;
-    ViewModel: typeof ViewModelClass;
-    CollectionObservable: typeof collectionObservable;
-    viewModel: typeof viewModel;
-    collectionObservable: typeof collectionObservable;
-    defaultObservable: typeof defaultObservable;
-  }
-}
-
 // Set globalThis.kb for plugin compatibility
 if (typeof globalThis !== 'undefined') {
-  globalThis.kb = kb;
-  globalThis.ViewModel = ViewModelClass;
-  globalThis.CollectionObservable = collectionObservable;
-  globalThis.viewModel = viewModel;
-  globalThis.collectionObservable = collectionObservable;
-  globalThis.defaultObservable = defaultObservable;
+  (globalThis as KnockbackGlobal).kb = kb;
+  (globalThis as KnockbackGlobal).ViewModel = ViewModelClass;
+  (globalThis as KnockbackGlobal).CollectionObservable = collectionObservable;
+  (globalThis as KnockbackGlobal).viewModel = viewModel;
+  (globalThis as KnockbackGlobal).collectionObservable = collectionObservable;
+  (globalThis as KnockbackGlobal).defaultObservable = defaultObservable;
 
   // Set up property forwarding for statistics
   Object.defineProperty(globalThis, 'statistics', {

@@ -10,7 +10,12 @@ declare module 'backbone-orm' {
 
   export function configure(options: { model_cache?: { enabled: boolean; max: number } }): void;
 
-  export function sync(modelClass: typeof Backbone.Model): (method: string, model: Backbone.Model, options?: unknown) => unknown;
+  export interface ModelConstructor {
+    new (attributes?: object, options?: object): Backbone.Model;
+    prototype: Backbone.Model;
+  }
+
+  export function sync(modelClass: ModelConstructor): Backbone.Model['sync'];
 
   export interface BackboneORMModel extends Backbone.Model {
     model_name?: string;

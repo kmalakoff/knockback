@@ -1,0 +1,17 @@
+{
+  "name": "knockback-complete-test-cjs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/cjs/typecheck/all-tests.js",
+  "source": "typecheck/all-tests.ts",
+  "types": "dist/cjs/typecheck/all-tests.d.ts",
+  "files": [
+    "dist"
+  ],
+  "tsds": {
+    "targets": [
+      "cjs"
+    ]
+  }
+}

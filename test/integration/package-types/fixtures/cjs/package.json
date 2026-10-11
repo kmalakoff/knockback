@@ -1,0 +1,12 @@
+{
+  "name": "knockback-type-consumer-cjs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "commonjs",
+  "source": "src/index.ts",
+  "tsds": {
+    "targets": [
+      "cjs"
+    ]
+  }
+}
