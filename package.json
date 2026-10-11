@@ -25,6 +25,7 @@
   },
   "scripts": {
     "test": "gulp test",
+    "prepublishOnly": "node scripts/require-dist-tag.cjs",
     "docs": "./node_modules/.bin/codo -n Knockback.js -o doc src/."
   },
   "dependencies": {

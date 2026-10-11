@@ -13,3 +13,6 @@ javascripts/*
 images/*
 
 components/*
+.agents/
+.archive/
+.tmp/
