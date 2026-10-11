@@ -42,6 +42,15 @@ class BackboneRelationalORM implements ORM {
     return !!RelationalModel;
   }
 
+  isModel(model: Backbone.Model): model is BackboneRelationalModel {
+    return isRelationalModel(model);
+  }
+
+  keys(model: Backbone.Model): string[] | null {
+    if (!isRelationalModel(model)) return null;
+    return model.getRelations().map((relation) => relation.key);
+  }
+
   relationType(model: unknown, key: string): ValueType | null {
     if (!isRelationalModel(model)) return null;
 

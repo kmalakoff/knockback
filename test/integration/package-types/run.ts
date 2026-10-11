@@ -8,6 +8,7 @@ import { safeRmSync } from 'fs-remove-compat';
 import { runCommand } from 'ts-dev-stack';
 
 interface PackageManifest {
+  dependencies?: Record<string, string>;
   exports?: unknown;
   main?: string;
   source?: string;
@@ -95,6 +96,8 @@ function linkDependency(nodeModules: string, name: string): void {
 }
 
 function stagePackage(nodeModules: string): void {
+  const packageManifest = readPackage(repoRoot);
+  assert.strictEqual(packageManifest.dependencies?.['@types/backbone'], '*', 'Published Backbone declarations require @types/backbone as a package dependency');
   const target = path.join(nodeModules, packageName);
   mkdirSync(target, { recursive: true });
   cpSync(path.join(repoRoot, 'package.json'), path.join(target, 'package.json'));
@@ -112,7 +115,7 @@ function stagePackage(nodeModules: string): void {
   );
   assert.deepStrictEqual(installedManifest, sourceManifest, 'Installed type-test package differs from the fresh build');
 
-  for (const file of requiredPackagePaths(readPackage(repoRoot))) {
+  for (const file of requiredPackagePaths(packageManifest)) {
     const source = path.join(repoRoot, file);
     const installed = path.join(target, file);
     assert.ok(existsSync(source), `Fresh package target is missing: ${file}`);
@@ -232,8 +235,12 @@ try {
   await build(prepareConsumer('esm', 'esm'), 'package consumer, ESM');
   await build(prepareConsumer('nodenext-esm', 'nodenext-esm'), 'package consumer, NodeNext ESM');
   await build(prepareConsumer('node16-cjs', 'node16-cjs', 'node16'), 'package consumer, Node16 CJS');
+  await build(prepareConsumer('ordinary-cjs', 'cjs', 'ordinary-consumers'), 'ordinary package consumer, CJS');
+  await build(prepareConsumer('ordinary-esm', 'esm', 'ordinary-consumers'), 'ordinary package consumer, ESM');
+  await build(prepareConsumer('ordinary-nodenext-esm', 'nodenext-esm', 'ordinary-consumers'), 'ordinary package consumer, NodeNext ESM');
+  await build(prepareConsumer('ordinary-node16-cjs', 'node16-cjs', 'ordinary-node16'), 'ordinary package consumer, Node16 CJS');
 
-  console.log('\nComplete owner graphs and package consumers passed.');
+  console.log('\nComplete owner graphs and package consumers passed, including ordinary Backbone-only consumers.');
 } finally {
   for (const fixture of fixtures) safeRmSync(fixture, { recursive: true, force: true });
 }

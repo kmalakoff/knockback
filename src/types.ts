@@ -236,11 +236,7 @@ export type ViewModel<T extends object = Record<string, unknown>, M extends Back
 
 /** Global settings for Knockback */
 export interface KBSettings {
-  orm?: {
-    useFunction?: (model: Backbone.Model, key: string) => boolean;
-    keys?: (model: Backbone.Model) => string[] | null;
-    bind?: (model: Backbone.Model, key: string, update: () => void, path: string) => (() => void) | null | undefined;
-  } | null;
+  orm?: import('./configure.ts').ORM | null;
   deep_retain?: boolean;
 }
 
@@ -333,6 +329,7 @@ export interface EventWatcher {
   __kb_dispose?: number;
   ee: Backbone.Model | null;
   modelRef: ModelReference | null;
+  orm: import('./configure.ts').ORM | null;
   dispose(): void;
   emitter(): Backbone.Model | null;
   emitter(newEmitter: ModelInput): Backbone.Model | null;

@@ -87,7 +87,7 @@ export function observable<T = unknown, M extends Backbone.Model = Backbone.Mode
 
     const createOptions = collapseOptions(options) as InternalObservableOptions;
     const eventWatcher = createOptions.eventWatcher;
-    let activeEventWatcher: EventWatcher | undefined;
+    let activeEventWatcher = eventWatcher as EventWatcher | undefined;
     delete createOptions.eventWatcher;
 
     // Set up basics
@@ -114,7 +114,7 @@ export function observable<T = unknown, M extends Backbone.Model = Backbone.Mode
           if (state.read) {
             updateWithValue(state.read.apply(state._vm, args));
           } else if (_model !== undefined) {
-            ignore(() => updateWithValue(getValue(_model, peek(state.key), state.args)));
+            ignore(() => updateWithValue(getValue(_model, peek(state.key), state.args, activeEventWatcher?.orm)));
           }
 
           return state._value?.value();
@@ -128,9 +128,9 @@ export function observable<T = unknown, M extends Backbone.Model = Backbone.Mode
 
             if (state.write) {
               state.write.call(state._vm, unwrappedNewValue);
-              newValue = getValue(_model, peek(state.key), state.args);
+              newValue = getValue(_model, peek(state.key), state.args, activeEventWatcher?.orm);
             } else if (_model) {
-              setValue(_model, peek(state.key), unwrappedNewValue);
+              setValue(_model, peek(state.key), unwrappedNewValue, activeEventWatcher?.orm);
             }
 
             updateWithValue(newValue);
@@ -172,7 +172,7 @@ export function observable<T = unknown, M extends Backbone.Model = Backbone.Mode
     (koObservable as ObservableInternal).model = state.model = modelComputed;
 
     // Set up event watcher
-    activeEventWatcher = EventWatcher.useOptionsOrCreate({ eventWatcher: eventWatcher }, model || null, state, {
+    activeEventWatcher = EventWatcher.useOptionsOrCreate({ eventWatcher }, model || null, state, {
       obj: state,
       emitter: (m: Backbone.Model | null) => updateModel(m),
       update: () => ignore(() => update()),
@@ -180,10 +180,8 @@ export function observable<T = unknown, M extends Backbone.Model = Backbone.Mode
       path: createOptions.path,
     });
 
-    // Initialize value
-    if (!state._value?.rawValue()) {
-      state._value?.update();
-    }
+    // Initialize value after the event watcher has captured its model adapter.
+    update();
 
     // Wrap with localizer if specified
     // biome-ignore lint/suspicious/noExplicitAny: Dynamic wrapper types
@@ -222,25 +220,27 @@ export function observable<T = unknown, M extends Backbone.Model = Backbone.Mode
 
     function valueType(): ValueType {
       if (!state._value || !state._model) return TYPE_UNKNOWN;
-      return state._value.valueType(peek(state._model), peek(state.key));
+      return state._value.valueType(peek(state._model), peek(state.key), activeEventWatcher?.orm);
     }
 
     // Update with explicit value (avoids arguments.length check)
     function updateWithValue(newValue: unknown): void {
       if (state.__kb_dispose && state.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) return;
-      state._value?.update(newValue);
+      const model = state._model ? peek(state._model) : null;
+      const key = peek(state.key);
+      state._value?.update(newValue, model ? activeEventWatcher?.orm?.relationType?.(model, key) : null);
     }
 
     function updateModel(newModel: Backbone.Model | null): void {
       if (!state._model) return;
       if ((state.__kb_dispose && state.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) || peek(state._model) === newModel) return;
 
-      const newValue = getValue(newModel, peek(state.key), state.args);
+      const newValue = getValue(newModel, peek(state.key), state.args, activeEventWatcher?.orm);
       state._model(newModel);
 
       if (!newModel) {
         updateWithValue(null);
-      } else if (newValue !== undefined) {
+      } else {
         updateWithValue(newValue);
       }
     }
@@ -248,8 +248,9 @@ export function observable<T = unknown, M extends Backbone.Model = Backbone.Mode
     // Update by reading from model (no argument)
     function update(): void {
       if ((state.__kb_dispose && state.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) || !state._model) return;
-      const newValue = getValue(peek(state._model), peek(state.key));
-      state._value?.update(newValue);
+      const model = peek(state._model);
+      const newValue = getValue(model, peek(state.key), undefined, activeEventWatcher?.orm);
+      updateWithValue(newValue);
     }
   }) as unknown as Observable<T, M>;
 }

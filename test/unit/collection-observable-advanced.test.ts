@@ -4,6 +4,7 @@ import Backbone from 'backbone';
 import ko from 'knockout';
 import { Store } from '../../src/store.ts';
 import { wrappedObject } from '../../src/utils.ts';
+import { deeplyNestedEqualValues } from '../lib/deeply-nested-values.ts';
 
 interface ShareableCollectionObservable<T> extends CollectionObservable<T> {
   __kb?: unknown;
@@ -508,6 +509,24 @@ describe('CollectionObservable advanced', () => {
     function recordCount(store: Store): number {
       return Object.values(store.observable_records).reduce((total, records) => total + Object.keys(records).length, 0);
     }
+
+    it('should compare deeply nested model arrays before resetting the collection', () => {
+      const [firstValue, secondValue] = deeplyNestedEqualValues();
+      const firstModel = new Backbone.Model({ payload: firstValue });
+      const secondModel = new Backbone.Model({ payload: secondValue });
+      firstModel.cid = 'deep-model';
+      secondModel.cid = 'deep-model';
+      const collection = new Backbone.Collection([firstModel]);
+      const co = kb.collectionObservable<Backbone.Model>(collection, { modelsOnly: true });
+
+      try {
+        co([secondModel]);
+        assert.strictEqual(co()[0], secondModel);
+        assert.strictEqual(collection.at(0), secondModel);
+      } finally {
+        co.dispose();
+      }
+    });
 
     it('should reject a malformed wrapped item before retaining earlier entries', () => {
       for (const callable of [false, true]) {

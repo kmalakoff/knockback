@@ -305,6 +305,8 @@ export function optionsPathJoin<T extends { path?: string }>(options: T, path: s
 
 /** Find creator from factory or ORM */
 export function inferCreator(value: unknown, factory: Factory | undefined, path: string): StoredCreator | null {
+  if (value === null || value === undefined) return null;
+
   if (factory) {
     const creator = factory.creatorForPath(value, path);
     if (creator) return creator;

@@ -4,7 +4,7 @@ import { KB_DISPOSE_STATE } from './constants.ts';
 import { EventWatcher } from './event-watcher.ts';
 import { Factory } from './factory.ts';
 import type { KnockbackGlobal } from './internal-types.ts';
-import { _throwUnexpected, ignore, isModel, settings, wasReleased } from './kb.ts';
+import { _throwUnexpected, ignore, isModel, wasReleased } from './kb.ts';
 import { observable as kbObservable } from './observable.ts';
 import { Store } from './store.ts';
 import type { InternalCreateOptions, InternalViewModelOptions, KBMetadata, ModelInput, ObservableOptions, ViewModelOptions, ViewModel as ViewModelType } from './types.ts';
@@ -295,7 +295,7 @@ export class ViewModelClass {
       }
 
       // ORM relationship keys
-      const orm = settings.orm;
+      const orm = wrappedEventWatcher(this)?.orm;
       if (orm?.keys) {
         const relKeys = orm.keys(model);
         if (relKeys) {

@@ -1,4 +1,4 @@
-import kb from '@mcpeasy/knockback';
+import kb, { type ORM } from '@mcpeasy/knockback';
 import assert from 'assert';
 import Backbone from 'backbone';
 import ModelRef from 'backbone-modelref';
@@ -26,11 +26,72 @@ interface PersonViewModel {
 
 describe('ModelRef integration', () => {
   it('uses one pinned Backbone instance in each test environment', () => {
-    const expectedVersion = typeof window === 'undefined' ? '1.6.1' : '1.6.0';
     const installedBackbone = Backbone as typeof Backbone & { ModelRef?: typeof ModelRef; VERSION: string };
 
-    assert.strictEqual(installedBackbone.VERSION, expectedVersion);
+    assert.strictEqual(installedBackbone.VERSION, '1.6.1');
     assert.strictEqual(installedBackbone.ModelRef, ModelRef);
+  });
+
+  it('captures an adapter for each direct or reference-backed model attachment', () => {
+    class AdapterPerson extends Backbone.Model<{ id: number; special: string }> {
+      special = (): string => `function:${this.get('special')}`;
+    }
+    class AdapterPeople extends Backbone.Collection<AdapterPerson> {
+      model = AdapterPerson;
+    }
+    interface AdapterView {
+      special: ko.Observable<unknown>;
+    }
+
+    const calls = { bindA: 0, bindB: 0, unbindA: 0, unbindB: 0 };
+    const adapter = (name: 'A' | 'B', useFunction: boolean): ORM<AdapterPerson> => ({
+      isAvailable: () => true,
+      isModel: (model): model is AdapterPerson => model instanceof AdapterPerson,
+      bind: () => {
+        calls[`bind${name}`]++;
+        return () => calls[`unbind${name}`]++;
+      },
+      useFunction: () => useFunction,
+    });
+    const adapterA = adapter('A', true);
+    const adapterB = adapter('B', false);
+    const collection = new AdapterPeople([new AdapterPerson({ id: 9, special: 'first' })]);
+    const reference = new ModelRef(collection, 9);
+
+    kb.configure({ orm: adapterA });
+    const view = kb.viewModel<AdapterView, AdapterPerson>(reference, { keys: ['special'] });
+    try {
+      assert.strictEqual(view.special(), 'function:first');
+      assert.deepStrictEqual(calls, { bindA: 1, bindB: 0, unbindA: 0, unbindB: 0 });
+
+      kb.configure({ orm: adapterB });
+      collection.at(0)?.set('special', 'same attachment');
+      assert.strictEqual(view.special(), 'function:same attachment');
+
+      const first = collection.at(0);
+      assert.ok(first);
+      collection.remove(first);
+      assert.strictEqual(view.model(), null);
+      assert.strictEqual(calls.unbindA, 1);
+
+      const replacement = new AdapterPerson({ id: 9, special: 'reference replacement' });
+      collection.add(replacement);
+      assert.strictEqual(view.special(), 'reference replacement');
+      assert.strictEqual(calls.bindB, 1);
+
+      kb.configure({ orm: adapterA });
+      const direct = new AdapterPerson({ id: 10, special: 'direct replacement' });
+      view.model(direct);
+      assert.strictEqual(view.special(), 'function:direct replacement');
+      assert.strictEqual(calls.unbindB, 1);
+      assert.strictEqual(calls.bindA, 2);
+    } finally {
+      view.dispose();
+      reference.release();
+      kb.configure({ orm: undefined });
+    }
+
+    assert.deepStrictEqual(calls, { bindA: 2, bindB: 1, unbindA: 2, unbindB: 1 });
   });
 
   it('keeps a surviving view current through the full reference lifecycle', () => {

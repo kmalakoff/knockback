@@ -4,6 +4,7 @@ import ModelRef from 'backbone-modelref';
 import ko from 'knockout';
 import './callback-contract.ts';
 import './presentation-contract.ts';
+import './relationship-adapter-contract.ts';
 
 interface PersonAttributes {
   name?: string;

@@ -1,5 +1,6 @@
 import Backbone from 'backbone';
 import ko from 'knockout';
+import type { ORM } from './configure.ts';
 import { KB_DISPOSE_STATE } from './constants.ts';
 import { MissingPropertyError, UnexpectedValueError } from './errors/index.ts';
 import type { Statistics } from './statistics.ts';
@@ -322,13 +323,13 @@ export function applyBindings(viewModel: unknown, node: Element | NodeList | HTM
 // =============================================================================
 
 /** Get value from model */
-export function getValue(model: Backbone.Model | null, key: string, args?: unknown[]): unknown {
+export function getValue(model: Backbone.Model | null, key: string, args?: unknown[], orm?: ORM | null): unknown {
   if (!model) return undefined;
 
   // Check if ORM wants to use a function (for Backbone ORMs with custom accessors)
   const modelWithDynamicProps = model as unknown as Record<string, unknown>;
   const prop = modelWithDynamicProps[key];
-  if (typeof prop === 'function' && settings.orm?.useFunction?.(model, key)) {
+  if (typeof prop === 'function' && orm?.useFunction?.(model, key)) {
     return (prop as () => unknown)();
   }
 
@@ -341,13 +342,13 @@ export function getValue(model: Backbone.Model | null, key: string, args?: unkno
 }
 
 /** Set value on model */
-export function setValue(model: Backbone.Model | null, key: string, value: unknown): void {
+export function setValue(model: Backbone.Model | null, key: string, value: unknown, orm?: ORM | null): void {
   if (!model) return;
 
   // Check if ORM wants to use a function (for Backbone ORMs with custom accessors)
   const modelWithDynamicProps = model as unknown as Record<string, unknown>;
   const prop = modelWithDynamicProps[key];
-  if (typeof prop === 'function' && settings.orm?.useFunction?.(model, key)) {
+  if (typeof prop === 'function' && orm?.useFunction?.(model, key)) {
     (prop as (val: unknown) => void)(value);
     return;
   }

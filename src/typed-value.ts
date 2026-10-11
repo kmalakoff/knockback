@@ -1,6 +1,7 @@
 import type * as Backbone from 'backbone';
 import ko from 'knockout';
 import _ from 'underscore';
+import type { ORM } from './configure.ts';
 import { KB_DISPOSE_STATE } from './constants.ts';
 import { NotInitializedError, UnexpectedValueError } from './errors/index.ts';
 import type { KnockbackGlobal, StoredCreator } from './internal-types.ts';
@@ -72,17 +73,18 @@ export class TypedValue {
   }
 
   // Get the value type
-  valueType(model: Backbone.Model | null, key: string): ValueType {
-    const newValue = getValue(model, key);
+  valueType(model: Backbone.Model | null, key: string, orm?: ORM | null): ValueType {
+    const newValue = getValue(model, key, undefined, orm);
+    const relationshipType = model ? orm?.relationType?.(model, key) : null;
     // Create so we can check the type
     if (!this.value_type) {
-      this._updateValueObservable(newValue);
+      this._updateValueObservable(newValue, undefined, relationshipType);
     }
     return this.value_type || TYPE_UNKNOWN;
   }
 
   // Update with a new value
-  update(newValue?: unknown): void {
+  update(newValue?: unknown, relationshipType?: ValueType | null): void {
     if (this._isPreparing || this._isReleasing) throw new UnexpectedValueError('TypedValue', 'reentrant update');
     if (this.__kb_dispose && this.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) return;
 
@@ -91,7 +93,7 @@ export class TypedValue {
       newValue = null;
     }
 
-    const newType = valueType(newValue);
+    const newType = newValue === null && relationshipType ? relationshipType : valueType(newValue);
 
     // Check if previous value was disposed
     const disposable = this.__kb_value as { __kb_dispose?: number } | undefined;
@@ -118,6 +120,8 @@ export class TypedValue {
             const collectionFn = value as Observable & { collection?: ko.Computed<Backbone.Collection | null> };
             if (collectionFn.collection && peek(collectionFn.collection) !== newValue) {
               collectionFn.collection(newValue as Backbone.Collection);
+            } else if (newValue && !collectionFn.collection) {
+              this._updateValueObservable(newValue, undefined, relationshipType);
             }
           }
           return;
@@ -127,13 +131,16 @@ export class TypedValue {
 
       case TYPE_MODEL: {
         if (newType === TYPE_MODEL || _.isNull(newValue)) {
+          if (_.isNull(newValue) && relationshipType === TYPE_MODEL && ko.isObservable(value) && wrappedObject(value as Observable) === undefined) {
+            return;
+          }
           // Use provided ViewModel
           if (newValue && !isModel(newValue)) {
             this._updateValueObservable(wrappedObject(newValue as Observable), newValue);
           } else {
             const resolvedModel = resolveModel(newValue);
             if (wrappedObject(value as Observable) !== resolvedModel) {
-              this._updateValueObservable(newValue);
+              this._updateValueObservable(newValue, undefined, relationshipType);
             }
           }
           return;
@@ -147,22 +154,22 @@ export class TypedValue {
       if (peek(value as ko.Observable) !== newValue) {
         (value as ko.Observable)(newValue);
       }
-    } else if (peek(value as ko.Observable) !== newValue) {
-      this._updateValueObservable(newValue);
+    } else {
+      this._updateValueObservable(newValue, undefined, relationshipType);
     }
   }
 
-  private _updateValueObservable(newValue: unknown, newObservable?: unknown): void {
+  private _updateValueObservable(newValue: unknown, newObservable?: unknown, relationshipType?: ValueType | null): void {
     if (this._isPreparing || this._isReleasing) throw new UnexpectedValueError('TypedValue', 'reentrant update');
     if (!this.create_options) throw new NotInitializedError('TypedValue', 'create_options');
     const createOptions = this.create_options;
     const previousCreator = createOptions.creator;
-    let creator: StoredCreator | null | undefined = inferCreator(newValue, createOptions.factory, createOptions.path || '');
+    let creator: StoredCreator | null | undefined = newValue === null && relationshipType ? null : inferCreator(newValue, createOptions.factory, createOptions.path || '');
 
     // Retain previous type
-    if (newValue === null && !creator) {
+    if (newValue === null && !creator && !relationshipType) {
       if (this.value_type === TYPE_MODEL) {
-        creator = (globalThis as KnockbackGlobal).ViewModel;
+        creator = previousCreator || (globalThis as KnockbackGlobal).ViewModel;
       } else if (this.value_type === TYPE_COLLECTION) {
         creator = (globalThis as KnockbackGlobal).CollectionObservable;
       }
@@ -214,7 +221,10 @@ export class TypedValue {
       } else {
         // Create basic observable
         retention.created = true;
-        if (Array.isArray(newValue)) {
+        if (newValue === null && relationshipType) {
+          nextValueType = relationshipType;
+          value = ko.observable(null);
+        } else if (Array.isArray(newValue)) {
           nextValueType = TYPE_ARRAY;
           value = ko.observableArray(newValue);
         } else {

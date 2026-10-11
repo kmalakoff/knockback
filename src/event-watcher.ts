@@ -1,8 +1,9 @@
 import type * as Backbone from 'backbone';
 import ko from 'knockout';
+import { type ORM, resolveORM } from './configure.ts';
 import { KB_DISPOSE_STATE } from './constants.ts';
 import type { KnockbackGlobal } from './internal-types.ts';
-import { _throwMissing, _throwUnexpected, settings, wasReleased } from './kb.ts';
+import { _throwMissing, _throwUnexpected, wasReleased } from './kb.ts';
 import type { EventCallbackInfo, EventWatcher as EventWatcherInterface, KBMetadata, ModelInput, ModelReference } from './types.ts';
 import { disposeMetadata, isModelReference, type KBObject, resolveModel, wrappedEventWatcher, wrappedEventWatcherIsOwned } from './utils.ts';
 
@@ -45,6 +46,7 @@ export class EventWatcher {
   __kb_dispose?: number;
   ee: Backbone.Model | null = null;
   modelRef: ModelReference | null = null;
+  orm: ORM | null = null;
 
   // Use existing event watcher from options or create a new one
   static useOptionsOrCreate(options: { eventWatcher?: EventWatcherInterface }, emitter: ModelInput, obj: KBObject, callbackOptions: CallbackInfo): EventWatcher {
@@ -200,7 +202,9 @@ export class EventWatcher {
 
   // Model loaded handler
   private _onModelLoaded = (model: Backbone.Model): void => {
+    const newAttachment = this.ee !== model;
     this.ee = model;
+    if (newAttachment) this.orm = resolveORM(model);
 
     if (!this.__kb.callbacks) return;
     const callbackInfos: CallbackInfo[] = [];
@@ -223,7 +227,7 @@ export class EventWatcher {
       for (const info of callbacks.list) {
         // ORM binding support
         if (!info.unbindFn && info.key && info.update && info.path) {
-          const orm = settings.orm;
+          const orm = this.orm;
           if (orm?.bind) {
             info.unbindFn = orm.bind(model, info.key as string, info.update, info.path) || null;
           }
@@ -248,6 +252,7 @@ export class EventWatcher {
         this._unbindCallbacks(eventName, callbacks);
       }
     }
+    this.orm = null;
   };
 
   // Unbind callbacks

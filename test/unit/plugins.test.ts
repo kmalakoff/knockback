@@ -2,6 +2,8 @@ import kb from '@mcpeasy/knockback';
 import assert from 'assert';
 import Backbone from 'backbone';
 import ko from 'knockout';
+import { hasChangedFn } from '../../src/plugins/validation/validators.ts';
+import { deeplyNestedEqualValues } from '../lib/deeply-nested-values.ts';
 
 describe('knockback plugins', () => {
   describe('defaults plugin', () => {
@@ -397,6 +399,20 @@ describe('knockback plugins', () => {
         assert.strictEqual(kb.valid.number('abc'), true); // invalid
         assert.strictEqual(kb.valid.number('123'), false); // kb.valid
         assert.strictEqual(kb.valid.number('12.34'), false); // kb.valid
+      });
+
+      it('should compare deeply nested model state without exhausting the stack', () => {
+        const [first, second] = deeplyNestedEqualValues();
+        const model = new Backbone.Model<{ payload: unknown; changed?: boolean }>({ payload: first });
+        const hasChanged = hasChangedFn(model);
+
+        assert.strictEqual(hasChanged(), false);
+        model.set('payload', second);
+        assert.strictEqual(model.get('payload'), second);
+        assert.strictEqual(hasChanged(), false);
+
+        model.set('changed', true);
+        assert.strictEqual(hasChanged(), true);
       });
     });
 

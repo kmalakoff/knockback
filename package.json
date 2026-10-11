@@ -48,14 +48,18 @@
     "validate": "npm run test:types && tsds validate",
     "version": "tsds version"
   },
+  "dependencies": {
+    "@types/backbone": "*"
+  },
   "devDependencies": {
-    "@types/backbone": "*",
     "@types/knockout": "*",
     "@types/mocha": "*",
     "@types/node": "*",
     "@types/underscore": "*",
-    "@web/dev-server-import-maps": "^0.2.1",
+    "@web/dev-server-import-maps": "^0.3.0",
     "backbone": "^1.6.1",
+    "backbone-associations": "0.6.2",
+    "backbone-legacy": "npm:backbone@1.2.3",
     "backbone-orm": "^0.7.0",
     "backbone-relational": "^0.10.0",
     "fs-remove-compat": "*",
@@ -65,18 +69,18 @@
     "tsds-config": "*",
     "tsds-mocha": "1.23.13",
     "tsds-validate": "1.7.9",
-    "tsds-web-test-runner": "*",
-    "underscore": "^1.13.7"
+    "tsds-web-test-runner": "1.20.7",
+    "underscore": "^1.13.8"
   },
   "peerDependencies": {
     "backbone": ">=1.4.0",
     "knockout": ">=3.5.0",
-    "underscore": ">=1.13.0"
+    "underscore": ">=1.13.8"
   },
   "allowScripts": {
     "@swc/core@1.16.2": true,
     "core-js-pure": false,
-    "esbuild@0.25.12": true,
+    "esbuild@0.28.2": true,
     "fsevents": false,
     "node-filename-to-dist-paths@1.4.0": true,
     "node-semvers@1.7.0": true,
@@ -90,6 +94,7 @@
       "umd"
     ],
     "globals": {
+      "@types/backbone": "Backbone",
       "backbone": "Backbone",
       "knockout": "ko",
       "underscore": "_"
