@@ -4,20 +4,20 @@ import _ from 'underscore';
 import collapseOptions from './functions/collapse-options.ts';
 import disposeMetadata from './functions/dispose-metadata.ts';
 import unwrapModels from './functions/unwrap-models.ts';
-import type { Creator } from './internal-types.ts';
+import type { KnockbackGlobal, StoredCreator } from './internal-types.ts';
 import { isCollection, isModel, isViewModel, peek } from './kb.ts';
-import type { EventWatcher, Factory, KBMetadata, ObservableBase, Store, ValueType, ViewModelOptions } from './types.ts';
+import type { EventWatcher, Factory, KBMetadata, ModelReference, ObservableBase, StoreInternal, ValueType, ViewModelOptions } from './types.ts';
 import { TYPE_ARRAY, TYPE_COLLECTION, TYPE_MODEL, TYPE_SIMPLE, TYPE_UNKNOWN } from './types.ts';
 
 /**
- * Any object that can have __kb metadata.
- * Internal type - not exported from index.ts.
- * Uses 'any' for flexibility since this is only used internally.
+ * Metadata owners are non-null objects, including callable Knockout values.
+ * MetadataOwner exposes only the reserved __kb property to these helpers.
+ *
  * @hidden
  * @internal
  */
-// biome-ignore lint/suspicious/noExplicitAny: Internal type for objects with __kb metadata
-export type KBObject = { __kb?: KBMetadata } & Record<string, any>;
+export type KBObject = object;
+type MetadataOwner = { __kb?: KBMetadata | null };
 
 // =============================================================================
 // Core metadata accessors
@@ -25,31 +25,31 @@ export type KBObject = { __kb?: KBMetadata } & Record<string, any>;
 
 /** Get a value from __kb metadata */
 export function get<T>(obj: KBObject, key: keyof KBMetadata, defaultValue?: T): T | undefined {
-  if (!obj.__kb || !Object.hasOwn(obj.__kb, key)) {
+  if (!(obj as MetadataOwner).__kb || !Object.hasOwn((obj as MetadataOwner).__kb as KBMetadata, key)) {
     return defaultValue;
   }
-  return obj.__kb[key] as T;
+  return ((obj as MetadataOwner).__kb as KBMetadata)[key] as T;
 }
 
 /** Set a value in __kb metadata */
 export function set<T>(obj: KBObject, key: keyof KBMetadata, value: T): T {
-  obj.__kb = obj.__kb || ({} as KBMetadata);
-  (obj.__kb as Record<string, unknown>)[key] = value;
+  (obj as MetadataOwner).__kb = (obj as MetadataOwner).__kb || ({} as KBMetadata);
+  ((obj as MetadataOwner).__kb as Record<string, unknown>)[key] = value;
   return value;
 }
 
 /** Set a value only if it doesn't exist */
 export function orSet<T>(obj: KBObject, key: keyof KBMetadata, value: T): T {
-  obj.__kb = obj.__kb || ({} as KBMetadata);
-  if (!Object.hasOwn(obj.__kb, key)) {
-    (obj.__kb as Record<string, unknown>)[key] = value;
+  (obj as MetadataOwner).__kb = (obj as MetadataOwner).__kb || ({} as KBMetadata);
+  if (!Object.hasOwn((obj as MetadataOwner).__kb as KBMetadata, key)) {
+    ((obj as MetadataOwner).__kb as Record<string, unknown>)[key] = value;
   }
-  return obj.__kb[key] as T;
+  return ((obj as MetadataOwner).__kb as KBMetadata)[key] as T;
 }
 
 /** Check if __kb has a key */
 export function has(obj: KBObject, key: keyof KBMetadata): boolean {
-  return !!obj.__kb && Object.hasOwn(obj.__kb, key);
+  return !!(obj as MetadataOwner).__kb && Object.hasOwn((obj as MetadataOwner).__kb as KBMetadata, key);
 }
 
 // =============================================================================
@@ -75,11 +75,11 @@ export function setObject(obj: KBObject, value: Backbone.Model | Backbone.Collec
 }
 
 // Creator
-export function getCreator(obj: KBObject): Creator | undefined {
+export function getCreator(obj: KBObject): StoredCreator | undefined {
   return get(obj, 'creator');
 }
 
-export function setCreator(obj: KBObject, value: Creator): Creator {
+export function setCreator(obj: KBObject, value: StoredCreator): StoredCreator {
   return set(obj, 'creator', value);
 }
 
@@ -94,11 +94,11 @@ export function setModel(obj: KBObject, value: Backbone.Model | null): Backbone.
 }
 
 // Store
-export function getStore(obj: KBObject): Store | undefined {
+export function getStore(obj: KBObject): StoreInternal | undefined {
   return get(obj, 'store');
 }
 
-export function setStore(obj: KBObject, value: Store): Store {
+export function setStore(obj: KBObject, value: StoreInternal): StoreInternal {
   return set(obj, 'store', value);
 }
 
@@ -144,65 +144,65 @@ export function setEventWatcherIsOwned(obj: KBObject, value: boolean): boolean {
 
 /** @deprecated Use getObservable/setObservable instead */
 export function wrappedObservable(obj: KBObject): ko.Observable | ko.Computed | ko.ObservableArray | undefined;
-export function wrappedObservable(obj: KBObject, value: ko.Observable | ko.Computed | ko.ObservableArray): ko.Observable | ko.Computed | ko.ObservableArray;
+export function wrappedObservable<T extends ko.Observable | ko.Computed | ko.ObservableArray | undefined>(obj: KBObject, value: T): T;
 export function wrappedObservable(obj: KBObject, value?: ko.Observable | ko.Computed | ko.ObservableArray): ko.Observable | ko.Computed | ko.ObservableArray | undefined {
-  return value === undefined ? getObservable(obj) : setObservable(obj, value);
+  return arguments.length === 1 ? getObservable(obj) : set(obj, 'observable', value);
 }
 
 /** @deprecated Use getObject/setObject instead */
 export function wrappedObject(obj: KBObject): Backbone.Model | Backbone.Collection | null | undefined;
-export function wrappedObject(obj: KBObject, value: Backbone.Model | Backbone.Collection | null): Backbone.Model | Backbone.Collection | null;
+export function wrappedObject<T extends Backbone.Model | Backbone.Collection | null | undefined>(obj: KBObject, value: T): T;
 export function wrappedObject(obj: KBObject, value?: Backbone.Model | Backbone.Collection | null): Backbone.Model | Backbone.Collection | null | undefined {
-  return value === undefined ? getObject(obj) : setObject(obj, value);
+  return arguments.length === 1 ? getObject(obj) : set(obj, 'object', value);
 }
 
 /** @deprecated Use getCreator/setCreator instead */
-export function wrappedCreator(obj: KBObject): Creator | undefined;
-export function wrappedCreator(obj: KBObject, value: Creator): Creator;
-export function wrappedCreator(obj: KBObject, value?: Creator): Creator | undefined {
-  return value === undefined ? getCreator(obj) : setCreator(obj, value);
+export function wrappedCreator(obj: KBObject): StoredCreator | undefined;
+export function wrappedCreator<T extends StoredCreator | undefined>(obj: KBObject, value: T): T;
+export function wrappedCreator(obj: KBObject, value?: StoredCreator): StoredCreator | undefined {
+  return arguments.length === 1 ? getCreator(obj) : set(obj, 'creator', value);
 }
 
 /** @deprecated Use getModel/setModel instead */
 export function wrappedModel(obj: KBObject): Backbone.Model | KBObject | null | undefined;
-export function wrappedModel(obj: KBObject, value: Backbone.Model | null): Backbone.Model | null;
+export function wrappedModel<T extends Backbone.Model | null | undefined>(obj: KBObject, value: T): T;
 export function wrappedModel(obj: KBObject, value?: Backbone.Model | null): Backbone.Model | KBObject | null | undefined {
-  return value === undefined ? getModel(obj) : setModel(obj, value);
+  return arguments.length === 1 ? getModel(obj) : set(obj, 'object', value);
 }
 
 /** @deprecated Use getStore/setStore instead */
-export function wrappedStore(obj: KBObject): Store | undefined;
-export function wrappedStore(obj: KBObject, value: Store): Store;
-export function wrappedStore(obj: KBObject, value?: Store): Store | undefined {
-  return value === undefined ? getStore(obj) : setStore(obj, value);
+export function wrappedStore(obj: KBObject): StoreInternal | undefined;
+export function wrappedStore<T extends StoreInternal | undefined>(obj: KBObject, value: T): T;
+export function wrappedStore(obj: KBObject, value?: StoreInternal): StoreInternal | undefined {
+  return arguments.length === 1 ? getStore(obj) : set(obj, 'store', value);
 }
 
 /** @deprecated Use getStoreIsOwned/setStoreIsOwned instead */
 export function wrappedStoreIsOwned(obj: KBObject): boolean | undefined;
-export function wrappedStoreIsOwned(obj: KBObject, value: boolean): boolean;
+export function wrappedStoreIsOwned<T extends boolean | undefined>(obj: KBObject, value: T): T;
 export function wrappedStoreIsOwned(obj: KBObject, value?: boolean): boolean | undefined {
-  return value === undefined ? getStoreIsOwned(obj) : setStoreIsOwned(obj, value);
+  return arguments.length === 1 ? getStoreIsOwned(obj) : set(obj, 'store_is_owned', value);
 }
 
 /** @deprecated Use getFactory/setFactory instead */
 export function wrappedFactory(obj: KBObject): Factory | undefined;
-export function wrappedFactory(obj: KBObject, value: Factory): Factory;
+export function wrappedFactory<T extends Factory | undefined>(obj: KBObject, value: T): T;
 export function wrappedFactory(obj: KBObject, value?: Factory): Factory | undefined {
-  return value === undefined ? getFactory(obj) : setFactory(obj, value);
+  return arguments.length === 1 ? getFactory(obj) : set(obj, 'factory', value);
 }
 
 /** @deprecated Use getEventWatcher/setEventWatcher instead */
 export function wrappedEventWatcher(obj: KBObject): EventWatcher | undefined;
-export function wrappedEventWatcher(obj: KBObject, value: EventWatcher): EventWatcher;
+export function wrappedEventWatcher<T extends EventWatcher | undefined>(obj: KBObject, value: T): T;
 export function wrappedEventWatcher(obj: KBObject, value?: EventWatcher): EventWatcher | undefined {
-  return value === undefined ? getEventWatcher(obj) : setEventWatcher(obj, value);
+  return arguments.length === 1 ? getEventWatcher(obj) : set(obj, 'eventWatcher', value);
 }
 
 /** @deprecated Use getEventWatcherIsOwned/setEventWatcherIsOwned instead */
 export function wrappedEventWatcherIsOwned(obj: KBObject): boolean | undefined;
-export function wrappedEventWatcherIsOwned(obj: KBObject, value: boolean): boolean;
+export function wrappedEventWatcherIsOwned<T extends boolean | undefined>(obj: KBObject, value: T): T;
 export function wrappedEventWatcherIsOwned(obj: KBObject, value?: boolean): boolean | undefined {
-  return value === undefined ? getEventWatcherIsOwned(obj) : setEventWatcherIsOwned(obj, value);
+  return arguments.length === 1 ? getEventWatcherIsOwned(obj) : set(obj, 'eventWatcher_is_owned', value);
 }
 
 // =============================================================================
@@ -304,7 +304,7 @@ export function optionsPathJoin<T extends { path?: string }>(options: T, path: s
 }
 
 /** Find creator from factory or ORM */
-export function inferCreator(value: unknown, factory: Factory | undefined, path: string): Creator | null {
+export function inferCreator(value: unknown, factory: Factory | undefined, path: string): StoredCreator | null {
   if (factory) {
     const creator = factory.creatorForPath(value, path);
     if (creator) return creator;
@@ -314,10 +314,10 @@ export function inferCreator(value: unknown, factory: Factory | undefined, path:
 
   // These will be set later when ViewModel and CollectionObservable are defined
   if (value instanceof Backbone.Model) {
-    return globalThis.ViewModel || null;
+    return (globalThis as KnockbackGlobal).ViewModel || null;
   }
   if (value instanceof Backbone.Collection) {
-    return globalThis.CollectionObservable || null;
+    return (globalThis as KnockbackGlobal).CollectionObservable || null;
   }
 
   return null;
@@ -326,10 +326,10 @@ export function inferCreator(value: unknown, factory: Factory | undefined, path:
 /** Create observable based on value type */
 export function createFromDefaultCreator(obj: unknown, options: ViewModelOptions): unknown {
   if (isModel(obj)) {
-    return globalThis.viewModel ? globalThis.viewModel(obj, options) : ko.observable(obj);
+    return (globalThis as KnockbackGlobal).viewModel ? ((globalThis as KnockbackGlobal).viewModel as NonNullable<KnockbackGlobal['viewModel']>)(obj, options) : ko.observable(obj);
   }
   if (isCollection(obj)) {
-    return globalThis.collectionObservable ? globalThis.collectionObservable(obj, options) : ko.observableArray([]);
+    return (globalThis as KnockbackGlobal).collectionObservable ? ((globalThis as KnockbackGlobal).collectionObservable as NonNullable<KnockbackGlobal['collectionObservable']>)(obj, options) : ko.observableArray([]);
   }
   if (Array.isArray(obj)) {
     return ko.observableArray(obj);
@@ -337,9 +337,22 @@ export function createFromDefaultCreator(obj: unknown, options: ViewModelOptions
   return ko.observable(obj);
 }
 
-/** Resolve model ref (ModelRef support removed in this version) */
+type BackboneWithModelRef = typeof Backbone & {
+  ModelRef?: abstract new (...args: never[]) => ModelReference;
+};
+
+/** @internal */
+export function isModelReference(model: unknown): model is ModelReference {
+  const ModelRef = (Backbone as BackboneWithModelRef).ModelRef;
+  return Boolean(model && ModelRef && model instanceof ModelRef);
+}
+
+/** @internal */
 export function resolveModel(model: unknown): Backbone.Model | null {
-  return model as Backbone.Model | null;
+  if (isModelReference(model)) {
+    return model.model() || null;
+  }
+  return (model as Backbone.Model | null | undefined) || null;
 }
 
 // =============================================================================

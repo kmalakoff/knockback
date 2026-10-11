@@ -1,6 +1,7 @@
 import kb from '@mcpeasy/knockback';
 import assert from 'assert';
 import Backbone from 'backbone';
+import ModelRef from 'backbone-modelref';
 import ko from 'knockout';
 
 describe('observable advanced', () => {
@@ -32,7 +33,7 @@ describe('observable advanced', () => {
 
       const model = new Backbone.Model({ number: '555-555-5556' });
 
-      const numberObs = kb.observable(model, {
+      const numberObs = kb.observable<string>(model, {
         key: 'number',
         read: () => `#: ${model.get('number')}`,
         write: (value: string) => model.set({ number: value.substring(3) }),
@@ -56,7 +57,7 @@ describe('observable advanced', () => {
       kb.setStatistics(stats);
 
       const model = new Backbone.Model({ name: 'Ringo' });
-      const nameObs = kb.observable(model, 'name');
+      const nameObs = kb.observable<string>(model, 'name');
 
       const formattedName = ko.computed({
         read: nameObs,
@@ -79,6 +80,22 @@ describe('observable advanced', () => {
   });
 
   describe('model observable', () => {
+    it('initializes ordinary and null model computeds', () => {
+      const ordinaryModel = new Backbone.Model({ name: 'ordinary' });
+      const ordinaryObservable = kb.observable<string>(ordinaryModel, 'name');
+      const nullObservable = kb.observable<string | null>(null, 'name');
+
+      try {
+        assert.strictEqual(ordinaryObservable.model(), ordinaryModel);
+        assert.strictEqual(ordinaryObservable(), 'ordinary');
+        assert.strictEqual(nullObservable.model(), null);
+        assert.strictEqual(nullObservable(), null);
+      } finally {
+        ordinaryObservable.dispose();
+        nullObservable.dispose();
+      }
+    });
+
     it('should make model changes observable via .model()', () => {
       const stats = new kb.Statistics();
       kb.setStatistics(stats);
@@ -103,6 +120,74 @@ describe('observable advanced', () => {
       obs.dispose();
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
+    });
+
+    it('keeps automatic reference reloads but makes an explicit null permanent', () => {
+      const collection = new Backbone.Collection<Backbone.Model>();
+      const reference = new ModelRef(collection, 0);
+      const obs = kb.observable<string>(reference, 'name');
+
+      assert.strictEqual(reference.ref_count, 2);
+      assert.strictEqual(obs.model(), null);
+      assert.strictEqual(obs(), null);
+
+      const firstModel = new Backbone.Model({ id: 0, name: 'first' });
+      collection.add(firstModel);
+      assert.strictEqual(obs.model(), firstModel);
+      assert.strictEqual(obs(), 'first');
+
+      collection.remove(firstModel);
+      assert.strictEqual(reference.ref_count, 2);
+      assert.strictEqual(obs.model(), null);
+      assert.strictEqual(obs(), null);
+
+      const replacement = new Backbone.Model({ id: 0, name: 'replacement' });
+      collection.add(replacement);
+      assert.strictEqual(obs.model(), replacement);
+      assert.strictEqual(obs(), 'replacement');
+
+      obs.model(null);
+      assert.strictEqual(reference.ref_count, 1);
+      assert.strictEqual(obs.model(), null);
+      assert.strictEqual(obs(), null);
+
+      collection.remove(replacement);
+      collection.add(new Backbone.Model({ id: 0, name: 'ignored' }));
+      assert.strictEqual(obs.model(), null);
+      assert.strictEqual(obs(), null);
+
+      obs.dispose();
+      assert.strictEqual(reference.ref_count, 1);
+      reference.release();
+    });
+
+    it('prevents a captured model computed from writing after disposal', () => {
+      const previousStatistics = kb.getStatistics();
+      const statistics = new kb.Statistics();
+      kb.setStatistics(statistics);
+
+      const initialModel = new Backbone.Model({ name: 'initial' });
+      const replacementModel = new Backbone.Model({ name: 'replacement' });
+      const observable = kb.observable<string>(initialModel, 'name');
+      const capturedModel = observable.model;
+
+      try {
+        observable.dispose();
+
+        assert.strictEqual((observable as unknown as { model?: typeof capturedModel }).model, undefined);
+        assert.strictEqual(capturedModel(), initialModel);
+
+        capturedModel(replacementModel);
+        initialModel.set('name', 'ignored initial');
+        replacementModel.set('name', 'ignored replacement');
+
+        assert.strictEqual(capturedModel(), initialModel);
+        assert.strictEqual(observable(), 'initial');
+        assert.strictEqual(statistics.registeredStatsString('all released'), 'all released');
+      } finally {
+        observable.dispose?.();
+        kb.setStatistics(previousStatistics);
+      }
     });
   });
 
@@ -223,7 +308,7 @@ describe('observable advanced', () => {
 
       const obs = kb.observable(model, {
         key: 'name',
-        read: (_key: string, arg1: string, arg2: number) => {
+        read: (_key: unknown, arg1: string, arg2: number) => {
           receivedArgs.push(arg1, arg2);
           return model.get('name');
         },

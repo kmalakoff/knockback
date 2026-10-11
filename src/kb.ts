@@ -9,9 +9,15 @@ import type { KBSettings, LocaleManager } from './types.ts';
 const globalWindow: (Window & typeof globalThis) | undefined = typeof window !== 'undefined' ? window : undefined;
 
 // Extended Knockout types for internal APIs
+interface Ignore {
+  <Return>(callback: (this: void) => Return): Return;
+  <Return, Target>(callback: (this: Target) => Return, callbackTarget: Target): Return;
+  <Return, Target, Args extends unknown[]>(callback: (this: Target, ...args: Args) => Return, callbackTarget: Target, callbackArgs: Args): Return;
+}
+
 interface KoExtended {
   dependencyDetection?: {
-    ignore: <T>(callback: () => T, callbackTarget?: unknown, callbackArgs?: unknown[]) => T;
+    ignore: Ignore;
   };
   storedBindingContextForNode?: (node: Node, context: unknown) => void;
 }
@@ -64,10 +70,10 @@ export function setStatistics(stats: Statistics | null): void {
 // =============================================================================
 
 /** Helper to ignore dependencies in a function */
-export const ignore: <T>(callback: () => T, callbackTarget?: unknown, callbackArgs?: unknown[]) => T =
+export const ignore: Ignore =
   (ko as unknown as KoExtended).dependencyDetection?.ignore ||
-  (<T>(callback: () => T, callbackTarget?: unknown, callbackArgs?: unknown[]): T => {
-    let value: T = null as T;
+  (<Return>(callback: (...args: unknown[]) => Return, callbackTarget?: unknown, callbackArgs?: unknown[]): Return => {
+    let value: Return = null as Return;
     ko.computed(() => {
       value = callback.apply(callbackTarget, callbackArgs || []);
     }).dispose();

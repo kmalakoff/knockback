@@ -20,7 +20,7 @@ interface ValidationOptions {
   noAttach?: boolean;
 }
 
-interface ValidationResult {
+export interface ValidationResult {
   [key: string]: boolean | number | string | undefined;
   $errorCount: number;
   $valid: boolean;
@@ -37,6 +37,8 @@ interface FormValidationResult {
   $disabled: ko.Computed<boolean>;
 }
 
+export type ReadableObservable<T> = ko.Observable<T> | ko.Computed<T>;
+
 /**
  * Creates an observable that wraps all validators for a value and generates helpers
  * for $valid, $errorCount, $enabled, $disabled, and $activeError.
@@ -46,23 +48,16 @@ interface FormValidationResult {
  * @param validationOptions - Validation options
  * @returns A computed observable with validation results
  */
-export function valueValidator(
-  value: ko.Observable<unknown>,
-  bindings: Record<string, (value: unknown) => boolean | unknown>,
+export function valueValidator<T>(
+  value: ReadableObservable<T>,
+  bindings: Record<string, (value: T) => unknown>,
   validationOptions: {
     disable?: boolean | (() => boolean);
     enable?: boolean | (() => boolean);
     priorities?: string | string[];
     noAttach?: boolean;
   } = {}
-): ko.Computed<{
-  [key: string]: boolean | number | string | undefined;
-  $errorCount: number;
-  $valid: boolean;
-  $enabled: boolean;
-  $disable: boolean;
-  $activeError?: string;
-}> {
+): ko.Computed<ValidationResult> {
   const opts = typeof validationOptions === 'function' ? {} : validationOptions || {};
 
   return ko.computed(() => {

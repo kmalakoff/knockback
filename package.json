@@ -28,7 +28,7 @@
       "require": "./dist/cjs/index.js"
     },
     "./package.json": "./package.json",
-    "./umd": "./dist/umd/knockback.cjs"
+    "./umd": "./dist/umd/@mcpeasy/knockback.cjs"
   },
   "main": "dist/cjs/index.js",
   "source": "src/index.ts",
@@ -38,11 +38,14 @@
   ],
   "scripts": {
     "build": "tsds build",
+    "docs": "tsds docs",
     "format": "tsds format",
-    "prepublishOnly": "tsds validate",
-    "test": "wtr --config wtr.config.mjs && tsds test:node --no-timeouts",
+    "prepublishOnly": "npm run validate",
+    "test": "npm run test:types && wtr --config wtr.config.mjs && tsds test:node --no-timeouts",
     "test:browser": "wtr --config wtr.config.mjs",
     "test:node": "tsds test:node --no-timeouts",
+    "test:types": "npm run build && node test/integration/package-types/run.ts",
+    "validate": "npm run test:types && tsds validate",
     "version": "tsds version"
   },
   "devDependencies": {
@@ -55,9 +58,13 @@
     "backbone": "^1.6.1",
     "backbone-orm": "^0.7.0",
     "backbone-relational": "^0.10.0",
+    "fs-remove-compat": "*",
     "knockout": "^3.5.1",
     "ts-dev-stack": "*",
+    "tsds-build": "1.23.3",
     "tsds-config": "*",
+    "tsds-mocha": "1.23.13",
+    "tsds-validate": "1.7.9",
     "tsds-web-test-runner": "*",
     "underscore": "^1.13.7"
   },
@@ -65,6 +72,15 @@
     "backbone": ">=1.4.0",
     "knockout": ">=3.5.0",
     "underscore": ">=1.13.0"
+  },
+  "allowScripts": {
+    "@swc/core@1.16.2": true,
+    "core-js-pure": false,
+    "esbuild@0.25.12": true,
+    "fsevents": false,
+    "node-filename-to-dist-paths@1.4.0": true,
+    "node-semvers@1.7.0": true,
+    "thread-sleep-compat": false
   },
   "tsds": {
     "entry": "src/umd.ts",
