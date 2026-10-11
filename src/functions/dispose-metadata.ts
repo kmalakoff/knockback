@@ -20,6 +20,7 @@ export default function disposeMetadata(obj: KBObject): void {
   // Clean up nested observable
   if (__kb.observable) {
     const obs = __kb.observable as unknown as Record<string, unknown>;
+    obs.destroy = undefined;
     obs.dispose = undefined;
     obs.release = undefined;
     disposeMetadata(__kb.observable as unknown as KBObject);

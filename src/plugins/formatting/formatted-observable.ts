@@ -126,7 +126,7 @@ export interface FormattedObservableInstance {
  * @example
  *   const observable = kb.formattedObservable("{0} and {1}", arg1, arg2);
  */
-export function formattedObservable(format: string | ko.Observable<string>, ...args: ko.Observable[]): ko.Observable<string> & { dispose: () => void } {
+export function formattedObservable(format: string | ko.Observable<string>, ...args: ko.Observable[]): ko.Observable<string> & { destroy(): void; dispose(): void; release(): void } {
   // Instance state (closure-based)
   const state: FormattedObservableInstance = {
     __kb: {},
@@ -153,7 +153,7 @@ export function formattedObservable(format: string | ko.Observable<string>, ...a
         }
       },
     })
-  ) as ko.Observable<string> & { dispose: () => void };
+  ) as ko.Observable<string> & { destroy(): void; dispose(): void; release(): void };
 
   // Publish public interface on the observable
   publishMethods(observable, state, KEYS_PUBLISH);

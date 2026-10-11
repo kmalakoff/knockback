@@ -1,6 +1,26 @@
 import _ from 'underscore';
 import type { ViewModelOptions } from '../types.ts';
 
+const LEGACY_OPTION_ALIASES = {
+  auto_compact: 'autoCompact',
+  event_watcher: 'eventWatcher',
+  models_only: 'modelsOnly',
+  sort_attribute: 'sortAttribute',
+  static_defaults: 'staticDefaults',
+  view_model: 'viewModel',
+} as const;
+
+function normalizeOptionAliases(options: ViewModelOptions): Record<string, unknown> {
+  const normalized = { ...options } as Record<string, unknown>;
+  for (const [legacy, current] of Object.entries(LEGACY_OPTION_ALIASES)) {
+    if (!Object.hasOwn(normalized, current) && Object.hasOwn(normalized, legacy)) {
+      normalized[current] = normalized[legacy];
+    }
+    delete normalized[legacy];
+  }
+  return normalized;
+}
+
 // Merge array values (union)
 function mergeArray(result: Record<string, unknown>, key: string, value: unknown): Record<string, unknown> {
   result[key] = result[key] || [];
@@ -29,8 +49,10 @@ function keyArrayToObject(value: string[]): Record<string, { key: string }> {
 function mergeOptions(result: Record<string, unknown>, options?: ViewModelOptions): Record<string, unknown> {
   if (!options) return result;
 
-  for (const key in options) {
-    const value = (options as Record<string, unknown>)[key];
+  const normalized = normalizeOptionAliases(options);
+
+  for (const key in normalized) {
+    const value = normalized[key];
 
     switch (key) {
       case 'internals':

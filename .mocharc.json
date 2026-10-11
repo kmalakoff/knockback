@@ -1,0 +1,3 @@
+{
+  "ignore": ["test/integration/local-family/**/*.test.ts", "**/node_modules/**"]
+}

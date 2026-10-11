@@ -1,0 +1,14 @@
+{
+  "candidate": {
+    "distAggregateSha256": "3731a1ee2cffdb4c4c72a91b1f06edca3babb38b261f5971360837279a418f81",
+    "entrySha256": "ead5a387d0a0df8bf8238609156239df33d0e3b2f57c736bc1159d0103095db7",
+    "packageJsonSha256": "2f53e5df057d844a9243c76f1eb690b5fdc18ff90e6bf5ebee53ada96e266d35",
+    "version": "2.0.0"
+  },
+  "published": {
+    "entrySha256": "eeeefdca830b95d747ee5c8f1d6c9a26a4702d223ac716f9ffd2f8300d45ba6d",
+    "gitHead": "8ac1f5f8d013f1eede74f1abc38ecffc8e4bd9f8",
+    "packageJsonSha256": "b353cee79086a6a72e6b73c1a5870af59a4f5a787a1032166ea594c5f257865c",
+    "version": "1.2.3"
+  }
+}

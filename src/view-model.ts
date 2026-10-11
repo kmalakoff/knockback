@@ -3,11 +3,12 @@ import ko from 'knockout';
 import { KB_DISPOSE_STATE } from './constants.ts';
 import { EventWatcher } from './event-watcher.ts';
 import { Factory } from './factory.ts';
-import { _throwUnexpected, ignore, isModel, settings, wasReleased } from './kb.ts';
+import type { KnockbackGlobal } from './internal-types.ts';
+import { _throwUnexpected, ignore, isModel, releaseKeys, wasReleased } from './kb.ts';
 import { observable as kbObservable } from './observable.ts';
-import { Store } from './store.ts';
-import type { InternalCreateOptions, InternalViewModelOptions, KBMetadata, ObservableOptions, ViewModelOptions, ViewModel as ViewModelType } from './types.ts';
-import { attachDispose, collapseOptions, disposeDisposableKeys, disposeMetadata, resolveModel, wrappedEventWatcher, wrappedFactory, wrappedObject, wrappedStore } from './utils.ts';
+import { REFERENCE_ATTACHMENT, REFERENCE_ROOT, type ReferenceAttachment, Store } from './store.ts';
+import type { InternalCreateOptions, InternalViewModelOptions, KBMetadata, ModelInput, ObservableOptions, ViewModelOptions, ViewModel as ViewModelType, ViewModelValue } from './types.ts';
+import { attachDispose, collapseOptions, disposeMetadata, isModelReference, resolveModel, wrappedEventWatcher, wrappedFactory, wrappedObject, wrappedStore } from './utils.ts';
 
 const KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'staticDefaults'] as const;
 
@@ -17,6 +18,8 @@ const KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'staticDefault
  * @internal
  */
 interface ViewModelMetadata extends KBMetadata {
+  [REFERENCE_ROOT]?: boolean;
+  [REFERENCE_ATTACHMENT]?: ReferenceAttachment;
   viewModel?: Record<string, unknown>; // Internal: reference to the view model instance
   keys?: string[] | Record<string, ObservableOptions>;
   internals?: string[];
@@ -95,9 +98,9 @@ export class ViewModelClass {
   __kb_dispose?: number;
   /** @hidden */
   __kb_is_vm = true;
-  model!: ko.Computed<Backbone.Model | null>;
+  model!: ko.Computed<Backbone.Model | null> & ((value: ModelInput) => void);
 
-  constructor(model: Backbone.Model | null, options: ViewModelOptions | string[] = {}, viewModel?: ViewModelType<Record<string, unknown>>) {
+  constructor(model: ModelInput, options: ViewModelOptions | string[] = {}, viewModel?: ViewModelType<Record<string, unknown>>) {
     // Initialize metadata first
     this.__kb = {};
 
@@ -106,7 +109,8 @@ export class ViewModelClass {
   }
 
   // Internal initialization (called in constructor)
-  private _initialize(model: Backbone.Model | null, options: ViewModelOptions | string[], viewModel?: ViewModelType<Record<string, unknown>>): void {
+  _initialize(modelInput: ModelInput, options: ViewModelOptions | string[], viewModel?: ViewModelType<Record<string, unknown>>): void {
+    const model = resolveModel(modelInput);
     // Validate model
     if (model && !isModel(model)) {
       _throwUnexpected(this, 'not a model');
@@ -131,6 +135,7 @@ export class ViewModelClass {
 
     const __kb = this.__kb as ViewModelMetadata;
     __kb.viewModel = viewModel || this;
+    if (isModelReference(modelInput)) __kb[REFERENCE_ROOT] = true;
 
     // Collapse options
     const mergedOptions = collapseOptions(opts) as InternalViewModelOptions;
@@ -153,16 +158,31 @@ export class ViewModelClass {
     const _model = ko.observable<Backbone.Model | null>(null);
     this._model = _model;
     let eventWatcher: EventWatcher | null = null;
+    let creatingObservables = false;
+    const prepareReferenceAttachment = (nextModel: Backbone.Model | null): (() => void) => {
+      if (__kb[REFERENCE_ATTACHMENT]) _throwUnexpected(this, 'reentrant reference attachment');
+      const store = wrappedStore(this) as Store;
+      const attachment: ReferenceAttachment = { store, model: nextModel, prepare: true };
+      __kb[REFERENCE_ATTACHMENT] = attachment;
+      try {
+        store.reuse(this, nextModel);
+        if (!attachment.commit) _throwUnexpected(this, 'missing reference attachment');
+        return attachment.commit;
+      } finally {
+        delete __kb[REFERENCE_ATTACHMENT];
+      }
+    };
 
     this.model = ko.computed({
       read: () => ko.utils.unwrapObservable(_model),
-      write: (newModel: Backbone.Model | null) => {
+      write: (newModel: ModelInput) => {
         ignore(() => {
           if (wasReleased(this) || !eventWatcher) return;
 
           const store = wrappedStore(this) as Store;
-          store.reuse(this, resolveModel(newModel));
+          if (!isModelReference(newModel)) store.reuse(this, resolveModel(newModel));
           eventWatcher.emitter(newModel);
+          if (wasReleased(this)) return;
           _model(eventWatcher.ee);
 
           if (eventWatcher.ee) {
@@ -173,20 +193,35 @@ export class ViewModelClass {
     });
 
     // Event watcher
-    eventWatcher = wrappedEventWatcher(
-      this,
-      new EventWatcher(model || null, this, {
-        obj: this,
-        emitter: (m: Backbone.Model | null) => _model(m),
-        update: () => {
-          ignore(() => {
-            if (eventWatcher?.ee) {
-              this.createObservables(eventWatcher.ee);
-            }
-          });
-        },
-      })
-    ) as EventWatcher;
+    eventWatcher = EventWatcher.useOptionsOrCreate({}, modelInput, this, {
+      obj: this,
+      emitterAfterCallbacks: true,
+      emitterPrepare: (m, reference) => {
+        if (wasReleased(this) || !reference) return;
+        return prepareReferenceAttachment(m);
+      },
+      emitter: (m: Backbone.Model | null) => {
+        if (creatingObservables || wasReleased(this) || wrappedEventWatcher(this)?.ee !== m) return;
+
+        if (m) {
+          creatingObservables = true;
+          try {
+            this.createObservables(m);
+          } finally {
+            creatingObservables = false;
+          }
+        }
+        if (wasReleased(this) || wrappedEventWatcher(this)?.ee !== m) return;
+        _model(m);
+      },
+      update: () => {
+        ignore(() => {
+          if (eventWatcher?.ee) {
+            this.createObservables(eventWatcher.ee);
+          }
+        });
+      },
+    });
 
     wrappedObject(this, model || null);
     _model(eventWatcher.ee);
@@ -228,14 +263,14 @@ export class ViewModelClass {
     attachDispose(this, this.dispose.bind(this));
 
     // Statistics tracking
-    if (globalThis.statistics) {
-      globalThis.statistics.register('ViewModel', this);
+    if ((globalThis as KnockbackGlobal).statistics) {
+      ((globalThis as KnockbackGlobal).statistics as NonNullable<KnockbackGlobal['statistics']>).register('ViewModel', this);
     }
   }
 
   // Clean up
   dispose(): void {
-    if (this.__kb_dispose && this.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) return;
+    if (this.__kb_dispose && this.__kb_dispose >= KB_DISPOSE_STATE.DISPOSED) return;
     this.__kb_dispose = KB_DISPOSE_STATE.DISPOSED;
     const __kb = this.__kb as ViewModelMetadata;
 
@@ -250,12 +285,20 @@ export class ViewModelClass {
     __kb.viewModel = undefined;
     __kb.create_options = undefined;
 
-    disposeDisposableKeys(this as unknown as Record<string, unknown>);
+    releaseKeys(this as unknown as Record<string, unknown>);
     disposeMetadata(this);
 
-    if (globalThis.statistics) {
-      globalThis.statistics.unregister('ViewModel', this);
+    if ((globalThis as KnockbackGlobal).statistics) {
+      ((globalThis as KnockbackGlobal).statistics as NonNullable<KnockbackGlobal['statistics']>).unregister('ViewModel', this);
     }
+  }
+
+  destroy(): void {
+    this.dispose();
+  }
+
+  release(): void {
+    this.dispose();
   }
 
   // Get share options for creating related observables
@@ -282,7 +325,7 @@ export class ViewModelClass {
       }
 
       // ORM relationship keys
-      const orm = settings.orm;
+      const orm = wrappedEventWatcher(this)?.orm;
       if (orm?.keys) {
         const relKeys = orm.keys(model);
         if (relKeys) {
@@ -294,7 +337,7 @@ export class ViewModelClass {
     } else if (Array.isArray(keys)) {
       // Array of key names
       for (const key of keys) {
-        createObservable(this, model, key, createOptions);
+        createObservable(this, model ?? null, key, createOptions);
       }
     } else {
       // Object with mapping info
@@ -308,11 +351,73 @@ export class ViewModelClass {
         }
 
         const viewModel = __kb.viewModel as Record<string, unknown>;
-        (this as Record<string, unknown>)[vmKey] = viewModel[vmKey] = kbObservable(model, mappingInfo, __kb.create_options as ViewModelOptions, this as unknown as Record<string, unknown>);
+        (this as Record<string, unknown>)[vmKey] = viewModel[vmKey] = kbObservable(model ?? null, mappingInfo, __kb.create_options as ViewModelOptions, this as unknown as Record<string, unknown>);
       }
     }
   }
 }
+
+type ViewModelPrototype = Record<string, unknown>;
+type MergeStatic<Parent extends Record<string, unknown>, Child extends Record<string, unknown>> = Omit<Parent, keyof Child> & Child;
+
+export type LegacyViewModelInstance<T extends object = Record<string, unknown>, M extends Backbone.Model = Backbone.Model> = ViewModelType<T, M> & {
+  createObservables(model: Backbone.Model | null | undefined, keys?: string[] | Record<string, ObservableOptions>): void;
+  shareOptions(): { store: unknown; factory: unknown };
+};
+
+export interface ViewModelConstructor<Instance extends LegacyViewModelInstance = LegacyViewModelInstance, InheritedStatic extends Record<string, unknown> = Record<string, never>> {
+  new <T extends object = Record<string, unknown>, M extends Backbone.Model = Backbone.Model>(model: ModelInput<M>, options?: ViewModelOptions<T, M> | string[], vm?: ViewModelType<Record<string, unknown>>): Instance & LegacyViewModelInstance<T, M>;
+  prototype: Instance;
+  extend<Prototype extends ViewModelPrototype = ViewModelPrototype, Static extends Record<string, unknown> = Record<string, never>>(
+    prototypeProperties?: Prototype & ThisType<Instance & Omit<Prototype, 'constructor'>>,
+    staticProperties?: Static
+  ): ViewModelConstructor<Instance & Omit<Prototype, 'constructor'>, MergeStatic<InheritedStatic, Static>> & MergeStatic<InheritedStatic, Static> & { __super__: Instance };
+}
+
+function extendViewModel<Instance extends LegacyViewModelInstance, InheritedStatic extends Record<string, unknown>, Prototype extends ViewModelPrototype, Static extends Record<string, unknown>>(
+  this: ViewModelConstructor<Instance, InheritedStatic>,
+  prototypeProperties: Prototype = {} as Prototype,
+  staticProperties: Static = {} as Static
+): ViewModelConstructor<Instance & Omit<Prototype, 'constructor'>, MergeStatic<InheritedStatic, Static>> & MergeStatic<InheritedStatic, Static> & { __super__: Instance } {
+  const parent = this;
+  const constructorValue = (prototypeProperties as Record<string, unknown>).constructor;
+  const customConstructor = Object.hasOwn(prototypeProperties, 'constructor') && typeof constructorValue === 'function' ? constructorValue : undefined;
+  const child = (customConstructor ||
+    function (this: Instance, ...args: unknown[]) {
+      return parent.apply(this, args as [ModelInput, ViewModelOptions | string[] | undefined, ViewModelType<Record<string, unknown>> | undefined]);
+    }) as unknown as ViewModelConstructor<Instance & Omit<Prototype, 'constructor'>, MergeStatic<InheritedStatic, Static>> & MergeStatic<InheritedStatic, Static> & { __super__: Instance };
+
+  Object.assign(child, parent);
+  child.prototype = Object.create(parent.prototype) as Instance & Omit<Prototype, 'constructor'>;
+  Object.assign(child.prototype, prototypeProperties);
+  Object.assign(child, staticProperties);
+  Object.defineProperty(child.prototype, 'constructor', { configurable: true, enumerable: false, value: child, writable: true });
+  child.__super__ = parent.prototype;
+  child.extend = parent.extend;
+  return child;
+}
+
+const viewModelConstructor = function <T extends object = Record<string, unknown>, M extends Backbone.Model = Backbone.Model>(this: ViewModelClass, model: ModelInput<M>, options: ViewModelOptions<T, M> | string[] = {}, vm?: ViewModelType<Record<string, unknown>>): ViewModelClass & ViewModelType<T, M> {
+  this.__kb = {};
+  this.__kb_dispose = undefined;
+  this.__kb_is_vm = true;
+  ignore(() => this._initialize(model, options as ViewModelOptions | string[], vm));
+  return this as ViewModelClass & ViewModelType<T, M>;
+} as unknown as ViewModelConstructor;
+
+viewModelConstructor.prototype = Object.create(ViewModelClass.prototype) as LegacyViewModelInstance;
+viewModelConstructor.extend = extendViewModel as ViewModelConstructor['extend'];
+Object.defineProperty(viewModelConstructor.prototype, 'constructor', { configurable: true, enumerable: false, value: viewModelConstructor, writable: true });
+Object.defineProperty(viewModelConstructor, Symbol.hasInstance, {
+  configurable: true,
+  value: (instance: unknown) => instance instanceof ViewModelClass,
+});
+
+/** Legacy constructor with Backbone-style extend semantics. */
+export const ViewModel: ViewModelConstructor = viewModelConstructor;
+
+/** Creates a typed ViewModel for a Backbone model. */
+export function viewModel<T extends object = Record<string, unknown>, M extends Backbone.Model = Backbone.Model>(model: ModelInput<M>, options?: ViewModelOptions<T, M> | string[], vm?: ViewModelType<Record<string, unknown>>): ViewModelValue<T, M>;
 
 // =============================================================================
 // Factory Function (Primary API)
@@ -330,16 +435,8 @@ export class ViewModelClass {
  * @param vm - Parent view model (for nested creation)
  * @returns A new ViewModel instance
  */
-export function viewModel<T extends object = Record<string, unknown>>(
-  model: Backbone.Model | null,
-  options?:
-    | (ViewModelOptions & {
-        extend?: ((vm: ViewModelType<T>, model: Backbone.Model | null) => void | Partial<T>) | Partial<T>;
-      })
-    | string[],
-  vm?: ViewModelType<Record<string, unknown>>
-): ViewModelType<T> {
-  return new ViewModelClass(model, options, vm) as unknown as ViewModelType<T>;
+export function viewModel(model: ModelInput, options?: ViewModelOptions | string[], vm?: ViewModelType<Record<string, unknown>>): ViewModelType<Record<string, unknown>> {
+  return new ViewModelClass(model, options, vm);
 }
 
 export default viewModel;

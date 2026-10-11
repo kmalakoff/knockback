@@ -1,0 +1,33 @@
+{
+  "knockback": {
+    "packageJsonSha256": "a2a09e4a7e3da881d74ec7938249d058d3d50ae85b55d09b5f4015c4d7ca6165",
+    "sourceAggregateSha256": "539251bbd43f732163545a91e8406f4f6759a085a5d2923767d567e7f417506e",
+    "distAggregateSha256": "992aa31fa19eef904b2717c968defc061b37d5345f7288bb5b6ead4881fd48b9",
+    "typedValueSha256": "fadc8b71e6d77a9d41173fdafdd4f8f805e731360385af1cc849c57f87250955",
+    "typedValueTestSha256": "5ae5f5127ea947a4fc28f08e79d26397dad67e0d62a885ae312e90b46889428d"
+  },
+  "modelref": {
+    "payloadManifestSha256": "1c4211447c8e18e3de68a5ceee322cbbf4a0c740426ae1c72cf96af796b5ae64",
+    "producerManifestSha256": "9b8ccf10e5584f25b9f9a47b89d11f258d95196b0dc0e09fa0dcc8ff4d619ff5",
+    "artifactManifestSha256": "9784f413d4d2ee2b058532707253747762088022013a3bcf4bcfda37655c2dcf",
+    "tarballSha256": "279df8efdf01b732b74f33cd0386291f8f5ab2ffeeac91c5f67b907555a1073a"
+  },
+  "orm": {
+    "artifactManifestSha256": "0e1750d0af7bcf39e1b377ddb73a78262ae9c0aa0b7350f5cce94c86e2d3cbaa",
+    "manifestSha256": "d4a755e7f1d67f1f3c3b92ea017572321033d8e6be2d63a9996cd1f2f267406f",
+    "packageJsonSha256": "da1133a0966c89615f41ff853779f3676c0985b396f7dc98a5179e1f0a61a99e",
+    "tarballSha256": "4b379681acd65481472f86bdbf1d65bba176f21df0582c655788e8719166e128",
+    "umdSha256": "967b374060b69d5e4067f3193885f3ef3cd115217ec71a63587598e7fa4c7ea7"
+  },
+  "mongo": {
+    "artifactManifestSha256": "1da0053765e0264c2202a3fbb9dc3da50b9f0163cbb36eb7338be3d5e27f068e",
+    "packageJsonSha256": "9b2d1b7b1b192b9b6d6a08feb7cf3b0731a3fd289a924e4066ed551b17fc8d57",
+    "tarballSha256": "9be91afda533fd1ab93f0959300d3e44d474454e6f4135fd78ae2dd42a7fa582"
+  },
+  "sql": {
+    "artifactManifestSha256": "627dac9b62b5791c49613ade4e1366207f640f3d468bc1649a575aab8329895f",
+    "manifestSha256": "4019d23142ca0a99b36425deab93feab04dabd610bade7e95054d269e96f6eea",
+    "packageJsonSha256": "61c722a6dc0cdde978252573c30944b1ab7d2995103e25f1829b8db90dd83c47",
+    "tarballSha256": "9c3c6f2867352d244049d398ee6c9f8cb0985d6e6a96a2070dcd6759fae774c6"
+  }
+}

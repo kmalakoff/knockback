@@ -48,7 +48,7 @@ export interface TriggeredObservableInstance {
  *   emitter.set({name: 'george'});  // trigger_count: 2
  *   emitter.set({last: 'smith'});   // trigger_count: 3
  */
-export function triggeredObservable(emitter: Backbone.Events, eventSelector: string): ko.Observable & { dispose: () => void } {
+export function triggeredObservable(emitter: Backbone.Events, eventSelector: string): ko.Observable & { destroy(): void; dispose(): void; release(): void } {
   if (!emitter) {
     _throwMissing({ constructor: { name: 'TriggeredObservable' } }, 'emitter');
   }
@@ -67,7 +67,7 @@ export function triggeredObservable(emitter: Backbone.Events, eventSelector: str
   const observable = setObservable(
     state,
     ko.computed(() => state.vo())
-  ) as ko.Observable & { dispose: () => void };
+  ) as ko.Observable & { destroy(): void; dispose(): void; release(): void };
 
   // Add dispose method to state for publishMethods
   const dispose = () => {

@@ -1,0 +1,15 @@
+{
+  "name": "knockback-local-family-cjs-type-consumer",
+  "version": "0.0.0",
+  "private": true,
+  "type": "commonjs",
+  "source": "src/index.cts",
+  "scripts": {
+    "build": "tsds build"
+  },
+  "tsds": {
+    "targets": [
+      "cjs"
+    ]
+  }
+}

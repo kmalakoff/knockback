@@ -5,7 +5,7 @@
  * Person and Building models with BackboneORM or Backbone-Relational.
  */
 import type Backbone from 'backbone';
-import type ko from 'knockout';
+import ko from 'knockout';
 
 // =============================================================================
 // Model Attribute Interfaces
@@ -144,8 +144,6 @@ export class SimpleViewModel {
   prop: ko.Observable<unknown> | null;
 
   constructor() {
-    // Import ko dynamically to avoid circular deps
-    const ko = require('knockout');
     this.prop = ko.observable();
     SimpleViewModel.viewModels.push(this);
   }

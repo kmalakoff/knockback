@@ -1,20 +1,21 @@
 import _ from 'underscore';
-import type { Creator, FactoriesOption } from './internal-types.ts';
+import type { FactoriesOption, StoredCreator } from './internal-types.ts';
 import type { InternalViewModelOptions } from './types.ts';
-import { pathJoin, wrappedFactory } from './utils.ts';
+import { type KBObject, pathJoin, wrappedFactory } from './utils.ts';
 
 interface PathMapping {
-  viewModel?: Creator;
+  viewModel?: StoredCreator;
+  view_model?: StoredCreator;
   [key: string]: unknown;
 }
 
 // Factory for creating view models based on path mappings
 export class Factory {
-  paths: Record<string, Creator | PathMapping> = {};
+  paths: Record<string, unknown> = {};
   parent_factory?: Factory;
 
   // Use existing factory from options or create a new one
-  static useOptionsOrCreate(options: InternalViewModelOptions, obj: unknown, ownerPath?: string): Factory {
+  static useOptionsOrCreate(options: InternalViewModelOptions, obj: KBObject, ownerPath?: string): Factory {
     // Share existing factory if it has all required mappings
     if (options.factory) {
       const factory = options.factory as Factory;
@@ -38,12 +39,12 @@ export class Factory {
   }
 
   // Check if a path exists
-  hasPath(path: string): boolean {
-    return Object.hasOwn(this.paths, path) || (this.parent_factory?.hasPath(path) ?? false);
+  hasPath(path: string): boolean | undefined {
+    return Object.hasOwn(this.paths, path) || this.parent_factory?.hasPath(path);
   }
 
   // Add a single path mapping
-  addPathMapping(path: string, createInfo: Creator | PathMapping): void {
+  addPathMapping(path: string, createInfo: unknown): void {
     this.paths[path] = createInfo;
   }
 
@@ -51,8 +52,8 @@ export class Factory {
   addPathMappings(factories: FactoriesOption, ownerPath?: string): void {
     if (_.isFunction(factories)) return;
 
-    for (const path in factories as Record<string, Creator>) {
-      const createInfo = (factories as Record<string, Creator>)[path];
+    for (const path in factories as Record<string, unknown>) {
+      const createInfo = (factories as Record<string, unknown>)[path];
       this.paths[pathJoin(ownerPath, path)] = createInfo;
     }
   }
@@ -62,8 +63,8 @@ export class Factory {
     if (_.isFunction(factories)) return true;
 
     let allExist = true;
-    for (const path in factories as Record<string, Creator>) {
-      const creator = (factories as Record<string, Creator>)[path];
+    for (const path in factories as Record<string, unknown>) {
+      const creator = (factories as Record<string, unknown>)[path];
       const existingCreator = this.creatorForPath(null, pathJoin(ownerPath, path));
       allExist = allExist && !!existingCreator && creator === existingCreator;
     }
@@ -71,19 +72,18 @@ export class Factory {
   }
 
   // Get creator for a path
-  creatorForPath(_obj: unknown, path: string): Creator | undefined {
+  creatorForPath(_obj: unknown, path: string): StoredCreator | null {
     const creator = this.paths[path];
     if (creator) {
-      // Handle viewModel property wrapper
       const mapping = creator as PathMapping;
-      return mapping.viewModel ? mapping.viewModel : (creator as Creator);
+      return mapping.viewModel || mapping.view_model || (creator as StoredCreator);
     }
 
     if (this.parent_factory) {
       return this.parent_factory.creatorForPath(_obj, path);
     }
 
-    return undefined;
+    return null;
   }
 }
 

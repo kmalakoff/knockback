@@ -1,17 +1,24 @@
 import Backbone from 'backbone';
 import ko from 'knockout';
+import type { ORM } from './configure.ts';
 import { KB_DISPOSE_STATE } from './constants.ts';
 import { MissingPropertyError, UnexpectedValueError } from './errors/index.ts';
 import type { Statistics } from './statistics.ts';
-import type { KBSettings, LocaleManager } from './types.ts';
+import { type KBSettings, type LocaleManager, TYPE_COLLECTION } from './types.ts';
 
 // Get global window object (works in browser and Node)
 const globalWindow: (Window & typeof globalThis) | undefined = typeof window !== 'undefined' ? window : undefined;
 
 // Extended Knockout types for internal APIs
+interface Ignore {
+  <Return>(callback: (this: void) => Return): Return;
+  <Return, Target>(callback: (this: Target) => Return, callbackTarget: Target): Return;
+  <Return, Target, Args extends unknown[]>(callback: (this: Target, ...args: Args) => Return, callbackTarget: Target, callbackArgs: Args): Return;
+}
+
 interface KoExtended {
   dependencyDetection?: {
-    ignore: <T>(callback: () => T, callbackTarget?: unknown, callbackArgs?: unknown[]) => T;
+    ignore: Ignore;
   };
   storedBindingContextForNode?: (node: Node, context: unknown) => void;
 }
@@ -64,10 +71,10 @@ export function setStatistics(stats: Statistics | null): void {
 // =============================================================================
 
 /** Helper to ignore dependencies in a function */
-export const ignore: <T>(callback: () => T, callbackTarget?: unknown, callbackArgs?: unknown[]) => T =
+export const ignore: Ignore =
   (ko as unknown as KoExtended).dependencyDetection?.ignore ||
-  (<T>(callback: () => T, callbackTarget?: unknown, callbackArgs?: unknown[]): T => {
-    let value: T = null as T;
+  (<Return>(callback: (...args: unknown[]) => Return, callbackTarget?: unknown, callbackArgs?: unknown[]): Return => {
+    let value: Return = null as Return;
     ko.computed(() => {
       value = callback.apply(callbackTarget, callbackArgs || []);
     }).dispose();
@@ -109,16 +116,103 @@ export function isViewModel(obj: unknown): boolean {
 // =============================================================================
 
 /** Checks if an object has been disposed (internal) */
-export function wasReleased(obj: unknown): boolean {
+export function wasReleased(obj: unknown): boolean | undefined {
   if (!obj) return true;
-  const disposable = obj as { __kb_dispose?: number };
-  // Check if disposing or disposed (state >= 1)
-  return disposable.__kb_dispose !== undefined && disposable.__kb_dispose >= 1;
+  const disposable = obj as { __kb_dispose?: number; __kb_released?: boolean };
+  if (disposable.__kb_released !== undefined) return disposable.__kb_released;
+  if (disposable.__kb_dispose === undefined) return undefined;
+  return disposable.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING;
 }
 
-/** Checks if an object can be disposed */
-export function isReleaseable(obj: unknown): boolean {
-  return !!obj && (ko.isSubscribable(obj) || typeof (obj as { dispose?: () => void }).dispose === 'function');
+const LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'] as const;
+
+function lifecycleMethod(obj: unknown): (() => void) | undefined {
+  for (const method of LIFECYCLE_METHODS) {
+    const lifecycle = (obj as Record<string, unknown>)[method];
+    if (typeof lifecycle === 'function') return lifecycle as () => void;
+  }
+  return undefined;
+}
+
+/** Checks if an object, or at depth 0 one of its direct children, can be released */
+export function isReleaseable(obj: unknown, depth = 0): boolean {
+  if (!obj || obj !== Object(obj) || wasReleased(obj)) return false;
+  if (ko.isObservable(obj) || isViewModel(obj)) return true;
+  if (typeof obj === 'function' || isModel(obj) || isCollection(obj)) return false;
+  if (lifecycleMethod(obj)) return true;
+  if (depth > 0) return false;
+  for (const key in obj as Record<string, unknown>) {
+    if (key !== '__kb' && isReleaseable((obj as Record<string, unknown>)[key], depth + 1)) return true;
+  }
+  return false;
+}
+
+/** Releases an object through its legacy or current lifecycle method. */
+export function release(obj: unknown): void {
+  if (!isReleaseable(obj)) return;
+
+  const releaseable = obj as {
+    __kb_is_co?: boolean;
+    __kb_is_o?: boolean;
+    __kb_released?: boolean;
+    destroy?: () => void;
+    dispose?: () => void;
+    valueType?: () => number;
+  };
+  releaseable.__kb_released = true;
+
+  if (Array.isArray(obj)) {
+    for (let index = 0; index < obj.length; index++) {
+      const value = obj[index];
+      if (isReleaseable(value)) {
+        obj[index] = null;
+        release(value);
+      }
+    }
+    return;
+  }
+
+  const value = ko.isObservable(obj) ? peek(obj as ko.Observable) : undefined;
+  if (Array.isArray(value)) {
+    if (releaseable.__kb_is_co || (releaseable.__kb_is_o && releaseable.valueType?.() === TYPE_COLLECTION)) {
+      releaseable.destroy?.();
+      return;
+    }
+    for (let index = 0; index < value.length; index++) {
+      const item = value[index];
+      if (isReleaseable(item)) {
+        value[index] = null;
+        release(item);
+      }
+    }
+    if (typeof releaseable.dispose === 'function') releaseable.dispose();
+    return;
+  }
+
+  const lifecycle = lifecycleMethod(obj);
+  if (lifecycle) {
+    lifecycle.call(obj);
+    return;
+  }
+
+  if (!ko.isObservable(obj)) releaseKeys(obj as Record<string, unknown>);
+}
+
+/** Releases direct owned values and clears their owner properties. */
+export function releaseKeys(obj: Record<string, unknown>): void {
+  for (const key in obj) {
+    if (key === '__kb') continue;
+    const value = obj[key];
+    if (!isReleaseable(value)) continue;
+    obj[key] = null;
+    release(value);
+  }
+}
+
+// kb.dispose clears only children it can dispose: live subscribables and owners of a dispose() method.
+function isDisposeTraversable(value: unknown): boolean {
+  if (!value || value !== Object(value) || wasReleased(value)) return false;
+  return ko.isSubscribable(value) || typeof (value as { dispose?: unknown }).dispose === 'function';
 }
 
 /**
@@ -132,7 +226,7 @@ function _traverseAndDisposeChildren(obj: unknown): void {
   if (Array.isArray(obj)) {
     for (let i = 0; i < obj.length; i++) {
       const value = obj[i];
-      if (isReleaseable(value)) {
+      if (isDisposeTraversable(value)) {
         obj[i] = null;
         (value as { dispose?: () => void }).dispose?.();
       }
@@ -150,7 +244,7 @@ function _traverseAndDisposeChildren(obj: unknown): void {
     if (Array.isArray(value)) {
       for (let i = 0; i < value.length; i++) {
         const item = value[i];
-        if (isReleaseable(item)) {
+        if (isDisposeTraversable(item)) {
           value[i] = null;
           (item as { dispose?: () => void }).dispose?.();
         }
@@ -159,7 +253,7 @@ function _traverseAndDisposeChildren(obj: unknown): void {
     }
 
     // Dispose single disposable property
-    if (isReleaseable(value)) {
+    if (isDisposeTraversable(value)) {
       (obj as Record<string, unknown>)[key] = null;
       (value as { dispose?: () => void }).dispose?.();
     }
@@ -243,13 +337,11 @@ export function dispose(obj: unknown): void {
   }
 }
 
-/** Binds a callback to the node that disposes the view model when the node is removed */
+/** Binds a callback to the node that releases the view model when the node is removed */
 export function releaseOnNodeRemove(viewModel: unknown, node: Node): void {
   if (!viewModel) _throwUnexpected('kb', 'missing view model');
   if (!node) _throwUnexpected('kb', 'missing node');
-  ko.utils.domNodeDisposal.addDisposeCallback(node, () => {
-    (viewModel as { dispose?: () => void }).dispose?.();
-  });
+  ko.utils.domNodeDisposal.addDisposeCallback(node, () => release(viewModel));
 }
 
 // =============================================================================
@@ -316,13 +408,13 @@ export function applyBindings(viewModel: unknown, node: Element | NodeList | HTM
 // =============================================================================
 
 /** Get value from model */
-export function getValue(model: Backbone.Model | null, key: string, args?: unknown[]): unknown {
+export function getValue(model: Backbone.Model | null, key: string, args?: unknown[], orm?: ORM | null): unknown {
   if (!model) return undefined;
 
   // Check if ORM wants to use a function (for Backbone ORMs with custom accessors)
   const modelWithDynamicProps = model as unknown as Record<string, unknown>;
   const prop = modelWithDynamicProps[key];
-  if (typeof prop === 'function' && settings.orm?.useFunction?.(model, key)) {
+  if (typeof prop === 'function' && orm?.useFunction?.(model, key)) {
     return (prop as () => unknown)();
   }
 
@@ -335,13 +427,13 @@ export function getValue(model: Backbone.Model | null, key: string, args?: unkno
 }
 
 /** Set value on model */
-export function setValue(model: Backbone.Model | null, key: string, value: unknown): void {
+export function setValue(model: Backbone.Model | null, key: string, value: unknown, orm?: ORM | null): void {
   if (!model) return;
 
   // Check if ORM wants to use a function (for Backbone ORMs with custom accessors)
   const modelWithDynamicProps = model as unknown as Record<string, unknown>;
   const prop = modelWithDynamicProps[key];
-  if (typeof prop === 'function' && settings.orm?.useFunction?.(model, key)) {
+  if (typeof prop === 'function' && orm?.useFunction?.(model, key)) {
     (prop as (val: unknown) => void)(value);
     return;
   }

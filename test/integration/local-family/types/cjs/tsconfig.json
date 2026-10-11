@@ -1,0 +1,15 @@
+{
+  "extends": "tsds-config/tsconfig.json",
+  "compilerOptions": {
+    "erasableSyntaxOnly": false,
+    "ignoreDeprecations": "6.0",
+    "lib": ["ES2022", "dom"],
+    "module": "Node16",
+    "moduleResolution": "Node16",
+    "outDir": "dist",
+    "rootDir": "src",
+    "types": ["node"]
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}

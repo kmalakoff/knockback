@@ -13,20 +13,32 @@ function callOrGet(value: unknown, ...args: unknown[]): unknown {
   return unwrapped;
 }
 
-interface ValidationOptions {
+export interface ValidationOptions {
   disable?: boolean | (() => boolean);
   enable?: boolean | (() => boolean);
   priorities?: string | string[];
   noAttach?: boolean;
+  no_attach?: boolean;
 }
 
-interface ValidationResult {
+export interface ValidationResult {
   [key: string]: boolean | number | string | undefined;
   $errorCount: number;
+  $error_count: number;
   $valid: boolean;
   $enabled: boolean;
   $disable: boolean;
   $activeError?: string;
+  $active_error?: string;
+}
+
+function normalizeValidationOptions(options: ValidationOptions | undefined): ValidationOptions {
+  const normalized = { ...(options || {}) };
+  if (!Object.hasOwn(normalized, 'noAttach') && Object.hasOwn(normalized, 'no_attach')) {
+    normalized.noAttach = normalized.no_attach;
+  }
+  delete normalized.no_attach;
+  return normalized;
 }
 
 interface FormValidationResult {
@@ -37,6 +49,8 @@ interface FormValidationResult {
   $disabled: ko.Computed<boolean>;
 }
 
+export type ReadableObservable<T> = ko.Observable<T> | ko.Computed<T>;
+
 /**
  * Creates an observable that wraps all validators for a value and generates helpers
  * for $valid, $errorCount, $enabled, $disabled, and $activeError.
@@ -46,28 +60,13 @@ interface FormValidationResult {
  * @param validationOptions - Validation options
  * @returns A computed observable with validation results
  */
-export function valueValidator(
-  value: ko.Observable<unknown>,
-  bindings: Record<string, (value: unknown) => boolean | unknown>,
-  validationOptions: {
-    disable?: boolean | (() => boolean);
-    enable?: boolean | (() => boolean);
-    priorities?: string | string[];
-    noAttach?: boolean;
-  } = {}
-): ko.Computed<{
-  [key: string]: boolean | number | string | undefined;
-  $errorCount: number;
-  $valid: boolean;
-  $enabled: boolean;
-  $disable: boolean;
-  $activeError?: string;
-}> {
-  const opts = typeof validationOptions === 'function' ? {} : validationOptions || {};
+export function valueValidator<T>(value: ReadableObservable<T>, bindings: Record<string, (value: T) => unknown>, validationOptions: ValidationOptions = {}): ko.Computed<ValidationResult> {
+  const opts = normalizeValidationOptions(typeof validationOptions === 'function' ? {} : validationOptions);
 
   return ko.computed(() => {
     const results: ValidationResult = {
       $errorCount: 0,
+      $error_count: 0,
       $valid: true,
       $enabled: true,
       $disable: false,
@@ -99,6 +98,7 @@ export function valueValidator(
 
       if (results[identifier]) {
         results.$errorCount++;
+        results.$error_count++;
 
         // Check priorities
         let identifierIndex = priorities.indexOf(identifier);
@@ -120,6 +120,7 @@ export function valueValidator(
     results.$enabled = !disabled;
     results.$disable = !!disabled;
     results.$valid = results.$errorCount === 0;
+    results.$active_error = results.$activeError;
 
     return results;
   });
@@ -134,24 +135,8 @@ export function valueValidator(
  * @param validationOptions - Validation options
  * @returns A computed observable with validation results, or null if not applicable
  */
-export function inputValidator(
-  viewModel: Record<string, unknown>,
-  el: HTMLElement,
-  validationOptions: {
-    disable?: boolean | (() => boolean);
-    enable?: boolean | (() => boolean);
-    priorities?: string | string[];
-    noAttach?: boolean;
-  } = {}
-): ko.Computed<{
-  [key: string]: boolean | number | string | undefined;
-  $errorCount: number;
-  $valid: boolean;
-  $enabled: boolean;
-  $disable: boolean;
-  $activeError?: string;
-}> | null {
-  const opts = typeof validationOptions === 'function' ? {} : validationOptions || {};
+export function inputValidator(viewModel: Record<string, unknown>, el: HTMLElement, validationOptions: ValidationOptions = {}): ko.Computed<ValidationResult> | null {
+  let opts = normalizeValidationOptions(typeof validationOptions === 'function' ? {} : validationOptions);
   const validators = valid;
   let inputName: string | null = el.getAttribute('name');
   if (inputName && typeof inputName !== 'string') {
@@ -168,6 +153,7 @@ export function inputValidator(
   let options: {
     value?: ko.Observable;
     validationOptions?: ValidationOptions;
+    validation_options?: ValidationOptions;
     validations?: Record<string, (value: unknown) => boolean | unknown>;
   };
   try {
@@ -183,9 +169,9 @@ export function inputValidator(
   }
 
   // Merge validation options
-  if (options.validationOptions) {
-    _.defaults(options.validationOptions, opts);
-    Object.assign(opts, options.validationOptions);
+  const bindingValidationOptions = options.validationOptions ?? options.validation_options;
+  if (bindingValidationOptions) {
+    opts = _.defaults(normalizeValidationOptions(bindingValidationOptions), opts);
   }
 
   // Collect validators
@@ -230,19 +216,7 @@ export function inputValidator(
 export function formValidator(
   viewModel: Record<string, unknown>,
   el: HTMLElement
-): Record<
-  string,
-  | ko.Computed<{
-      [key: string]: boolean | number | string | undefined;
-      $errorCount: number;
-      $valid: boolean;
-      $enabled: boolean;
-      $disable: boolean;
-      $activeError?: string;
-    }>
-  | ko.Computed<number>
-  | ko.Computed<boolean>
-> & {
+): Record<string, ko.Computed<ValidationResult> | ko.Computed<number> | ko.Computed<boolean>> & {
   $errorCount: ko.Computed<number>;
   $valid: ko.Computed<boolean>;
   $enabled: ko.Computed<boolean>;
@@ -263,8 +237,8 @@ export function formValidator(
     try {
       const fn = new Function('sc', `with(sc[0]) { return { ${bindingsAttr} } }`);
       const options = fn([viewModel]);
-      if (options?.validationOptions) {
-        validationOptions = options.validationOptions;
+      if (options?.validationOptions || options?.validation_options) {
+        validationOptions = normalizeValidationOptions(options.validationOptions ?? options.validation_options);
       }
     } catch {
       // Ignore parsing errors

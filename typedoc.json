@@ -1,0 +1,4 @@
+{
+  "intentionallyNotExported": ["CollectionCreatorConstructor", "CollectionCreatorFunction", "CollectionCreatorItem", "CollectionCreatorObject", "CollectionOptionsItem", "CreateOptions", "Creator", "DirectCollectionCreator", "FactoriesOption", "ModelEvent", "ObservableArguments"],
+  "tsconfig": "tsconfig.docs.json"
+}

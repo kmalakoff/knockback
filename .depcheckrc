@@ -1,1 +1,1 @@
-ignores: ["ts-dev-stack", "@mcpeasy/knockback"]
+ignores: ["@mcpeasy/knockback", "ts-dev-stack", "tsds-build", "tsds-mocha", "tsds-validate", "backbone-associations", "backbone-legacy", "backbone-modelref"]

@@ -1,4 +1,4 @@
-import kb from '@mcpeasy/knockback';
+import kb, { type ObservableOptions } from '@mcpeasy/knockback';
 import assert from 'assert';
 import Backbone from 'backbone';
 import ko from 'knockout';
@@ -205,6 +205,26 @@ describe('ViewModel advanced', () => {
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
     });
+
+    it('should clear an ordinary model and its values', () => {
+      interface NameViewModel {
+        name: ko.Observable<string | null>;
+      }
+
+      const model = new Backbone.Model({ name: 'before' });
+      const vm = kb.viewModel<NameViewModel>(model, { keys: ['name'] });
+
+      vm.model(null);
+      assert.strictEqual(vm.model(), null);
+      assert.strictEqual(vm.name(), null);
+
+      model.set('name', 'after');
+      assert.strictEqual(vm.model(), null);
+      assert.strictEqual(vm.name(), null);
+
+      vm.dispose();
+      vm.dispose();
+    });
   });
 
   describe('model replacement', () => {
@@ -336,18 +356,66 @@ describe('ViewModel advanced', () => {
       const vm = kb.viewModel<DynamicViewModel>(model, { keys: ['name'] });
 
       assert.ok(ko.isObservable(vm.name), 'name exists');
-      assert.strictEqual(vm.age, undefined, 'age does not exist');
+      const ageBeforeCreation = vm.age;
+      assert.strictEqual(ageBeforeCreation, undefined, 'age does not exist');
 
       // Add age to model and create observable
       model.set('age', 30);
       vm.createObservables(model, ['age']);
 
-      assert.ok(ko.isObservable(vm.age), 'age now exists');
-      assert.strictEqual(vm.age?.(), 30);
+      const createdAge = vm.age;
+      assert.ok(ko.isObservable(createdAge), 'age now exists');
+      assert.strictEqual(createdAge?.(), 30);
 
       vm.dispose();
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
+    });
+
+    it('creates null-backed array and mapped keys from an undefined model without reviving after disposal', () => {
+      interface OptionalModelViewModel {
+        arrayValue?: kb.Observable<unknown>;
+        mappedValue?: kb.Observable<unknown>;
+        lateArrayValue?: kb.Observable<unknown>;
+        lateMappedValue?: kb.Observable<unknown>;
+        __kb?: Record<string, unknown> | null;
+        createObservables: (model: Backbone.Model | null | undefined, keys: string[] | Record<string, ObservableOptions>) => void;
+        shareOptions: () => { store: unknown; factory: unknown };
+      }
+
+      const previousStatistics = kb.getStatistics();
+      const statistics = new kb.Statistics();
+      kb.setStatistics(statistics);
+      const vm = kb.viewModel<OptionalModelViewModel>(null, { keys: [] });
+
+      try {
+        vm.createObservables(undefined, ['arrayValue']);
+        vm.createObservables(undefined, { mappedValue: { key: 'sourceValue' } });
+
+        assert.ok(ko.isObservable(vm.arrayValue));
+        assert.ok(ko.isObservable(vm.mappedValue));
+        assert.strictEqual(vm.arrayValue?.model(), null);
+        assert.strictEqual(vm.mappedValue?.model(), null);
+        assert.strictEqual(vm.arrayValue?.(), null);
+        assert.strictEqual(vm.mappedValue?.(), null);
+
+        vm.dispose();
+        const disposedMetadata = vm.__kb;
+        const disposedMetadataSnapshot = { ...disposedMetadata };
+
+        vm.createObservables(undefined, ['lateArrayValue']);
+        vm.createObservables(undefined, { lateMappedValue: { key: 'lateSourceValue' } });
+
+        assert.strictEqual(vm.lateArrayValue, undefined);
+        assert.strictEqual(vm.lateMappedValue, undefined);
+        assert.strictEqual(vm.__kb, disposedMetadata);
+        assert.deepStrictEqual(vm.__kb, disposedMetadataSnapshot);
+        assert.deepStrictEqual(vm.shareOptions(), { store: undefined, factory: undefined });
+        assert.strictEqual(statistics.registeredStatsString('all released'), 'all released');
+      } finally {
+        vm.dispose();
+        kb.setStatistics(previousStatistics);
+      }
     });
   });
 
@@ -421,6 +489,93 @@ describe('ViewModel advanced', () => {
       vm.dispose();
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       kb.setStatistics(null);
+    });
+  });
+
+  describe('dispose children', () => {
+    function childExercise(name: string, operation: (stats: InstanceType<typeof kb.Statistics>, track: <T extends { dispose(): void }>(child: T) => T) => void): void {
+      const previousStatistics = kb.getStatistics();
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
+      const failures: unknown[] = [];
+      const childCleanups: Array<() => void> = [];
+      try {
+        operation(stats, (child) => {
+          childCleanups.push(child.dispose.bind(child));
+          return child;
+        });
+      } catch (error) {
+        failures.push(error);
+      } finally {
+        for (const cleanup of [
+          ...childCleanups,
+          () => assert.strictEqual(stats.registeredStatsString('all released'), 'all released', 'Cleanup after fallback: stats'),
+          () => kb.setStatistics(previousStatistics),
+        ]) {
+          try {
+            cleanup();
+          } catch (error) {
+            failures.push(error);
+          }
+        }
+      }
+      if (failures.length === 1) throw failures[0];
+      if (failures.length) {
+        const summary = failures.map((error) => (error instanceof Error ? `${error.name}: ${error.message}` : `thrown ${typeof error}`));
+        throw new AggregateError(failures, `${name} operation and cleanup failed: ${summary.join('; ')}`);
+      }
+    }
+
+    it('should release direct plain-container children and leave deeper containers untouched', () => {
+      childExercise('Nested container disposal', (stats, track) => {
+        const directModel = new Backbone.Model({ name: 'direct' });
+        const deepModel = new Backbone.Model({ name: 'deep' });
+        const direct = track(kb.observable<string>(directModel, 'name'));
+        const deep = track(kb.observable<string>(deepModel, 'name'));
+        const vm = track(kb.viewModel<Record<string, unknown>>(new Backbone.Model()));
+        const container = { label: 'keep', direct };
+        const inner = { deep };
+        const nested = { inner };
+        vm.container = container;
+        vm.nested = nested;
+
+        vm.dispose();
+
+        assert.strictEqual(vm.container, null, 'direct plain container is released');
+        assert.strictEqual(container.label, 'keep');
+        assert.strictEqual(container.direct, null, 'its releaseable child is released');
+        assert.strictEqual(kb.Statistics.eventsStats(directModel).count, 0);
+        assert.strictEqual(vm.nested, nested, 'container without a direct releaseable child is kept');
+        assert.strictEqual(nested.inner, inner);
+        assert.strictEqual(inner.deep, deep, 'grandchild is not released');
+        assert.ok(kb.Statistics.eventsStats(deepModel).count > 0, 'grandchild remains live');
+
+        deep.dispose();
+        assert.strictEqual(stats.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+      });
+    });
+
+    it('should preserve Backbone models and collections that reference each other', () => {
+      childExercise('Backbone cycle disposal', (stats, track) => {
+        const collection = new Backbone.Collection([{ id: 1, name: 'Bob' }]);
+        const member = collection.get(1) as Backbone.Model;
+        assert.strictEqual(member.collection, collection, 'model and collection reference each other');
+        const vm = track(kb.viewModel<Record<string, unknown>>(new Backbone.Model()));
+        const records = { member, collection };
+        vm.member = member;
+        vm.group = collection;
+        vm.records = records;
+
+        vm.dispose();
+
+        assert.strictEqual(vm.member, member, 'model is kept');
+        assert.strictEqual(vm.group, collection, 'collection is kept');
+        assert.strictEqual(vm.records, records, 'container of models and collections is kept');
+        assert.strictEqual(member.collection, collection);
+        assert.strictEqual(collection.length, 1);
+        assert.deepStrictEqual(member.toJSON(), { id: 1, name: 'Bob' });
+        assert.strictEqual(stats.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+      });
     });
   });
 });

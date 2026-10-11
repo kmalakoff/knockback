@@ -1,0 +1,2 @@
+# Family packages use verified local symlinks; providers are loaded by staged ORM/SQL/Mongo runtimes.
+ignores: ["@mcpeasy/knockback", "backbone-modelref", "backbone-orm", "backbone-sql", "backbone-mongo", "ts-dev-stack", "tsds-biome", "tsds-validate", "inflection", "lru-cache", "knex", "better-sqlite3", "mongo-queue-cb", "mongodb-connection-string-url"]

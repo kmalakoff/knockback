@@ -8,6 +8,7 @@ import { applyBindings, ignore, releaseOnNodeRemove } from './kb.ts';
 
 export interface InjectData {
   viewModel?: new (viewModel: unknown, element: Element, valueAccessor?: unknown, allBindingsAccessor?: unknown) => unknown;
+  view_model?: new (viewModel: unknown, element: Element, valueAccessor?: unknown, allBindingsAccessor?: unknown) => unknown;
   create?: (viewModel: unknown, element: Element, valueAccessor?: unknown, allBindingsAccessor?: unknown) => void;
   options?: InjectOptions;
   [key: string]: unknown;
@@ -22,6 +23,7 @@ export interface InjectOptions {
 export interface InjectResult {
   el: Element;
   viewModel: unknown;
+  view_model: unknown;
   binding?: string;
 }
 
@@ -63,16 +65,15 @@ export function inject(data: InjectData | (new (...args: unknown[]) => unknown),
       viewModel = new Constructor(viewModel, element, valueAccessor, allBindingsAccessor) as Record<string, unknown>;
       releaseOnNodeRemove(viewModel, element);
     } else {
-      // viewModel constructor causes a scope change
-      if (injectData.viewModel) {
-        const VMConstructor = injectData.viewModel;
+      const VMConstructor = injectData.viewModel || injectData.view_model;
+      if (VMConstructor) {
         viewModel = new VMConstructor(viewModel, element, valueAccessor, allBindingsAccessor) as Record<string, unknown>;
         releaseOnNodeRemove(viewModel, element);
       }
 
       // Resolve and merge in each key
       for (const key in injectData) {
-        if (key === 'viewModel') continue;
+        if (key === 'viewModel' || key === 'view_model') continue;
 
         const value = injectData[key];
 
@@ -117,7 +118,8 @@ export function injectViewModels(root?: Element | Document): InjectResult[] {
         const attr = Array.from(element.attributes).find((a) => a.name === 'kb-inject');
         if (attr) {
           element.__kb_injected = true;
-          results.push({ el: element, viewModel: {}, binding: attr.value });
+          const viewModel = {};
+          results.push({ el: element, viewModel, view_model: viewModel, binding: attr.value });
         }
       }
     }
@@ -154,26 +156,23 @@ export function injectViewModels(root?: Element | Document): InjectResult[] {
         expression = `{${expression}}`;
       }
 
-      try {
-        // Evaluate the expression
-        const fn = new Function('', `return ( ${expression} )`);
-        let data = fn() as InjectData;
-        if (!data) data = {};
+      // Evaluate the expression
+      const fn = new Function('', `return ( ${expression} )`);
+      let data = fn() as InjectData;
+      if (!data) data = {};
 
-        // Extract options
-        if (data.options) {
-          options = data.options;
-          delete data.options;
-        }
-
-        app.viewModel = inject(data, app.viewModel as Record<string, unknown>, app.el, null, null, true);
-
-        const vm = app.viewModel as { afterBinding?: InjectOptions['afterBinding']; beforeBinding?: InjectOptions['beforeBinding'] };
-        afterBinding = vm.afterBinding || options.afterBinding;
-        beforeBinding = vm.beforeBinding || options.beforeBinding;
-      } catch (e) {
-        console.error('kb.Inject: Error evaluating kb-inject expression:', e);
+      // Extract options
+      if (data.options) {
+        options = data.options;
+        delete data.options;
       }
+
+      app.viewModel = inject(data, app.viewModel as Record<string, unknown>, app.el, null, null, true);
+      app.view_model = app.viewModel;
+
+      const vm = app.viewModel as { afterBinding?: InjectOptions['afterBinding']; beforeBinding?: InjectOptions['beforeBinding'] };
+      afterBinding = vm.afterBinding || options.afterBinding;
+      beforeBinding = vm.beforeBinding || options.beforeBinding;
     }
 
     // Auto-bind
@@ -203,6 +202,11 @@ export function registerInjectBinding(): void {
       },
     };
   }
+}
+
+export class Inject {
+  static inject = inject;
+  static injectViewModels = injectViewModels;
 }
 
 export default inject;

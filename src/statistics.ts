@@ -1,4 +1,7 @@
 import _ from 'underscore';
+import type { EventCallbackInfo } from './types.ts';
+
+type ModelEvent = { name: string; key: EventCallbackInfo['key']; [key: string]: unknown };
 
 /**
  * Statistics is an optional component useful for measuring application performance.
@@ -6,7 +9,7 @@ import _ from 'underscore';
  * and track the memory footprint (instance count) of ViewModels and collection observables.
  */
 export class Statistics {
-  modelEventsTracker: Array<{ name: string; key: string; [key: string]: unknown }> = [];
+  modelEventsTracker: ModelEvent[] = [];
   registeredTracker: Record<string, unknown[]> = {};
 
   constructor() {
@@ -25,7 +28,7 @@ export class Statistics {
    * Register a model event
    * @param event - The event to track
    */
-  addModelEvent(event: { name: string; key: string; [key: string]: unknown }): void {
+  addModelEvent(event: ModelEvent): void {
     this.modelEventsTracker.push(event);
   }
 

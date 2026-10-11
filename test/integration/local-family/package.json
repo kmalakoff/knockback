@@ -1,0 +1,55 @@
+{
+  "name": "knockback-local-family-integration",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "source": "src/type-consumer.ts",
+  "scripts": {
+    "build": "tsds build",
+    "format": "tsds format",
+    "refresh": "node scripts/refresh.ts",
+    "refresh:execute": "node scripts/refresh.ts --execute",
+    "test": "npm run validate && npm run test:refresh && npm run test:types && npm run test:links && npm run test:intended",
+    "test:browser": "wtr --config wtr.config.mjs browser/local-family.test.ts browser/orm-import.test.ts",
+    "test:intended": "node scripts/test-intended.ts",
+    "test:links": "node scripts/verify-links.ts",
+    "test:refresh": "tsds test:node --no-timeouts test/refresh.test.ts",
+    "test:types": "tsds build && npm --prefix types/cjs run build",
+    "validate": "tsds validate"
+  },
+  "dependencies": {
+    "backbone": "1.6.1",
+    "better-sqlite3": "11.10.0",
+    "inflection": "1.8.0",
+    "knex": "3.3.0",
+    "knockout": "3.5.1",
+    "lru-cache": "4.0.0",
+    "mongo-queue-cb": "npm:queue-cb@1.6.3",
+    "mongodb": "7.7.0",
+    "mongodb-connection-string-url": "7.0.2",
+    "pg": "8.20.0",
+    "underscore": "1.13.8"
+  },
+  "devDependencies": {
+    "@types/backbone": "1.4.23",
+    "@types/knockout": "3.4.77",
+    "@types/mocha": "10.0.10",
+    "@types/node": "18.19.130",
+    "@types/underscore": "1.13.0",
+    "@web/dev-server-import-maps": "0.3.0",
+    "cross-spawn": "7.0.6",
+    "fs-remove-compat": "1.0.2",
+    "node-exec-path": "1.2.4",
+    "ts-dev-stack": "1.22.1",
+    "tsds-biome": "1.21.6",
+    "tsds-config": "1.0.4",
+    "tsds-validate": "1.7.9",
+    "tsds-web-test-runner": "1.20.7"
+  },
+  "tsds": {
+    "targets": [
+      "cjs",
+      "esm"
+    ]
+  }
+}
