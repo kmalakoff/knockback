@@ -1,5 +1,6 @@
 import kb from '@mcpeasy/knockback';
 import Backbone from 'backbone';
+import ModelRef from 'backbone-modelref';
 import ko from 'knockout';
 
 /**
@@ -19,6 +20,29 @@ describe('Type Safety', () => {
   }
 
   class PersonModel extends Backbone.Model<PersonAttributes> {}
+
+  it('preserves the concrete model type for ModelRef inputs', () => {
+    const collection = new Backbone.Collection<PersonModel>();
+    const reference = new ModelRef(collection, 'person-1');
+    const vm = kb.viewModel<{ name: ko.Observable<string> }, PersonModel>(reference, { keys: ['name'] });
+    const model: PersonModel | null = vm.model();
+
+    if (model !== null) throw new Error('Expected an unloaded reference');
+
+    function checkModelReferenceTypes(): void {
+      class OtherModel extends Backbone.Model<{ title: string }> {}
+
+      // @ts-expect-error The declared concrete model type must match the reference.
+      kb.viewModel<{ name: ko.Observable<string> }, OtherModel>(reference);
+
+      // @ts-expect-error A model getter alone does not satisfy the reference ownership contract.
+      kb.viewModel({ model: () => new PersonModel({ name: 'invalid', age: 1 }) });
+    }
+    void checkModelReferenceTypes;
+
+    vm.dispose();
+    reference.release();
+  });
 
   describe('kb.observable<T>', () => {
     it('should infer correct type from model attribute', () => {

@@ -4,10 +4,10 @@ import _ from 'underscore';
 import { KB_DISPOSE_STATE } from './constants.ts';
 import { NotInitializedError } from './errors/index.ts';
 import { Factory } from './factory.ts';
-import type { Creator } from './internal-types.ts';
-import { _throwUnexpected, ignore, peek, publishMethods, wasReleased } from './kb.ts';
+import type { CreateOptions, FactoriesOption, KnockbackGlobal, StoredCreator } from './internal-types.ts';
+import { _throwUnexpected, ignore, isModel, peek, publishMethods, wasReleased } from './kb.ts';
 import { Store } from './store.ts';
-import type { CollectionObservable, CollectionObservableInternal, CollectionObservableOptions, InternalCollectionObservableOptions, InternalCreateOptions, Observable } from './types.ts';
+import type { CollectionCreator, CollectionCreatorItem, CollectionObservable, CollectionObservableInternal, CollectionObservableOptions, InternalCollectionObservableOptions, InternalCreateOptions, Observable, ViewModel } from './types.ts';
 import { attachDispose, collapseOptions, disposeMetadata, getObservable, pathJoin, setObservable, wrappedFactory, wrappedModel, wrappedObject, wrappedStore, wrappedStoreIsOwned } from './utils.ts';
 import { viewModel as viewModelFactory } from './view-model.ts';
 
@@ -17,7 +17,7 @@ const COMPARE_DESCENDING = 1;
 
 const KEYS_PUBLISH = ['dispose', 'shareOptions', 'filters', 'comparator', 'sortAttribute', 'viewModelByModel', 'hasViewModels'] as const;
 
-type ComparatorFn = (a: unknown, b: unknown) => number;
+type StoredComparator = (valueA: never, valueB: never) => number;
 type FilterFn = (model: Backbone.Model) => boolean;
 
 // =============================================================================
@@ -38,7 +38,7 @@ export interface CollectionObservableInstance {
   dispose(): void;
   shareOptions(): { store: unknown; factory: unknown };
   filters(filters?: unknown | unknown[]): void;
-  comparator(comparator: ComparatorFn | null): void;
+  comparator(comparator: StoredComparator | null): void;
   sortAttribute(sortAttribute: string | null): void;
   viewModelByModel(model: Backbone.Model): unknown | null;
   hasViewModels(): boolean;
@@ -53,7 +53,7 @@ export function compare(valueA: unknown, valueB: unknown): number {
   if (typeof valueB === 'string') {
     return valueB.localeCompare(String(valueA));
   }
-  return valueA === valueB ? COMPARE_EQUAL : valueA < valueB ? COMPARE_ASCENDING : COMPARE_DESCENDING;
+  return valueA === valueB ? COMPARE_EQUAL : (valueA as never) < (valueB as never) ? COMPARE_ASCENDING : COMPARE_DESCENDING;
 }
 
 // =============================================================================
@@ -68,7 +68,32 @@ export function compare(valueA: unknown, valueB: unknown): number {
  * @param options - Additional options
  * @returns A Knockout observable array with Knockback extensions
  */
-export function collectionObservable<T = unknown>(inputCollection: Backbone.Collection | Backbone.Model[] | Record<string, unknown>[], viewModelOrOptions?: CollectionObservableOptions<T> | CollectionObservableOptions<T>['viewModel'], options?: CollectionObservableOptions<T>): CollectionObservable<T>;
+type DefaultCollectionView<M extends Backbone.Model> = ViewModel<Record<string, unknown>, M>;
+
+type DirectCollectionCreator<M extends Backbone.Model> = (((model: M, options: CreateOptions) => unknown) & { modelsOnly?: boolean }) | ((new (model: M, options: CreateOptions) => unknown) & { modelsOnly?: boolean });
+type NonFalsy<T> = Exclude<T, false | null | undefined>;
+type RetainedCreatorResult<T> = T extends object ? T : unknown;
+type HasPossiblyTruthyProperty<O, K extends PropertyKey> = K extends keyof O ? (NonFalsy<O[K]> extends never ? false : true) : false;
+type CreatedOptionItem<O, M extends Backbone.Model> = 'create' extends keyof O ? (NonFalsy<O['create']> extends (model: M, options: CreateOptions) => infer T ? RetainedCreatorResult<T> : never) | (undefined extends O['create'] ? DefaultCollectionView<M> : never) : DefaultCollectionView<M>;
+type CreatorOptionItem<O, M extends Backbone.Model> = 'viewModel' extends keyof O ? (NonFalsy<O['viewModel']> extends infer C ? (C extends CollectionCreator<unknown, M> ? CollectionCreatorItem<C, M> : never) : never) | (undefined extends O['viewModel'] ? CreatedOptionItem<O, M> : never) : CreatedOptionItem<O, M>;
+type PresentModeItem<F, M extends Backbone.Model> = (true extends F ? M : never) | (Extract<F, false | undefined> extends never ? never : DefaultCollectionView<M>);
+type ModeOptionItem<O, M extends Backbone.Model> = 'modelsOnly' extends keyof O ? PresentModeItem<O['modelsOnly'], M> | CreatorOptionItem<O, M> : CreatorOptionItem<O, M>;
+type CollectionOptionsItem<O, M extends Backbone.Model> = HasPossiblyTruthyProperty<O, 'factory'> extends true ? unknown : HasPossiblyTruthyProperty<O, 'factories'> extends true ? unknown : HasPossiblyTruthyProperty<O, 'options'> extends true ? unknown : ModeOptionItem<O, M> | DefaultCollectionView<M>;
+type CollectionInferenceOptions<T, M extends Backbone.Model> = Omit<CollectionObservableOptions<T, M>, 'viewModel' | 'create' | 'modelsOnly' | 'factory' | 'factories'> & {
+  viewModel?: CollectionCreator<unknown, M>;
+  create?: (model: M, options: CreateOptions) => unknown;
+  modelsOnly?: boolean;
+  factory?: unknown;
+  factories?: FactoriesOption;
+};
+
+export function collectionObservable<M extends Backbone.Model, C extends DirectCollectionCreator<NoInfer<M>>>(inputCollection: Backbone.Collection<M> | M[], viewModelOrOptions: C): CollectionObservable<CollectionCreatorItem<C, M>>;
+export function collectionObservable<M extends Backbone.Model, O extends Record<string, unknown>>(inputCollection: Backbone.Collection<M> | M[], viewModelOrOptions: O & CollectionInferenceOptions<CollectionOptionsItem<O, M>, NoInfer<M>>): CollectionObservable<CollectionOptionsItem<O, M>>;
+export function collectionObservable<T = unknown, M extends Backbone.Model = Backbone.Model>(
+  inputCollection: Backbone.Collection<M> | M[] | Record<string, unknown>[],
+  viewModelOrOptions?: CollectionObservableOptions<NoInfer<T>, M> | CollectionObservableOptions<NoInfer<T>, M>['viewModel'],
+  options?: CollectionObservableOptions<NoInfer<T>, M>
+): CollectionObservable<T>;
 export function collectionObservable<T = unknown>(inputCollection?: Backbone.Collection | unknown[], viewModelOrOptions?: unknown, options?: CollectionObservableOptions<T>): CollectionObservable<T> {
   return ignore(() => {
     // Normalize arguments
@@ -82,9 +107,9 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
     }
 
     // Handle viewModel as function
-    let mergedOptions: CollectionObservableOptions<T> = {};
+    let mergedOptions: InternalCollectionObservableOptions<T> = {};
     if (typeof viewModelOrOptions === 'function') {
-      mergedOptions = { viewModel: viewModelOrOptions as Creator<T> };
+      mergedOptions = { viewModel: viewModelOrOptions as StoredCreator };
     } else if (viewModelOrOptions && typeof viewModelOrOptions === 'object') {
       Object.assign(mergedOptions, viewModelOrOptions);
     }
@@ -112,7 +137,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
 
     // Private state
     let _collection: ko.Observable<Backbone.Collection | null>;
-    let _comparator: ko.Observable<ComparatorFn | null>;
+    let _comparator: ko.Observable<StoredComparator | null>;
     let _filters: ko.ObservableArray<unknown>;
     let _mapper: ko.Computed<void>;
 
@@ -121,23 +146,23 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
     observable.__kb_is_co = true;
 
     // Options
-    mergedOptions = collapseOptions(mergedOptions) as CollectionObservableOptions<T>;
+    mergedOptions = collapseOptions(mergedOptions) as InternalCollectionObservableOptions<T>;
     if (mergedOptions.autoCompact) {
       state.autoCompact = true;
     }
 
     // Comparator
     if (mergedOptions.sortAttribute) {
-      _comparator = ko.observable(attributeComparator(mergedOptions.sortAttribute));
+      _comparator = ko.observable<StoredComparator | null>(attributeComparator(mergedOptions.sortAttribute));
     } else {
-      _comparator = ko.observable(mergedOptions.comparator || null);
+      _comparator = ko.observable<StoredComparator | null>(mergedOptions.comparator || null);
     }
 
     // Filters
     if (mergedOptions.filters) {
-      _filters = ko.observableArray(Array.isArray(mergedOptions.filters) ? mergedOptions.filters : [mergedOptions.filters]);
+      _filters = ko.observableArray<unknown>(Array.isArray(mergedOptions.filters) ? mergedOptions.filters : [mergedOptions.filters]);
     } else {
-      _filters = ko.observableArray([]);
+      _filters = ko.observableArray<unknown>([]);
     }
 
     // Store
@@ -149,7 +174,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
 
     // Factory
     state.path = mergedOptions.path;
-    createOptions.factory = wrappedFactory(observable, shareOrCreateFactory(mergedOptions as InternalCollectionObservableOptions));
+    createOptions.factory = wrappedFactory(observable, shareOrCreateFactory(mergedOptions));
     createOptions.path = pathJoin(mergedOptions.path, 'models');
 
     // Check for modelsOnly
@@ -163,7 +188,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
     attachDispose(observable, dispose);
 
     // Collection observable
-    _collection = ko.observable(collection);
+    _collection = ko.observable<Backbone.Collection | null>(collection);
 
     const collectionComputed = ko.computed({
       read: () => _collection(),
@@ -224,7 +249,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
 
         // Apply sorting
         if (comparatorFn) {
-          viewModels = filteredModels.map((model: Backbone.Model) => createViewModel(model)).sort(comparatorFn);
+          viewModels = filteredModels.map((model: Backbone.Model) => createViewModel(model)).sort(comparatorFn as (valueA: unknown, valueB: unknown) => number);
         } else {
           if (state.modelsOnly) {
             viewModels = filterList.length ? filteredModels : filteredModels.slice();
@@ -244,8 +269,8 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
     observable.subscribe(onObservableArrayChange);
 
     // Statistics
-    if (globalThis.statistics) {
-      globalThis.statistics.register('CollectionObservable', state);
+    if ((globalThis as KnockbackGlobal).statistics) {
+      ((globalThis as KnockbackGlobal).statistics as NonNullable<KnockbackGlobal['statistics']>).register('CollectionObservable', state);
     }
 
     return observable as CollectionObservable<T>;
@@ -281,13 +306,13 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
       state.create_options = undefined;
       disposeMetadata(state);
 
-      if (globalThis.statistics) {
-        globalThis.statistics.unregister('CollectionObservable', state);
+      if ((globalThis as KnockbackGlobal).statistics) {
+        ((globalThis as KnockbackGlobal).statistics as NonNullable<KnockbackGlobal['statistics']>).unregister('CollectionObservable', state);
       }
     }
 
     function shareOptions(): { store: unknown; factory: unknown } {
-      const obs = getObservable(state);
+      const obs = observable;
       return {
         store: wrappedStore(obs),
         factory: wrappedFactory(obs),
@@ -302,7 +327,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
       }
     }
 
-    function setComparator(comparatorFn: ComparatorFn | null): void {
+    function setComparator(comparatorFn: StoredComparator | null): void {
       _comparator(comparatorFn);
     }
 
@@ -335,7 +360,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
 
     function compact(): void {
       ignore(() => {
-        const obs = getObservable(state);
+        const obs = observable;
         if (!wrappedStoreIsOwned(obs)) return;
 
         const store = wrappedStore(obs) as Store;
@@ -348,7 +373,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
     // Private Helpers (closures)
     // =============================================================================
 
-    function shareOrCreateFactory(opts: InternalCollectionObservableOptions): Factory {
+    function shareOrCreateFactory(opts: InternalCollectionObservableOptions<T>): Factory {
       const absoluteModelsPath = pathJoin(opts.path, 'models');
       const factories = opts.factories;
 
@@ -356,7 +381,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
       const existingFactory = opts.factory as Factory | undefined;
       if (existingFactory) {
         const existingCreator = existingFactory.creatorForPath(null, absoluteModelsPath);
-        if (existingCreator && (!factories || (factories as Record<string, Creator>).models === existingCreator)) {
+        if (existingCreator && (!factories || (factories as Record<string, unknown>).models === existingCreator)) {
           if (!factories) return existingFactory;
           if (existingFactory.hasPathMappings(factories, opts.path)) {
             return existingFactory;
@@ -376,14 +401,14 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
           if (opts.modelsOnly) {
             factory.addPathMapping(absoluteModelsPath, { modelsOnly: true });
           } else {
-            factory.addPathMapping(absoluteModelsPath, viewModelFactory as unknown as Creator);
+            factory.addPathMapping(absoluteModelsPath, viewModelFactory);
           }
         } else if (opts.viewModel) {
           factory.addPathMapping(absoluteModelsPath, opts.viewModel);
         } else if (opts.create) {
           factory.addPathMapping(absoluteModelsPath, { create: opts.create });
         } else {
-          factory.addPathMapping(absoluteModelsPath, viewModelFactory as unknown as Creator);
+          factory.addPathMapping(absoluteModelsPath, viewModelFactory);
         }
       }
 
@@ -421,7 +446,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
             const comp = _comparator();
             if (comp) {
               (obs as ko.ObservableArray)().push(createViewModel(arg));
-              obs.sort(comp);
+              obs.sort(comp as (valueA: unknown, valueB: unknown) => number);
             } else {
               obs.splice(coll.indexOf(arg), 0, createViewModel(arg));
             }
@@ -450,7 +475,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
             if (!comp) return;
 
             state.in_edit++;
-            (getObservable(state) as ko.ObservableArray).sort(comp);
+            (getObservable(state) as ko.ObservableArray).sort(comp as (valueA: unknown, valueB: unknown) => number);
             state.in_edit--;
             break;
           }
@@ -484,26 +509,39 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
         if (state.modelsOnly) {
           models = hasFilters ? (modelsOrViewModels.filter((model) => selectModel(model as Backbone.Model)) as Backbone.Model[]) : (modelsOrViewModels as Backbone.Model[]);
         } else {
-          if (hasFilters) viewModels = [];
-          models = [];
-
-          for (const vm of modelsOrViewModels) {
-            const model = wrappedObject(vm) as Backbone.Model;
-
-            if (hasFilters) {
-              if (!selectModel(model)) continue;
-              (viewModels as unknown[]).push(vm);
+          const candidates = modelsOrViewModels.map((viewModel) => {
+            if ((typeof viewModel !== 'object' || viewModel === null) && typeof viewModel !== 'function') {
+              throw new TypeError('CollectionObservable array items must be objects or functions');
             }
+            const model = wrappedObject(viewModel);
+            if (!isModel(model)) {
+              throw new TypeError('CollectionObservable array items must wrap a model');
+            }
+            return { model, viewModel };
+          });
+          const selected = hasFilters ? candidates.filter(({ model }) => selectModel(model)) : candidates;
 
-            // Retain in store
-            const store = state.create_options?.store as Store;
-            const currentViewModel = state.create_options?.creator ? store.find(model, state.create_options?.creator) : null;
+          if (hasFilters) viewModels = selected.map(({ viewModel }) => viewModel);
+          models = [];
+          const store = state.create_options?.store as Store;
+          const creator = state.create_options?.creator;
+          const planned = new Map<string | Backbone.Model, object>();
+
+          for (const { model, viewModel } of selected) {
+            const cachedViewModel = creator ? store.find(model, creator) : null;
+            const key = model.cid || model;
+            const currentViewModel = creator ? planned.get(key) || cachedViewModel : null;
             if (currentViewModel) {
-              if (currentViewModel.constructor !== (vm as object).constructor) {
+              if (currentViewModel.constructor !== viewModel.constructor) {
                 _throwUnexpected({ constructor: { name: 'CollectionObservable' } }, 'replacing different type of view model');
               }
             }
-            store.retain(vm, model, state.create_options?.creator);
+            if (creator) planned.set(key, viewModel);
+          }
+
+          for (const { model, viewModel } of selected) {
+            // Retain in store
+            store.retain(viewModel, model, creator);
             models.push(model);
           }
         }
@@ -519,7 +557,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
       });
     }
 
-    function attributeComparator(attr: string): ComparatorFn {
+    function attributeComparator(attr: string): StoredComparator {
       const modelAttributeCompare = (modelA: Backbone.Model, modelB: Backbone.Model): number => {
         const attributeName = ko.utils.unwrapObservable(attr);
         return compare(modelA.get(attributeName), modelB.get(attributeName));
@@ -530,7 +568,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
       }
 
       return (a: unknown, b: unknown): number => {
-        return modelAttributeCompare(wrappedModel(a) as Backbone.Model, wrappedModel(b) as Backbone.Model);
+        return modelAttributeCompare(wrappedModel(a as object) as Backbone.Model, wrappedModel(b as object) as Backbone.Model);
       };
     }
 

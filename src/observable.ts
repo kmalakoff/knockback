@@ -3,9 +3,10 @@ import ko from 'knockout';
 import { KB_DISPOSE_STATE } from './constants.ts';
 import { EventWatcher } from './event-watcher.ts';
 import { Factory } from './factory.ts';
+import type { KnockbackGlobal } from './internal-types.ts';
 import { _throwMissing, getValue, ignore, peek, publishMethods, setValue } from './kb.ts';
 import { TypedValue } from './typed-value.ts';
-import type { InternalObservableOptions, Observable, ObservableBase, ObservableInternal, ObservableOptions, ValueType, ViewModelOptions } from './types.ts';
+import type { InternalObservableOptions, KBMetadata, ModelInput, Observable, ObservableBase, ObservableInternal, ObservableOptions, ValueType, ViewModelOptions } from './types.ts';
 import { TYPE_UNKNOWN } from './types.ts';
 import { attachDispose, collapseOptions, disposeMetadata, getEventWatcher, pathJoin, setObservable, unwrapModels, wrappedFactory, wrappedStore } from './utils.ts';
 
@@ -29,7 +30,7 @@ export interface ObservableInstance {
   _model?: ko.Observable<Backbone.Model | null>;
   model?: ko.Computed<Backbone.Model | null>;
   __kb_dispose?: number;
-  __kb?: unknown;
+  __kb?: KBMetadata | null;
 
   // Methods
   dispose(): void;
@@ -37,6 +38,15 @@ export interface ObservableInstance {
   valueType(): ValueType;
   update(newValue?: unknown): void;
 }
+
+/** Creates a typed Knockout observable bound to a Backbone model attribute. */
+export function observable<T = unknown, M extends Backbone.Model = Backbone.Model>(model: ModelInput<M>, keyOrInfo: string, options?: ViewModelOptions, vm?: Record<string, unknown>): Observable<T, M>;
+export function observable<T = unknown, M extends Backbone.Model = Backbone.Model, Args extends unknown[] = unknown[], RawRead = T, RawWrite = T>(
+  model: ModelInput<M>,
+  keyOrInfo: ObservableOptions<NoInfer<T>, Args, NoInfer<RawRead>, NoInfer<RawWrite>>,
+  options?: ViewModelOptions,
+  vm?: Record<string, unknown>
+): Observable<T, M>;
 
 // =============================================================================
 // Factory Function (Primary API)
@@ -51,7 +61,7 @@ export interface ObservableInstance {
  * @param vm - Parent view model context
  * @returns A Knockout observable with Knockback extensions
  */
-export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo: string | ObservableOptions, options?: ViewModelOptions, vm: Record<string, unknown> = {}): Observable<T> {
+export function observable<T = unknown, M extends Backbone.Model = Backbone.Model>(model: ModelInput<M>, keyOrInfo: string | ObservableOptions, options?: ViewModelOptions, vm: Record<string, unknown> = {}): Observable<T, M> {
   return ignore(() => {
     if (!keyOrInfo) _throwMissing({ constructor: { name: 'Observable' } }, 'key_or_info');
 
@@ -77,6 +87,7 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
 
     const createOptions = collapseOptions(options) as InternalObservableOptions;
     const eventWatcher = createOptions.eventWatcher;
+    let activeEventWatcher: EventWatcher | undefined;
     delete createOptions.eventWatcher;
 
     // Set up basics
@@ -96,7 +107,9 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
 
           // Update event watcher
           const ew = getEventWatcher(state);
-          ew?.emitter(_model || null);
+          if (!ew?.modelRef) {
+            ew?.emitter(_model || null);
+          }
 
           if (state.read) {
             updateWithValue(state.read.apply(state._vm, args));
@@ -147,20 +160,11 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
 
     // Create model computed
     const modelComputed = ko.computed({
-      read: () => ko.utils.unwrapObservable(state._model),
+      read: () => ko.utils.unwrapObservable(state._model as NonNullable<typeof state._model>),
       write: (newModel: Backbone.Model | null) => {
         ignore(() => {
-          if (!state._model) return;
-          if ((state.__kb_dispose && state.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) || peek(state._model) === newModel) return;
-
-          const newValue = getValue(newModel, peek(state.key), state.args);
-          state._model?.(newModel);
-
-          if (!newModel) {
-            updateWithValue(null);
-          } else if (newValue !== undefined) {
-            updateWithValue(newValue);
-          }
+          if (state.__kb_dispose && state.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) return;
+          activeEventWatcher?.emitter(newModel);
         });
       },
     });
@@ -168,9 +172,9 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
     (koObservable as ObservableInternal).model = state.model = modelComputed;
 
     // Set up event watcher
-    EventWatcher.useOptionsOrCreate({ eventWatcher: eventWatcher }, model || null, state, {
+    activeEventWatcher = EventWatcher.useOptionsOrCreate({ eventWatcher: eventWatcher }, model || null, state, {
       obj: state,
-      emitter: (m: Backbone.Model | null) => state.model?.(m),
+      emitter: (m: Backbone.Model | null) => updateModel(m),
       update: () => ignore(() => update()),
       key: state.key as string,
       path: createOptions.path,
@@ -189,11 +193,11 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
     }
 
     // Wrap with default observable if specified (plugin support)
-    if (typeof globalThis.defaultObservable === 'function' && Object.hasOwn(info, 'default')) {
-      result = globalThis.defaultObservable(result, info.default);
+    if (typeof (globalThis as KnockbackGlobal).defaultObservable === 'function' && Object.hasOwn(info, 'default')) {
+      result = ((globalThis as KnockbackGlobal).defaultObservable as NonNullable<KnockbackGlobal['defaultObservable']>)(result, info.default);
     }
 
-    return result as Observable;
+    return result as Observable<T, M>;
 
     // =============================================================================
     // Instance Methods (closures)
@@ -207,7 +211,7 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
       state.model?.dispose();
       state.model = undefined;
       if (koObservable) {
-        (koObservable as unknown as ObservableInternal).model = undefined;
+        (koObservable as unknown as { model?: ObservableInternal['model'] }).model = undefined;
       }
       disposeMetadata(state);
     }
@@ -227,13 +231,27 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
       state._value?.update(newValue);
     }
 
+    function updateModel(newModel: Backbone.Model | null): void {
+      if (!state._model) return;
+      if ((state.__kb_dispose && state.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) || peek(state._model) === newModel) return;
+
+      const newValue = getValue(newModel, peek(state.key), state.args);
+      state._model(newModel);
+
+      if (!newModel) {
+        updateWithValue(null);
+      } else if (newValue !== undefined) {
+        updateWithValue(newValue);
+      }
+    }
+
     // Update by reading from model (no argument)
     function update(): void {
       if ((state.__kb_dispose && state.__kb_dispose >= KB_DISPOSE_STATE.DISPOSING) || !state._model) return;
       const newValue = getValue(peek(state._model), peek(state.key));
       state._value?.update(newValue);
     }
-  }) as Observable<T>;
+  }) as unknown as Observable<T, M>;
 }
 
 export default observable;

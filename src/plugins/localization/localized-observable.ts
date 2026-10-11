@@ -1,5 +1,6 @@
 import ko from 'knockout';
 import { KB_DISPOSE_STATE } from '../../constants.ts';
+import type { KnockbackGlobal } from '../../internal-types.ts';
 import { _throwMissing, _throwUnexpected, publishMethods } from '../../kb.ts';
 import type { LocaleManager } from '../../types.ts';
 import { attachDispose, disposeMetadata, getObservable, setObservable } from '../../utils.ts';
@@ -65,7 +66,7 @@ export function localizedObservable(value: unknown, options: LocalizedObservable
   if (!options?.read) {
     _throwMissing({ constructor: { name: 'localizedObservable' } }, 'options.read');
   }
-  if (!globalThis.kb?.localeManager) {
+  if (!(globalThis as KnockbackGlobal).kb?.localeManager) {
     _throwMissing({ constructor: { name: 'localizedObservable' } }, 'kb.localeManager');
   }
 

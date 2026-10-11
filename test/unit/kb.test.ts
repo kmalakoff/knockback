@@ -2,6 +2,7 @@ import kb, { viewModel } from '@mcpeasy/knockback';
 import assert from 'assert';
 import Backbone from 'backbone';
 import ko from 'knockout';
+import { ignore } from '../../src/kb.ts';
 
 describe('@mcpeasy/knockback', () => {
   describe('kb namespace', () => {
@@ -17,6 +18,71 @@ describe('@mcpeasy/knockback', () => {
       assert.strictEqual(kb.TYPE_MODEL, 3);
       assert.strictEqual(kb.TYPE_COLLECTION, 4);
     });
+  });
+
+  describe('ignore()', () => {
+    it('preserves callback target, tuple order and return value', () => {
+      const target = { base: 7 };
+      const observed: unknown[] = [];
+
+      const result = ignore(
+        function (this: typeof target, left: number, right: string) {
+          observed.push(this, left, right);
+          return this.base + left + right.length;
+        },
+        target,
+        [2, 'abc']
+      );
+
+      assert.strictEqual(result, 12);
+      assert.deepStrictEqual(observed, [target, 2, 'abc']);
+      assert.strictEqual(
+        ignore(() => 'zero'),
+        'zero'
+      );
+      assert.strictEqual(
+        ignore((value?: number) => value ?? 4),
+        4
+      );
+    });
+
+    it('does not capture callback dependencies', () => {
+      const source = ko.observable(1);
+      let evaluations = 0;
+      const outer = ko.computed(() => {
+        evaluations += 1;
+        return ignore(() => source());
+      });
+
+      try {
+        assert.strictEqual(outer(), 1);
+        assert.strictEqual(evaluations, 1);
+        source(2);
+        assert.strictEqual(evaluations, 1);
+        assert.strictEqual(outer(), 1);
+      } finally {
+        outer.dispose();
+      }
+    });
+
+    function checkIgnoreTypes(): void {
+      // @ts-expect-error A required callback argument tuple cannot be omitted.
+      ignore((value: number) => value + 1);
+      // @ts-expect-error A callback target does not supply required arguments.
+      ignore((value: number) => value + 1, undefined);
+      // @ts-expect-error Callback argument tuples retain their element types.
+      ignore((value: number) => value + 1, undefined, ['bad']);
+      // @ts-expect-error A required callback argument tuple cannot be incomplete.
+      ignore((left: number, right: string) => left + right.length, undefined, [1]);
+      ignore(
+        function (this: { base: number }) {
+          return this.base;
+        },
+        // @ts-expect-error Callback targets must satisfy the callback this type.
+        { base: 'bad' }
+      );
+    }
+    void checkIgnoreTypes;
   });
 
   describe('kb.observable', () => {
